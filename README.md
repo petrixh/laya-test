@@ -290,9 +290,14 @@ adding a third option to the working question -- fails badly:
 
 | framing | all | named objects | held-out objects |
 |---|---|---|---|
-| **split** (2-option choice + a `noul` barrier question) | **0.933** | 1.000 | 0.889 |
-| two_noul (barrier? hangs overhead?) | 0.600 | 0.667 | 0.556 |
-| choice3 (one 3-option question) | 0.400 | 0.500 | 0.333 |
+| **split** (2-option choice + a `noul` barrier question) | **0.800** | 0.750 | 0.833 |
+| two_noul (barrier? hangs overhead?) | 0.567 | 0.500 | 0.611 |
+| choice3 (one 3-option question) | 0.500 | 0.750 | 0.333 |
+
+(Scored across two sentence phrasings per object. An earlier version of this
+table read 0.933 for `split`; that came from a single phrasing, and a code
+review found the second one was defined but never used. The ordering is
+unchanged, the headline number was optimistic.)
 
 `choice3` mostly answers "impassable" to everything, which is the same collapse
 the single-lane sweep found when a third option was added (two 0.65, three 0.51).

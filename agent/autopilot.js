@@ -11,13 +11,13 @@
  * (an empty lane beats a manoeuvre, never enter a barrier). Nothing pre-ranks
  * the options for the model.
  *
- * The question is the `split` framing, which scored 0.933 in
- * eval/obstacle_class.py (1.000 on named objects, 0.889 on held-out ones):
- * the validated two-option ground-versus-air choice, plus a separate noul for
- * "is this a solid barrier?". Folding the barrier in as a third choice option
- * instead collapses accuracy to 0.27-0.40 -- option count is the sharpest edge
- * on this model, so the third class gets its own question rather than a third
- * label. Both ride in one forward pass.
+ * The question is the `split` framing, which scored 0.800 in
+ * eval/obstacle_class.py across two sentence phrasings (0.750 on named
+ * objects, 0.833 on held-out ones): the validated two-option ground-versus-air
+ * choice, plus a separate noul for "is this a solid barrier?". Folding the
+ * barrier in as a third choice option instead collapses accuracy to 0.27-0.50
+ * -- option count is the sharpest edge on this model, so the third class gets
+ * its own question rather than a third label. Both ride in one forward pass.
  */
 (function () {
   'use strict';
@@ -92,6 +92,7 @@
     config: Object.assign({}, DEFAULTS),
     running: false,
     laneNeed: 'idle',
+    currentNeed: null,
     trace: [],
     stats: null,
     onUpdate: null,
@@ -370,7 +371,7 @@
     }
 
     const wave = currentWave();
-    if (!wave) { rj.setDuck(false); return; }
+    if (!wave) { api.currentNeed = null; rj.setDuck(false); return; }
 
     const ttc = -wave.z / Math.max(1e-3, s.speed);
 
@@ -386,6 +387,8 @@
         lastSeen = { id: idOf(o), type: o.type, ttc };
       }
     }
+    // what the model says about the wave in front of us, right now, for the HUD
+    api.currentNeed = need.slice();
 
     // harness preference, used directly in 'rule' mode and as the fallback
     // while stage two is still in flight

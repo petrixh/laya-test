@@ -75,9 +75,12 @@ function serveMock(accuracy, latencyMs) {
         const text = typeof st === 'string' ? st : JSON.stringify(st);
         const truth = BARRIER.test(text) ? 'block' : DUCKABLE.test(text) ? 'duck' : 'jump';
         const right = Math.random() < accuracy;
-        const klass = right
-          ? truth
-          : ['jump', 'duck', 'block'][(Math.random() * 3) | 0];
+        // Draw a wrong answer from the classes that are NOT the truth. Drawing
+        // from all three delivered a + (1-a)/3, so a stated 0.30 came out at
+        // 0.55 -- which would read as a five-point error in the grading path
+        // the mock exists to validate.
+        const others = ['jump', 'duck', 'block'].filter((c) => c !== truth);
+        const klass = right ? truth : others[(Math.random() * others.length) | 0];
 
         const answers = {};
         // the autopilot thresholds the barrier noul at 0.5, so put the mock's

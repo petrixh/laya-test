@@ -5,7 +5,6 @@
     "endpoint": "http://100.121.51.97:8000",
     "decisions": 120,
     "laneChoice": "model",
-    "laneShield": false,
     "seconds": 1200,
     "out": "runs/gated",
     "video": true,
@@ -52,5 +51,6 @@
     }
   },
   "deaths_with_correct_verdict": 0,
-  "deaths_by_verdict": {}
+  "deaths_by_verdict": {},
+  "note": "options.laneShield has been removed from this record: the flag existed when the run was made but was never read, so it would read as a varied condition. Candidate lanes were filtered unconditionally, as they still are."
 }

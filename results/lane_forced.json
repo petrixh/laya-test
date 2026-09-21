@@ -11,7 +11,7 @@
     "torch": null,
     "threads": 0,
     "ready": true,
-    "load_seconds": 0.9106523749651387,
+    "load_seconds": 0.6073747499613091,
     "question_types": [
       "choice",
       "score",
@@ -74,7 +74,7 @@
     {
       "pair": "jump vs duck",
       "order_consistent": 0.0,
-      "picks_better": 0.5,
+      "picks_better": null,
       "mean_confidence": 0.424
     }
   ]

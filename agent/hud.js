@@ -319,18 +319,18 @@
       const rj = window.__rj;
       if (rj) {
         $('lh-dist').innerHTML = Math.floor(rj.state.distance) + '<small> m</small>';
-        // Lane strip: filled = heading there, red = *the model* called it a
-        // barrier. This used to read o.def.kind, which is the game's own
-        // answer -- so the recordings showed walls flagged red before the
-        // model had said anything about them.
+        // Lane strip: filled = heading there, red = the model called THIS
+        // wave's obstacle in that lane a barrier.
+        //
+        // Two wrong versions preceded this one. Reading o.def.kind showed the
+        // game's own answer, so walls went red before the model had spoken.
+        // Scanning the whole trace for past 'block' verdicts accumulated them
+        // by lane, so within about forty decisions every occupied lane was red
+        // whatever the model had said. The autopilot now publishes the current
+        // wave's readings and the strip shows only those.
+        const need = autopilot.currentNeed;
         const blocked = new Set();
-        for (const t of autopilot.trace) {
-          if (t.stage === 'lane' || t.pred !== 'block') continue;
-          if (t.lane !== undefined) blocked.add(t.lane);
-        }
-        const live = new Set(rj.obstacles.filter(o => o.mesh.position.z > -40)
-                                         .map(o => o.lane));
-        for (const l of [...blocked]) if (!live.has(l)) blocked.delete(l);
+        if (need) for (let l = 0; l < need.length; l++) if (need[l] === 'block') blocked.add(l);
         for (const node of document.querySelectorAll('#laya-hud .lanes span')) {
           const l = Number(node.dataset.l);
           node.classList.toggle('on', l === rj.state.lane);

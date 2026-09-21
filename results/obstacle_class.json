@@ -11,7 +11,7 @@
     "torch": null,
     "threads": 0,
     "ready": true,
-    "load_seconds": 0.6117500830441713,
+    "load_seconds": 0.6073747499613091,
     "question_types": [
       "choice",
       "score",
@@ -22,44 +22,48 @@
     {
       "framing": "split",
       "labels": "neutral",
-      "accuracy": 0.933,
-      "named": 1.0,
-      "held_out": 0.889,
+      "accuracy": 0.8,
+      "named": 0.75,
+      "held_out": 0.833,
       "errors": {
-        "jump->block": 1
+        "jump->block": 3,
+        "duck->block": 3
       }
     },
     {
       "framing": "split",
       "labels": "descriptive",
-      "accuracy": 0.8,
-      "named": 0.833,
-      "held_out": 0.778,
+      "accuracy": 0.633,
+      "named": 0.667,
+      "held_out": 0.611,
       "errors": {
-        "jump->duck": 2,
-        "jump->block": 1
+        "jump->duck": 5,
+        "jump->block": 3,
+        "duck->block": 3
       }
     },
     {
       "framing": "two_noul",
       "labels": "neutral",
-      "accuracy": 0.6,
-      "named": 0.667,
-      "held_out": 0.556,
+      "accuracy": 0.567,
+      "named": 0.5,
+      "held_out": 0.611,
       "errors": {
+        "jump->duck": 2,
+        "jump->block": 3,
         "duck->jump": 5,
-        "jump->block": 1
+        "duck->block": 3
       }
     },
     {
       "framing": "choice3",
       "labels": "neutral",
-      "accuracy": 0.4,
-      "named": 0.5,
+      "accuracy": 0.5,
+      "named": 0.75,
       "held_out": 0.333,
       "errors": {
-        "jump->block": 4,
-        "duck->block": 5
+        "jump->block": 7,
+        "duck->block": 8
       }
     },
     {
@@ -69,8 +73,8 @@
       "named": 0.167,
       "held_out": 0.333,
       "errors": {
-        "jump->block": 6,
-        "duck->block": 5
+        "jump->block": 12,
+        "duck->block": 10
       }
     }
   ]
