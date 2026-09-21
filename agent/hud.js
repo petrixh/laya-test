@@ -29,7 +29,9 @@
     --s2: #d95926;   /* duck  */
     --s3: #199e70;   /* run   */
     --latency: #9085e9;
+    --lane: #d55181;       /* one hue: these bars are one measure over three lanes */
     --good: #0ca30c;
+    --warning: #fab219;
     --critical: #d03b3b;
 
     position: fixed; top: 0; right: 0; bottom: 0;
@@ -52,7 +54,34 @@
   #laya-hud .lbl {
     font-size: 9.5px; letter-spacing: 1.6px; color: var(--muted);
     text-transform: uppercase; margin-bottom: 8px;
+    display: flex; justify-content: space-between; align-items: baseline;
   }
+  #laya-hud .tag {
+    font-size: 9px; letter-spacing: 1.2px; padding: 1px 6px; border-radius: 3px;
+    background: var(--raised); color: var(--muted);
+  }
+  #laya-hud .tag.forced { background: var(--warning); color: #201a04; font-weight: 700; }
+  #laya-hud .tag.bad { background: var(--critical); color: #fff; font-weight: 700; }
+
+  /* stage two: probability across the three lanes. one measure, so one hue. */
+  #laya-hud .lane-row {
+    display: grid; grid-template-columns: 14px 1fr 34px; gap: 8px;
+    align-items: center; margin-bottom: 6px;
+  }
+  #laya-hud .lane-row:last-child { margin-bottom: 0; }
+  #laya-hud .lane-row b { font-size: 10px; color: var(--muted); font-weight: 600; }
+  #laya-hud .lane-row .trk { height: 8px; background: var(--raised); border-radius: 4px; overflow: hidden; }
+  #laya-hud .lane-row .fill {
+    height: 100%; width: 0; border-radius: 4px; background: var(--lane); opacity: .45;
+    transition: width .18s ease-out, opacity .18s;
+  }
+  #laya-hud .lane-row i {
+    font-style: normal; font-size: 10.5px; color: var(--ink-2);
+    font-variant-numeric: tabular-nums; text-align: right;
+  }
+  #laya-hud .lane-row.pick .fill { opacity: 1; }
+  #laya-hud .lane-row.pick b, #laya-hud .lane-row.pick i { color: var(--ink); font-weight: 700; }
+  #laya-hud .lane-row.wall b { color: var(--critical); }
 
   /* hero: the action currently being executed */
   #laya-hud .hero { display: flex; align-items: baseline; gap: 10px; }
@@ -148,6 +177,20 @@
       bars.appendChild(b);
     }
     root.appendChild(bars);
+
+    const lane = el('div', 'sec');
+    lane.id = 'lh-lanesec';
+    lane.appendChild(el('div', 'lbl',
+      '<span>Lane choice</span><span class="tag" id="lh-lanetag">waiting</span>'));
+    for (let i = 0; i < 3; i++) {
+      const r = el('div', 'lane-row');
+      r.id = 'lh-lane-' + i;
+      r.innerHTML = `<b>${['L', 'M', 'R'][i]}</b>`
+        + `<div class="trk"><div class="fill" id="lh-lf-${i}"></div></div>`
+        + `<i id="lh-lp-${i}">--</i>`;
+      lane.appendChild(r);
+    }
+    root.appendChild(lane);
 
     const lat = el('div', 'sec');
     lat.appendChild(el('div', 'lbl', 'Inference latency &middot; ms'));
@@ -260,6 +303,10 @@
       $('lh-crash').textContent = st.deaths;
       $('lh-acc').textContent = st.decisions
         ? (100 * st.correct / st.decisions).toFixed(1) + '%' : '--';
+      if (st.laneDecisions) {
+        $('lh-lanesec').querySelector('.lbl > span').textContent =
+          `Lane choice · ${st.laneDecisions}`;
+      }
       const rj = window.__rj;
       if (rj) {
         $('lh-dist').innerHTML = Math.floor(rj.state.distance) + '<small> m</small>';
@@ -290,7 +337,28 @@
       }
     }
 
+    function paintLane(d, need) {
+      if (!d || d.status !== 'done') return;
+      const tag = $('lh-lanetag');
+      // "forced" = the lane the reindeer is standing in was called a barrier,
+      // so stage two had to move it. Otherwise the choice was optional.
+      tag.textContent = d.contradiction ? 'CHOSE A WALL' : d.forced ? 'FORCED' : 'optional';
+      tag.className = 'tag' + (d.contradiction ? ' bad' : d.forced ? ' forced' : '');
+      for (let i = 0; i < 3; i++) {
+        const p = d.probs[i] || 0;
+        $('lh-lp-' + i).textContent = p.toFixed(2);
+        $('lh-lf-' + i).style.width = Math.max(1.5, p * 100) + '%';
+        const row = $('lh-lane-' + i);
+        row.classList.toggle('pick', i === d.lane);
+        row.classList.toggle('wall', need && need[i] === 'block');
+      }
+    }
+
     autopilot.onUpdate = paintDecision;
+    autopilot.onLane = paintLane;
+    if (autopilot.config.laneChoice !== 'model') {
+      $('lh-lanetag').textContent = 'harness rule';
+    }
     setInterval(paintStats, 120);
     addEventListener('resize', () => drawSpark(spark, autopilot.stats.latencies.slice(-SPARK_N)));
   }

@@ -32,6 +32,15 @@
     duckUntil: -0.12,
     autoRestart: true,
     maxDecisions: 0,
+    // 'model' asks Laya which lane to take (two-stage); 'rule' uses the
+    // harness preference. Defaults to 'rule' because stage two does not work:
+    // it scores no better than always answering "left" and drives into a wall
+    // on a quarter of waves. See eval/lane_choice.py and the README.
+    laneChoice: 'rule',
+    // Refuse a lane that stage one called a barrier. Off by default: the point
+    // is to measure stage two unguarded. When on it is still the model's own
+    // output doing the guarding, not ground truth.
+    laneShield: false,
   };
 
   // Plain English for the game's type names. Naming a thing is not a hint
@@ -59,6 +68,29 @@
     },
   };
 
+  // Stage two. Best of 20 framings in eval/lane_choice.py at 0.875
+  // picks-passable: neutral labels, bare criteria, plain instruction, and the
+  // reindeer's current lane left unstated -- all four of those helped. Putting
+  // the preference into the instruction actively hurt (0.700).
+  const LANE_LABELS = ['option_a', 'option_b', 'option_c'];
+  const LANE_WORDS = ['left', 'middle', 'right'];
+  const LANE_DESC = {
+    clear: 'clear, with nothing in it',
+    jump: 'something resting on the snow that has to be jumped over',
+    duck: 'something hanging overhead that has to be ducked under',
+    block: 'a solid barrier that cannot be passed at all',
+    unknown: 'not yet identified',
+  };
+  const LANE_QUESTION = {
+    lane: {
+      type: 'choice',
+      instructions: 'Which lane should the reindeer take?',
+      criteria: {
+        option_a: 'the left lane', option_b: 'the middle lane', option_c: 'the right lane',
+      },
+    },
+  };
+
   const PLAYER_DEPTH = 0.65;   // the game's collision half-depth
   const WAVE_Z = 3;            // obstacles within this z of each other are one wave
 
@@ -68,6 +100,7 @@
     trace: [],
     stats: null,
     onUpdate: null,
+    onLane: null,
     start, stop, reset,
   };
 
@@ -79,12 +112,16 @@
   let inFlight = 0;
   let runIndex = 0;
   let lastSeen = null;
+  let laneCalls = new Map();   // wave key -> stage-two result
+  let laneInFlight = 0;
 
   function freshStats() {
     return {
       decisions: 0, correct: 0, byAction: {}, latencies: [],
       deaths: 0, bestDistance: 0, lastDistance: 0,
       errors: 0, deathLog: [], laneChanges: 0,
+      laneDecisions: 0, laneForced: 0, laneContradictions: 0,
+      laneLatencies: [],
     };
   }
 
@@ -92,6 +129,7 @@
     api.trace = [];
     api.stats = freshStats();
     decisions = new Map();
+    laneCalls = new Map();
     ids = new WeakMap();
     nextId = 1;
   }
@@ -195,6 +233,56 @@
     }
   }
 
+  /** Stage two: hand the model its own stage-one readings and ask for a lane. */
+  async function askLane(key, need, forced) {
+    const entry = { status: 'pending', forced };
+    laneCalls.set(key, entry);
+    laneInFlight++;
+    try {
+      const sentence = [0, 1, 2].map(i =>
+        `The ${LANE_WORDS[i]} lane is ${LANE_DESC[need[i] === null ? 'clear' : need[i]]}.`
+      ).join(' ');
+      const t0 = performance.now();
+      const res = await fetch(api.config.endpoint + '/predict', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ state: sentence, questions: LANE_QUESTION }),
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const body = await res.json();
+      const a = body.answers.lane;
+      const wall = performance.now() - t0;
+      const lane = LANE_LABELS.indexOf(a.choice);
+      const probs = LANE_LABELS.map(l => a.probabilities[l] || 0);
+
+      Object.assign(entry, {
+        status: 'done', lane, probs, confidence: a.confidence, wallMs: wall,
+        // stage two picking a lane stage one called a barrier is the model
+        // contradicting itself, and worth counting separately from a miss
+        contradiction: need[lane] === 'block',
+      });
+      const st = api.stats;
+      st.laneDecisions++;
+      st.laneLatencies.push(wall);
+      if (forced) st.laneForced++;
+      if (entry.contradiction) st.laneContradictions++;
+      api.trace.push({
+        stage: 'lane', run: runIndex, distance: Math.floor(rj.state.distance),
+        lanes: need.map(n => n === null ? 'clear' : n),
+        forced, chose: lane, contradiction: entry.contradiction,
+        probabilities: { left: probs[0], middle: probs[1], right: probs[2] },
+        confidence: a.confidence, server_ms: body.latency_ms,
+        wall_ms: Number(wall.toFixed(1)),
+      });
+      if (api.onLane) api.onLane(entry, need);
+    } catch (err) {
+      entry.status = 'error';
+      api.stats.errors++;
+    } finally {
+      laneInFlight--;
+    }
+  }
+
   // ---------------------------------------------------------------- loop
 
   function reachedLimit() {
@@ -265,17 +353,41 @@
       }
     }
 
-    // prefer an empty lane, then a manoeuvre we know, then an unclassified one;
-    // never a lane the model called a barrier
+    // harness preference, used directly in 'rule' mode and as the fallback
+    // while stage two is still in flight
     const usable = [0, 1, 2].filter(l => need[l] !== 'block');
     const rank = l => (need[l] === null ? 0 : need[l] === 'unknown' ? 2 : 1);
-    const target = usable.length
+    const ruleTarget = usable.length
       ? usable.reduce((a, b) => {
           const ra = rank(a), rb = rank(b);
           if (ra !== rb) return ra < rb ? a : b;
           return Math.abs(b - s.lane) < Math.abs(a - s.lane) ? b : a;
         })
       : s.lane;                       // every lane called blocked: hold and hope
+
+    let target = ruleTarget;
+    if (api.config.laneChoice === 'model') {
+      // one stage-two call per wave, once every obstacle in it has a reading
+      const key = Math.min(...wave.group.map(idOf));
+      const settled = wave.group.every(o => {
+        const d = decisions.get(idOf(o));
+        return d && d.status !== 'pending';
+      });
+      let lc = laneCalls.get(key);
+      if (!lc && settled && laneInFlight < 2 && !reachedLimit()) {
+        askLane(key, need, need[s.lane] === 'block');
+        lc = laneCalls.get(key);
+      }
+      if (lc && lc.status === 'done') {
+        target = lc.lane;
+        if (api.config.laneShield && need[target] === 'block') target = ruleTarget;
+      }
+      if (laneCalls.size > 64) {
+        const keep = new Map();
+        for (const [k, v] of laneCalls) if (k > nextId - 48) keep.set(k, v);
+        laneCalls = keep;
+      }
+    }
 
     if (s.lane !== target) {
       rj.moveLane(Math.sign(target - s.lane));

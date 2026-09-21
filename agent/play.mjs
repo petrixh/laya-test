@@ -27,6 +27,8 @@ const opts = {
   endpoint: String(arg('endpoint', 'http://127.0.0.1:8000')),
 
   decisions: Number(arg('decisions', 40)),
+  laneChoice: String(arg('lane-choice', 'rule')),
+  laneShield: arg('lane-shield', false) === true,
   seconds: Number(arg('seconds', 180)),
   out: String(arg('out', 'runs/latest')),
   video: arg('video', true) !== 'false',
@@ -169,7 +171,8 @@ const main = async () => {
   await page.addScriptTag({ path: join(ROOT, 'agent/autopilot.js') });
   await page.addScriptTag({ path: join(ROOT, 'agent/hud.js') });
   await page.evaluate((o) => {
-    window.__autopilot.start({ endpoint: o.endpoint, maxDecisions: o.decisions });
+    window.__autopilot.start({ endpoint: o.endpoint, maxDecisions: o.decisions,
+                               laneChoice: o.laneChoice, laneShield: o.laneShield });
     window.__layaHud.mount(window.__autopilot, o.endpoint);
   }, opts);
   console.log(`autopilot started (target ${opts.decisions} decisions)`);
@@ -203,6 +206,7 @@ const main = async () => {
   const lat = result.stats.latencies.slice().sort((a, b) => a - b);
   const byTruth = {};
   for (const t of result.trace) {
+    if (t.stage === 'lane') continue;      // stage-two rows carry no obstacle truth
     const k = t.truth;
     byTruth[k] = byTruth[k] || { n: 0, correct: 0 };
     byTruth[k].n++; if (t.correct) byTruth[k].correct++;
@@ -218,6 +222,16 @@ const main = async () => {
     best_distance_m: result.stats.bestDistance,
     errors: result.stats.errors,
     lane_changes: result.stats.laneChanges,
+    stage_two: {
+      mode: opts.laneChoice,
+      decisions: result.stats.laneDecisions,
+      forced: result.stats.laneForced,
+      chose_a_wall: result.stats.laneContradictions,
+      chose_a_wall_rate: result.stats.laneDecisions
+        ? +(result.stats.laneContradictions / result.stats.laneDecisions).toFixed(4) : null,
+      latency_p50_ms: result.stats.laneLatencies.length
+        ? +pct(result.stats.laneLatencies.slice().sort((a, b) => a - b), 0.5).toFixed(1) : null,
+    },
     latency_ms: {
       p50: lat.length ? +pct(lat, 0.5).toFixed(1) : null,
       p95: lat.length ? +pct(lat, 0.95).toFixed(1) : null,

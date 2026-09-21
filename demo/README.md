@@ -1,3 +1,21 @@
+## `two-stage-lane/` — asking the model to pick the lane, which fails
+
+The same game and the same stage-one classifier, but the lane is chosen by a
+second Laya question instead of by the harness rule.
+
+| | |
+|---|---|
+| stage-one accuracy | 1.00 (120/120) |
+| stage-two decisions | 36 |
+| **chose a wall** | **25% of waves** |
+| crashes | 9 |
+| best distance | 167m (against 1798m on the rule) |
+
+The frame shows why: the lane panel reads L 0.92, M 0.06, R 0.02, and it reads
+close to that whatever the lanes actually contain. The model is answering
+"left", not choosing. A constant "always left" baseline scores 0.825 on the
+offline sweep against the best framing's 0.875.
+
 ## `three-lanes/` — the lane-aware autopilot
 
 Laya on MLX driving the three-lane game: three lanes, walls that must be gone

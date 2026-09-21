@@ -1008,6 +1008,7 @@ renderer.setAnimationLoop(() => {
         window.__autopilot.start({
           endpoint: endpoint,
           maxDecisions: Number(q.get('decisions') || 0),
+          laneChoice: q.get('lane') || 'rule',
         });
         window.__layaHud.mount(window.__autopilot, endpoint);
       })
