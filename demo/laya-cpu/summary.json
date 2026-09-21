@@ -1,0 +1,42 @@
+{
+  "generated": "2026-09-21T10:39:54.092Z",
+  "options": {
+    "headed": false,
+    "endpoint": "http://127.0.0.1:8000",
+    "encoding": "json",
+    "decisions": 40,
+    "seconds": 500,
+    "out": "runs/laya-final",
+    "video": true,
+    "width": 960,
+    "height": 640,
+    "mock": false,
+    "mockAccuracy": 0.85,
+    "mockLatency": 280
+  },
+  "decisions": 40,
+  "correct": 14,
+  "accuracy": 0.35,
+  "crashes": 10,
+  "best_distance_m": 81,
+  "errors": 0,
+  "latency_ms": {
+    "p50": 939.9,
+    "p95": 1134.9,
+    "max": 1171.1
+  },
+  "per_truth": {
+    "jump": {
+      "n": 26,
+      "accuracy": 0
+    },
+    "duck": {
+      "n": 14,
+      "accuracy": 1
+    }
+  },
+  "deaths_with_correct_verdict": 0,
+  "deaths_by_verdict": {
+    "wrong": 10
+  }
+}

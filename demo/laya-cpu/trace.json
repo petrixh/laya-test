@@ -1,0 +1,802 @@
+[
+  {
+    "run": 0,
+    "t": 4.86,
+    "distance": 48,
+    "speed": 18,
+    "obstacle": "log",
+    "kind": "ground",
+    "ttc_at_ask": 2.6,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.1096,
+    "probabilities": {
+      "jump": 0.367,
+      "duck": 0.5034,
+      "run": 0.1296
+    },
+    "server_ms": 1163.6,
+    "wall_ms": 1171.1
+  },
+  {
+    "run": 0,
+    "t": 5.96,
+    "distance": 60,
+    "speed": 18.5,
+    "obstacle": "garland",
+    "kind": "air",
+    "ttc_at_ask": 2.576,
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "confidence": 0.2191,
+    "probabilities": {
+      "jump": 0.1965,
+      "duck": 0.6693,
+      "run": 0.1342
+    },
+    "server_ms": 864.9,
+    "wall_ms": 870.3
+  },
+  {
+    "run": 1,
+    "t": 10.81,
+    "distance": 45,
+    "speed": 17.9,
+    "obstacle": "garland",
+    "kind": "air",
+    "ttc_at_ask": 2.581,
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "confidence": 0.2243,
+    "probabilities": {
+      "jump": 0.1935,
+      "duck": 0.6736,
+      "run": 0.1329
+    },
+    "server_ms": 830.7,
+    "wall_ms": 840
+  },
+  {
+    "run": 1,
+    "t": 11.97,
+    "distance": 58,
+    "speed": 18.4,
+    "obstacle": "log",
+    "kind": "ground",
+    "ttc_at_ask": 2.566,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.0955,
+    "probabilities": {
+      "jump": 0.3732,
+      "duck": 0.4867,
+      "run": 0.1401
+    },
+    "server_ms": 992.7,
+    "wall_ms": 997
+  },
+  {
+    "run": 1,
+    "t": 13.24,
+    "distance": 72,
+    "speed": 18.9,
+    "obstacle": "garland",
+    "kind": "air",
+    "ttc_at_ask": 2.554,
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "confidence": 0.227,
+    "probabilities": {
+      "jump": 0.1935,
+      "duck": 0.6754,
+      "run": 0.1311
+    },
+    "server_ms": 980.1,
+    "wall_ms": 984.2
+  },
+  {
+    "run": 2,
+    "t": 18.15,
+    "distance": 45,
+    "speed": 17.9,
+    "obstacle": "snowman",
+    "kind": "ground",
+    "ttc_at_ask": 2.564,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.1651,
+    "probabilities": {
+      "jump": 0.323,
+      "duck": 0.5744,
+      "run": 0.1027
+    },
+    "server_ms": 879.5,
+    "wall_ms": 883.6
+  },
+  {
+    "run": 2,
+    "t": 19.24,
+    "distance": 57,
+    "speed": 18.4,
+    "obstacle": "snowman",
+    "kind": "ground",
+    "ttc_at_ask": 2.558,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.1571,
+    "probabilities": {
+      "jump": 0.3359,
+      "duck": 0.5604,
+      "run": 0.1037
+    },
+    "server_ms": 856.2,
+    "wall_ms": 863
+  },
+  {
+    "run": 3,
+    "t": 20.28,
+    "distance": 3,
+    "speed": 16.2,
+    "obstacle": "log",
+    "kind": "ground",
+    "ttc_at_ask": 2.553,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.1151,
+    "probabilities": {
+      "jump": 0.3676,
+      "duck": 0.5073,
+      "run": 0.125
+    },
+    "server_ms": 938.9,
+    "wall_ms": 943
+  },
+  {
+    "run": 3,
+    "t": 24.37,
+    "distance": 45,
+    "speed": 17.9,
+    "obstacle": "gifts",
+    "kind": "ground",
+    "ttc_at_ask": 2.574,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.0921,
+    "probabilities": {
+      "jump": 0.4085,
+      "duck": 0.4536,
+      "run": 0.1378
+    },
+    "server_ms": 827.9,
+    "wall_ms": 832.4
+  },
+  {
+    "run": 3,
+    "t": 25.84,
+    "distance": 61,
+    "speed": 18.5,
+    "obstacle": "gifts",
+    "kind": "ground",
+    "ttc_at_ask": 2.593,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.0758,
+    "probabilities": {
+      "jump": 0.3842,
+      "duck": 0.4592,
+      "run": 0.1566
+    },
+    "server_ms": 905,
+    "wall_ms": 912
+  },
+  {
+    "run": 4,
+    "t": 26.85,
+    "distance": 7,
+    "speed": 16.3,
+    "obstacle": "baubles",
+    "kind": "air",
+    "ttc_at_ask": 2.574,
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "confidence": 0.1458,
+    "probabilities": {
+      "jump": 0.2537,
+      "duck": 0.5981,
+      "run": 0.1483
+    },
+    "server_ms": 1038.8,
+    "wall_ms": 1042.7
+  },
+  {
+    "run": 4,
+    "t": 30.6,
+    "distance": 45,
+    "speed": 17.9,
+    "obstacle": "snowman",
+    "kind": "ground",
+    "ttc_at_ask": 2.597,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.1748,
+    "probabilities": {
+      "jump": 0.3072,
+      "duck": 0.5907,
+      "run": 0.1021
+    },
+    "server_ms": 881.6,
+    "wall_ms": 884.9
+  },
+  {
+    "run": 5,
+    "t": 36.94,
+    "distance": 46,
+    "speed": 17.9,
+    "obstacle": "gifts",
+    "kind": "ground",
+    "ttc_at_ask": 2.563,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.0918,
+    "probabilities": {
+      "jump": 0.4046,
+      "duck": 0.4569,
+      "run": 0.1384
+    },
+    "server_ms": 873.4,
+    "wall_ms": 878.4
+  },
+  {
+    "run": 5,
+    "t": 37.86,
+    "distance": 56,
+    "speed": 18.3,
+    "obstacle": "baubles",
+    "kind": "air",
+    "ttc_at_ask": 2.575,
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "confidence": 0.1149,
+    "probabilities": {
+      "jump": 0.2758,
+      "duck": 0.5634,
+      "run": 0.1608
+    },
+    "server_ms": 956.7,
+    "wall_ms": 961
+  },
+  {
+    "run": 6,
+    "t": 38.65,
+    "distance": 0,
+    "speed": 16,
+    "obstacle": "gifts",
+    "kind": "ground",
+    "ttc_at_ask": 2.553,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.0885,
+    "probabilities": {
+      "jump": 0.4098,
+      "duck": 0.4491,
+      "run": 0.1411
+    },
+    "server_ms": 869.8,
+    "wall_ms": 877.1
+  },
+  {
+    "run": 6,
+    "t": 43.14,
+    "distance": 46,
+    "speed": 17.9,
+    "obstacle": "gifts",
+    "kind": "ground",
+    "ttc_at_ask": 2.583,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.0956,
+    "probabilities": {
+      "jump": 0.3975,
+      "duck": 0.4667,
+      "run": 0.1358
+    },
+    "server_ms": 859.4,
+    "wall_ms": 867.3
+  },
+  {
+    "run": 6,
+    "t": 44.12,
+    "distance": 56,
+    "speed": 18.3,
+    "obstacle": "baubles",
+    "kind": "air",
+    "ttc_at_ask": 2.566,
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "confidence": 0.1067,
+    "probabilities": {
+      "jump": 0.2821,
+      "duck": 0.5533,
+      "run": 0.1646
+    },
+    "server_ms": 887.8,
+    "wall_ms": 891.3
+  },
+  {
+    "run": 7,
+    "t": 45.48,
+    "distance": 6,
+    "speed": 16.3,
+    "obstacle": "snowman",
+    "kind": "ground",
+    "ttc_at_ask": 2.566,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.1653,
+    "probabilities": {
+      "jump": 0.3195,
+      "duck": 0.5768,
+      "run": 0.1037
+    },
+    "server_ms": 972.8,
+    "wall_ms": 976.6
+  },
+  {
+    "run": 7,
+    "t": 49.53,
+    "distance": 47,
+    "speed": 18,
+    "obstacle": "snowman",
+    "kind": "ground",
+    "ttc_at_ask": 2.587,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.1747,
+    "probabilities": {
+      "jump": 0.3116,
+      "duck": 0.5878,
+      "run": 0.1006
+    },
+    "server_ms": 1047.1,
+    "wall_ms": 1050.7
+  },
+  {
+    "run": 7,
+    "t": 50.53,
+    "distance": 58,
+    "speed": 18.4,
+    "obstacle": "baubles",
+    "kind": "air",
+    "ttc_at_ask": 2.577,
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "confidence": 0.1526,
+    "probabilities": {
+      "jump": 0.2492,
+      "duck": 0.605,
+      "run": 0.1458
+    },
+    "server_ms": 949.5,
+    "wall_ms": 952.5
+  },
+  {
+    "run": 8,
+    "t": 55.63,
+    "distance": 46,
+    "speed": 17.9,
+    "obstacle": "baubles",
+    "kind": "air",
+    "ttc_at_ask": 2.58,
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "confidence": 0.1482,
+    "probabilities": {
+      "jump": 0.2534,
+      "duck": 0.6,
+      "run": 0.1466
+    },
+    "server_ms": 867.9,
+    "wall_ms": 872.8
+  },
+  {
+    "run": 8,
+    "t": 57.04,
+    "distance": 61,
+    "speed": 18.5,
+    "obstacle": "gifts",
+    "kind": "ground",
+    "ttc_at_ask": 2.583,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.0865,
+    "probabilities": {
+      "jump": 0.4088,
+      "duck": 0.4482,
+      "run": 0.143
+    },
+    "server_ms": 881.7,
+    "wall_ms": 890.5
+  },
+  {
+    "run": 8,
+    "t": 58.49,
+    "distance": 77,
+    "speed": 19.1,
+    "obstacle": "baubles",
+    "kind": "air",
+    "ttc_at_ask": 2.564,
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "confidence": 0.1425,
+    "probabilities": {
+      "jump": 0.2561,
+      "duck": 0.5945,
+      "run": 0.1494
+    },
+    "server_ms": 930.2,
+    "wall_ms": 939.9
+  },
+  {
+    "run": 9,
+    "t": 63.39,
+    "distance": 47,
+    "speed": 17.9,
+    "obstacle": "baubles",
+    "kind": "air",
+    "ttc_at_ask": 2.595,
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "confidence": 0.1453,
+    "probabilities": {
+      "jump": 0.2553,
+      "duck": 0.597,
+      "run": 0.1477
+    },
+    "server_ms": 997.5,
+    "wall_ms": 1002.7
+  },
+  {
+    "run": 9,
+    "t": 64.56,
+    "distance": 59,
+    "speed": 18.4,
+    "obstacle": "snowman",
+    "kind": "ground",
+    "ttc_at_ask": 2.588,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.1579,
+    "probabilities": {
+      "jump": 0.335,
+      "duck": 0.5615,
+      "run": 0.1035
+    },
+    "server_ms": 826.9,
+    "wall_ms": 830.1
+  },
+  {
+    "run": 9,
+    "t": 65.35,
+    "distance": 68,
+    "speed": 18.8,
+    "obstacle": "gifts",
+    "kind": "ground",
+    "ttc_at_ask": 2.6,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.0913,
+    "probabilities": {
+      "jump": 0.3991,
+      "duck": 0.4613,
+      "run": 0.1396
+    },
+    "server_ms": 816.5,
+    "wall_ms": 824.8
+  },
+  {
+    "run": 10,
+    "t": 67.01,
+    "distance": 6,
+    "speed": 16.3,
+    "obstacle": "gifts",
+    "kind": "ground",
+    "ttc_at_ask": 2.584,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.0996,
+    "probabilities": {
+      "jump": 0.3986,
+      "duck": 0.4692,
+      "run": 0.1322
+    },
+    "server_ms": 939.4,
+    "wall_ms": 943.7
+  },
+  {
+    "run": 10,
+    "t": 70.91,
+    "distance": 46,
+    "speed": 17.9,
+    "obstacle": "gifts",
+    "kind": "ground",
+    "ttc_at_ask": 2.573,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.0921,
+    "probabilities": {
+      "jump": 0.4085,
+      "duck": 0.4536,
+      "run": 0.1378
+    },
+    "server_ms": 960,
+    "wall_ms": 967.4
+  },
+  {
+    "run": 11,
+    "t": 72.58,
+    "distance": 0,
+    "speed": 16,
+    "obstacle": "gifts",
+    "kind": "ground",
+    "ttc_at_ask": 2.579,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.0955,
+    "probabilities": {
+      "jump": 0.403,
+      "duck": 0.4618,
+      "run": 0.1353
+    },
+    "server_ms": 866.9,
+    "wall_ms": 869.8
+  },
+  {
+    "run": 11,
+    "t": 77.07,
+    "distance": 46,
+    "speed": 17.9,
+    "obstacle": "garland",
+    "kind": "air",
+    "ttc_at_ask": 2.584,
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "confidence": 0.2243,
+    "probabilities": {
+      "jump": 0.1935,
+      "duck": 0.6736,
+      "run": 0.1329
+    },
+    "server_ms": 938.4,
+    "wall_ms": 943.3
+  },
+  {
+    "run": 11,
+    "t": 78.23,
+    "distance": 58,
+    "speed": 18.4,
+    "obstacle": "snowman",
+    "kind": "ground",
+    "ttc_at_ask": 2.581,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.1738,
+    "probabilities": {
+      "jump": 0.2898,
+      "duck": 0.6005,
+      "run": 0.1097
+    },
+    "server_ms": 985.3,
+    "wall_ms": 988.8
+  },
+  {
+    "run": 11,
+    "t": 78.96,
+    "distance": 66,
+    "speed": 18.7,
+    "obstacle": "garland",
+    "kind": "air",
+    "ttc_at_ask": 2.591,
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "confidence": 0.2234,
+    "probabilities": {
+      "jump": 0.1946,
+      "duck": 0.6728,
+      "run": 0.1327
+    },
+    "server_ms": 968,
+    "wall_ms": 989.3
+  },
+  {
+    "run": 12,
+    "t": 80.45,
+    "distance": 5,
+    "speed": 16.3,
+    "obstacle": "snowman",
+    "kind": "ground",
+    "ttc_at_ask": 2.568,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.1803,
+    "probabilities": {
+      "jump": 0.2998,
+      "duck": 0.5987,
+      "run": 0.1015
+    },
+    "server_ms": 1086.2,
+    "wall_ms": 1089.3
+  },
+  {
+    "run": 12,
+    "t": 84.57,
+    "distance": 48,
+    "speed": 18,
+    "obstacle": "gifts",
+    "kind": "ground",
+    "ttc_at_ask": 2.577,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.0957,
+    "probabilities": {
+      "jump": 0.3994,
+      "duck": 0.4651,
+      "run": 0.1355
+    },
+    "server_ms": 1129.3,
+    "wall_ms": 1134.9
+  },
+  {
+    "run": 12,
+    "t": 85.55,
+    "distance": 58,
+    "speed": 18.4,
+    "obstacle": "log",
+    "kind": "ground",
+    "ttc_at_ask": 2.572,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.0958,
+    "probabilities": {
+      "jump": 0.3711,
+      "duck": 0.4886,
+      "run": 0.1403
+    },
+    "server_ms": 988.8,
+    "wall_ms": 993.3
+  },
+  {
+    "run": 13,
+    "t": 90.57,
+    "distance": 45,
+    "speed": 17.9,
+    "obstacle": "gifts",
+    "kind": "ground",
+    "ttc_at_ask": 2.574,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.0922,
+    "probabilities": {
+      "jump": 0.4086,
+      "duck": 0.4537,
+      "run": 0.1378
+    },
+    "server_ms": 884.4,
+    "wall_ms": 889.8
+  },
+  {
+    "run": 13,
+    "t": 91.42,
+    "distance": 54,
+    "speed": 18.2,
+    "obstacle": "baubles",
+    "kind": "air",
+    "ttc_at_ask": 2.557,
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "confidence": 0.1135,
+    "probabilities": {
+      "jump": 0.2769,
+      "duck": 0.5617,
+      "run": 0.1614
+    },
+    "server_ms": 805.2,
+    "wall_ms": 808.6
+  },
+  {
+    "run": 14,
+    "t": 92.86,
+    "distance": 5,
+    "speed": 16.2,
+    "obstacle": "log",
+    "kind": "ground",
+    "ttc_at_ask": 2.564,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.1088,
+    "probabilities": {
+      "jump": 0.3701,
+      "duck": 0.5003,
+      "run": 0.1296
+    },
+    "server_ms": 881.8,
+    "wall_ms": 890.8
+  },
+  {
+    "run": 14,
+    "t": 96.83,
+    "distance": 45,
+    "speed": 17.9,
+    "obstacle": "baubles",
+    "kind": "air",
+    "ttc_at_ask": 2.583,
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "confidence": 0.1482,
+    "probabilities": {
+      "jump": 0.2534,
+      "duck": 0.6,
+      "run": 0.1466
+    },
+    "server_ms": 924.6,
+    "wall_ms": 927.3
+  },
+  {
+    "run": 14,
+    "t": 98.35,
+    "distance": 62,
+    "speed": 18.5,
+    "obstacle": "gifts",
+    "kind": "ground",
+    "ttc_at_ask": 2.58,
+    "truth": "jump",
+    "pred": "duck",
+    "correct": false,
+    "confidence": 0.0865,
+    "probabilities": {
+      "jump": 0.4088,
+      "duck": 0.4482,
+      "run": 0.143
+    },
+    "server_ms": 1021.3,
+    "wall_ms": 1028.9
+  }
+]

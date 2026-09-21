@@ -183,12 +183,17 @@ response the moment it lands cannot work. Instead each obstacle is classified
 once, early -- obstacles are visible 2.8-5.9s out -- and the verdict is cached and
 fired on a timer as the obstacle arrives.
 
-**CPU is fast enough, contrary to the obvious guess.** The game needs
-**0.6-1.5 decisions per second** (obstacle spacing at 16-34 m/s); one CPU forward
-pass takes 278ms, so we have roughly 3.6 per second. The bottleneck was never
-latency, it was reacting instead of looking ahead. Verified: with a perfect
-oracle at 280ms simulated latency the autopilot took 20 decisions with **zero**
-crashes.
+**CPU is fast enough, but only just, and only with lookahead.** The game needs
+**0.6-1.5 decisions per second**. The real game prompt costs **940ms p50**, not
+the 278ms the Banking77 bench showed -- the scene state and three long option
+descriptions are several times more tokens. That leaves about 1.06 decisions per
+second, inside the requirement but not comfortably.
+
+At that latency a perfect oracle still crashed **11 times in 30**, because the
+autopilot only classified the *next* obstacle and its verdict landed after
+impact. Classifying every obstacle inside a 2.6s horizon as it enters, up to
+three in flight, took that to **0 crashes over 30 decisions, 556m**. Obstacles
+are independent questions; pipelining them is what makes CPU viable.
 
 **Every run is self-labelling.** Ground truth comes from the game's own collision
 geometry (`def.kind === 'air'` means duck, otherwise jump), so accuracy, latency
@@ -201,6 +206,46 @@ while still inside a garland it had correctly classified.
 
 The state encoding is switchable (`--encoding json|nl`) so the JSON-dict and
 natural-language framings can be compared on the same task.
+
+### Result: Laya cannot play this game
+
+40 decisions on the base checkpoint, CPU:
+
+| | |
+|---|---|
+| accuracy | **0.35** (chance 0.33) |
+| ground obstacles | **0 / 26** |
+| air obstacles | **14 / 14** |
+| mean confidence | 0.13 |
+
+**It answers `duck` to everything**, so 0.35 is simply the base rate of air
+obstacles. All ten crashes are attributed to wrong verdicts and none to latency,
+so this is the model, not the rig. Recorded run and stills in `demo/`.
+
+`python -m eval.game_probes` runs the diagnostic ladder that locates the failure:
+
+| rung | accuracy | mean confidence |
+|---|---|---|
+| 1 control (sentiment) | **1.00** | 0.795 |
+| 2 action -- the question the autopilot asks | **0.20** | 0.084 |
+| 3 position -- "where is the obstacle?" | **1.00** | 0.580 |
+| 4 knowledge -- object name only | 0.60 | 0.103 |
+
+Rung 1 clears the pipeline of suspicion. Rung 2 is *below* chance at near-zero
+confidence. Rung 3 shows it can classify the scene when the position is stated in
+the text -- so it can read, it just cannot turn "the obstacle is on the ground"
+into "jump". Rung 4 gives only the object's name and it answers `on_the_ground`
+for all five, including the garland and the baubles: no world knowledge that a
+garland hangs, which means rung 3 was paraphrase matching rather than inference.
+The typed-decisions checkpoint behaves the same way.
+
+**The useful part is the confidence.** Mean 0.13 here against 0.73 on Banking77
+at four labels, and 0.795 on the sentiment control. The model is not confidently
+wrong -- it is abstaining, correctly. That is the exact complement of the
+label-budget finding above, where at k=77 it was 0.99 confident and 38% accurate.
+Taken together: confidence collapses honestly when the model cannot do a task,
+and lies only when the option list is truncated. A confidence gate would have
+caught this failure before it reached the game.
 
 ### The telemetry panel
 

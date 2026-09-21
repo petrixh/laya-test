@@ -20,7 +20,8 @@
   const DEFAULTS = {
     endpoint: 'http://127.0.0.1:8000',
     encoding: 'json',     // 'json' | 'nl'  -- state representation to A/B
-    decideAt: 1.6,        // seconds-to-impact at which we ask the model
+    decideAt: 2.6,        // seconds-to-impact at which we ask the model
+    maxInFlight: 3,       // concurrent classifications (obstacles are independent)
     jumpAt: 0.30,         // seconds-to-impact at which a 'jump' verdict fires
     duckFrom: 0.40,       // duck is held across this window, in seconds
     duckUntil: -0.12,
@@ -243,7 +244,7 @@
             obstacle: lastSeen ? lastSeen.type : null,
             kind: lastSeen ? lastSeen.kind : null,
             ttc: lastSeen ? Number(lastSeen.ttc.toFixed(3)) : null,
-            verdict: v ? (v.action || v.status) : 'none',
+            verdict: v ? (v.status === 'pending' ? 'pending' : (v.action || v.status)) : 'none',
             truth: v ? v.truth : (lastSeen ? (lastSeen.kind === 'air' ? 'duck' : 'jump') : null),
             correct: v ? v.action === v.truth : null,
             airborne: lastSeen ? lastSeen.airborne : null,
@@ -268,6 +269,23 @@
 
     // track the furthest we have got, not only at the moment of death
     if (s.distance > api.stats.bestDistance) api.stats.bestDistance = Math.floor(s.distance);
+
+    // Pre-classify every obstacle already inside the decision horizon, not just
+    // the next one. Real inference is ~1s while obstacles can be 0.66s apart at
+    // top speed, so waiting until an obstacle is next in line means its verdict
+    // lands after it has already hit us. They are independent questions, so
+    // pipeline them.
+    if (!reachedLimit()) {
+      for (const cand of rj.obstacles) {
+        if (inFlight >= api.config.maxInFlight) break;
+        const cz = cand.mesh.position.z;
+        if (cz > cand.def.zHalf + PLAYER_DEPTH) continue;
+        const cttc = -cz / Math.max(1e-3, s.speed);
+        if (cttc > api.config.decideAt) continue;
+        const cid = threatId(cand);
+        if (!decisions.has(cid)) ask(cand, cttc);
+      }
+    }
 
     const o = nearestThreat();
     if (!o) { rj.setDuck(false); return; }

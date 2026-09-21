@@ -229,7 +229,9 @@ const main = async () => {
     // a death whose verdict was correct indicts the execution window, not the model
     deaths_with_correct_verdict: result.stats.deathLog.filter((d) => d.correct === true).length,
     deaths_by_verdict: result.stats.deathLog.reduce((a, d) => {
-      const k = d.correct === true ? 'correct' : d.verdict === 'none' ? 'no-verdict' : 'wrong';
+      const k = d.correct === true ? 'correct'
+        : d.verdict === 'pending' ? 'answer-too-late'
+        : d.verdict === 'none' ? 'never-asked' : 'wrong';
       a[k] = (a[k] || 0) + 1; return a;
     }, {}),
   };
