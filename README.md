@@ -267,12 +267,36 @@ autopilot therefore reads which lane an obstacle is in from the game, exactly as
 it already read the obstacle's name, and asks the model only what the object
 requires.
 
-### Stage two: the model cannot choose between described alternatives
+### Who decides what
 
-Stage one classifies each obstacle. Stage two hands the model its own readings
--- "The left lane is a solid barrier that cannot be passed at all. The middle
-lane is clear..." -- and asks which lane to take. It is built
-(`--lane-choice model`, or `?lane=model`) and shown in the HUD as its own panel.
+Worth being precise about, because it is easy to under- or over-credit the
+model.
+
+| decision | who makes it |
+|---|---|
+| what is this object -- jumpable, duckable, or impassable? | **model**, 400+ calls, no misses |
+| can the reindeer keep going in its current lane? | **model** -- this is `need[myLane] === 'block'`, and `need` is entirely model output |
+| which lanes are viable? | **model**, same source |
+| which of the viable lanes to take? | model is asked; contributes nothing (below) |
+| when to slide, jump and duck | harness |
+
+The acting path never reads the game's own obstacle class. `def.kind` appears
+twice in `agent/autopilot.js`, in `truthOf()` for grading and in the trace for
+logging, and nowhere else. What the harness reads off an obstacle is its
+`type` (the name that goes into the prompt), its `lane`, and its `z` for
+timing. Something has to say what is present, since the model is not given
+pixels; what that thing *means* is the model's call throughout.
+
+So in a 120-decision run the model made 120 consequential classifications, all
+correct, which drove 10 forced lane changes -- and 4 inconsequential picks
+between lanes it had already certified as safe.
+
+#### The one thing it cannot do: rank alternatives
+
+Stage two hands the model its own readings -- "The left lane is a solid barrier
+that cannot be passed at all. The middle lane is clear..." -- and asks which
+lane to take. It is built (`--lane-choice model`, or `?lane=model`) and shown
+in the HUD as its own panel.
 
 **The clean test needs no baseline: ask the same question with the two options
 swapped.** A model reading the scene names the same lane twice.
@@ -322,14 +346,21 @@ there differ so much.
 
 `laneChoice` therefore defaults to `rule`. `demo/lane-choice/` records the
 gated version; the HUD panel tags each wave `FORCED`, `optional` or
-`not needed`, so it is visible when stage two is consulted at all -- in a
-150-decision run it fired 14 times, and 9 of those had only one candidate, so
-there was no choice to make.
+`not needed`, so it is visible when stage two is consulted at all. In a
+150-decision run it made 14 calls, each between two or more candidates, and a
+further 9 waves had only a single candidate and needed no call at all.
+
+Keep the size of this in proportion. Stage two fires on roughly 3% of
+decisions, always among options the model has already certified as safe, so it
+is never survival-critical. The headline is not that the model cannot decide --
+it makes every decision that matters and gets them right. It is that this
+particular *shape* of question, rank these described alternatives, returns
+nothing.
 
 #### What this says about the model
 
-**It answers questions about a described thing; it does not choose among
-described alternatives.** "Is this a barrier?" about a named object is 1.00.
+**It answers questions about a described thing; it does not rank described
+alternatives.** "Is this a barrier?" about a named object is 1.00.
 "Which of these two lanes?" with the contents spelled out in the state is at
 chance and order-dependent. Alternatives belong in the criteria, one question
 per thing -- which is exactly how stage one is built, and stage one does not
