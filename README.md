@@ -443,7 +443,7 @@ same scenes scores **40/40 with zero crashes over 721m**.
 | accuracy | 0.35 | **1.00** |
 | ground obstacles | 0 / 26 | **29 / 29** |
 | air obstacles | 14 / 14 | **11 / 11** |
-| crashes | 10 | **0** |
+| crashes | 14 | **0** |
 
 Nothing about the task got easier. The state still only names the object --
 `There is a log on the track ahead of the running reindeer.` -- and the model
@@ -520,7 +520,7 @@ natural-language framings can be compared on the same task.
 | mean confidence | 0.13 |
 
 **It answers `duck` to everything**, so 0.35 is simply the base rate of air
-obstacles. All ten crashes are attributed to wrong verdicts and none to latency,
+obstacles. All the crashes are attributed to wrong verdicts and none to latency,
 so this is the model, not the rig. Recorded run and stills in `demo/`.
 
 `python -m eval.game_probes` runs the diagnostic ladder that locates the failure:

@@ -319,12 +319,18 @@
       const rj = window.__rj;
       if (rj) {
         $('lh-dist').innerHTML = Math.floor(rj.state.distance) + '<small> m</small>';
-        // lane strip: filled = heading there, red = the model called it a barrier
+        // Lane strip: filled = heading there, red = *the model* called it a
+        // barrier. This used to read o.def.kind, which is the game's own
+        // answer -- so the recordings showed walls flagged red before the
+        // model had said anything about them.
         const blocked = new Set();
-        for (const o of rj.obstacles) {
-          if (o.mesh.position.z < -40) continue;
-          if (o.def.kind === 'block') blocked.add(o.lane);
+        for (const t of autopilot.trace) {
+          if (t.stage === 'lane' || t.pred !== 'block') continue;
+          if (t.lane !== undefined) blocked.add(t.lane);
         }
+        const live = new Set(rj.obstacles.filter(o => o.mesh.position.z > -40)
+                                         .map(o => o.lane));
+        for (const l of [...blocked]) if (!live.has(l)) blocked.delete(l);
         for (const node of document.querySelectorAll('#laya-hud .lanes span')) {
           const l = Number(node.dataset.l);
           node.classList.toggle('on', l === rj.state.lane);
@@ -335,6 +341,7 @@
 
       while (lastLogged < autopilot.trace.length) {
         const t = autopilot.trace[lastLogged++];
+        if (t.stage === 'lane') continue;      // lane calls have their own panel
         const row = el('div', 'row');
         row.innerHTML =
           `<span class="g ${t.correct ? 'ok' : 'no'}">${t.correct ? '✓' : '✗'}</span>` +
@@ -365,10 +372,16 @@
 
     autopilot.onUpdate = paintDecision;
     autopilot.onLane = paintLane;
+    // stop() should stop the panel too, or the canvas keeps redrawing forever
+    const wrappedStop = autopilot.stop;
+    autopilot.stop = function () {
+      clearInterval(timer);
+      return wrappedStop.apply(this, arguments);
+    };
     if (autopilot.config.laneChoice !== 'model') {
       $('lh-lanetag').textContent = 'harness rule';
     }
-    setInterval(paintStats, 120);
+    const timer = setInterval(paintStats, 120);
     addEventListener('resize', () => drawSpark(spark, autopilot.stats.latencies.slice(-SPARK_N)));
   }
 

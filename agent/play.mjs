@@ -28,7 +28,6 @@ const opts = {
 
   decisions: Number(arg('decisions', 40)),
   laneChoice: String(arg('lane-choice', 'rule')),
-  laneShield: arg('lane-shield', false) === true,
   seconds: Number(arg('seconds', 180)),
   out: String(arg('out', 'runs/latest')),
   video: arg('video', true) !== 'false',
@@ -43,9 +42,17 @@ const opts = {
   mockLatency: Number(arg('mock-latency', 280)),
 };
 
-/** Fake Laya service with a known answer distribution. */
+/** Fake Laya service with a known answer distribution.
+ *
+ * Speaks the same two-question protocol the autopilot uses: a two-option
+ * choice for ground-versus-overhead plus a noul for "is it a barrier". It
+ * derives truth from the object named in the state, the same way the game
+ * does, so its accuracy is known and the grading path can be checked without
+ * the model.
+ */
 function serveMock(accuracy, latencyMs) {
-  const ACTIONS = ['jump', 'duck', 'run'];
+  const DUCKABLE = /garland|baubles/;
+  const BARRIER = /wall|barrier|fence|barricade/;
   return new Promise((ok) => {
     const server = createServer((req, res) => {
       const cors = {
@@ -66,25 +73,43 @@ function serveMock(accuracy, latencyMs) {
         const body = JSON.parse(raw || '{}');
         const st = body.state || {};
         const text = typeof st === 'string' ? st : JSON.stringify(st);
-        const truth = /hanging in the air/.test(text) ? 'duck' : 'jump';
+        const truth = BARRIER.test(text) ? 'block' : DUCKABLE.test(text) ? 'duck' : 'jump';
         const right = Math.random() < accuracy;
-        const choice = right ? truth : ACTIONS[(Math.random() * 3) | 0];
-        const probabilities = {};
-        let rest = 1;
-        for (const a of ACTIONS) {
-          probabilities[a] = a === choice ? (rest = 0.62 + Math.random() * 0.34, rest) : 0;
+        const klass = right
+          ? truth
+          : ['jump', 'duck', 'block'][(Math.random() * 3) | 0];
+
+        const answers = {};
+        // the autopilot thresholds the barrier noul at 0.5, so put the mock's
+        // verdict clearly on one side of it
+        answers.barrier = {
+          type: 'noul',
+          noul: klass === 'block' ? 0.80 + Math.random() * 0.19 : Math.random() * 0.3,
+          confidence: 0.5,
+        };
+        const pGround = klass === 'duck'
+          ? 0.05 + Math.random() * 0.3
+          : 0.65 + Math.random() * 0.3;
+        answers.manoeuvre = {
+          type: 'choice',
+          choice: pGround >= 0.5 ? 'option_a' : 'option_b',
+          probabilities: { option_a: pGround, option_b: 1 - pGround },
+          confidence: Math.abs(pGround - 0.5) * 2,
+        };
+        // a stage-two lane question, if the autopilot asks one
+        if (body.questions && body.questions.lane) {
+          const keys = Object.keys(body.questions.lane.criteria || {});
+          const probs = {};
+          keys.forEach((k, i) => { probs[k] = i === 0 ? 0.7 : 0.3 / (keys.length - 1 || 1); });
+          answers.lane = { type: 'choice', choice: keys[0], probabilities: probs, confidence: 0.4 };
         }
-        const spare = 1 - rest;
-        for (const a of ACTIONS) if (a !== choice) probabilities[a] = spare / 2;
-        // jitter around the measured CPU latency so the sparkline looks real
+
+        // jitter around a real measured latency so the sparkline looks plausible
         const wait = latencyMs * (0.75 + Math.random() * 0.6);
         setTimeout(() => {
           res.writeHead(200, { ...cors, 'content-type': 'application/json' });
           res.end(JSON.stringify({
-            model: 'mock', answers: { action: {
-              type: 'choice', choice, probabilities,
-              confidence: probabilities[choice],
-            } }, usage: { input_tokens: 0 }, latency_ms: wait,
+            model: 'mock', answers, usage: { input_tokens: 0 }, latency_ms: wait,
           }));
         }, wait);
       });
@@ -172,7 +197,7 @@ const main = async () => {
   await page.addScriptTag({ path: join(ROOT, 'agent/hud.js') });
   await page.evaluate((o) => {
     window.__autopilot.start({ endpoint: o.endpoint, maxDecisions: o.decisions,
-                               laneChoice: o.laneChoice, laneShield: o.laneShield });
+                               laneChoice: o.laneChoice });
     window.__layaHud.mount(window.__autopilot, o.endpoint);
   }, opts);
   console.log(`autopilot started (target ${opts.decisions} decisions)`);
@@ -192,7 +217,7 @@ const main = async () => {
         `errors ${s.err}  dist ${s.dist}m   `);
       last = n;
     }
-    if (n >= opts.decisions) break;
+    if (opts.decisions > 0 && n >= opts.decisions) break;
     await page.waitForTimeout(200);
   }
   process.stdout.write('\n');

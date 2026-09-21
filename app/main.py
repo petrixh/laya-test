@@ -19,7 +19,7 @@ import anyio
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, model_validator
 
 from .model import ModelState, state_from_env
 
@@ -102,17 +102,18 @@ class Question(BaseModel):
     # choice -> {label: description}; score -> [level, ...]; noul -> absent
     criteria: dict[str, str] | list[str] | None = None
 
-    @field_validator("criteria")
-    @classmethod
-    def _check(cls, v, info):
-        qtype = info.data.get("type")
-        if qtype == "choice":
-            if not isinstance(v, dict) or len(v) < 2:
+    @model_validator(mode="after")
+    def _check(self):
+        # A field_validator does not run when the field was never supplied, so
+        # omitting `criteria` entirely used to reach the model and come back as
+        # a 500. Validate on the whole object instead.
+        if self.type == "choice":
+            if not isinstance(self.criteria, dict) or len(self.criteria) < 2:
                 raise ValueError("choice requires a criteria object with at least 2 labels")
-        elif qtype == "score":
-            if not isinstance(v, list) or len(v) < 2:
+        elif self.type == "score":
+            if not isinstance(self.criteria, list) or len(self.criteria) < 2:
                 raise ValueError("score requires a criteria list with at least 2 levels")
-        return v
+        return self
 
 
 class PredictRequest(BaseModel):
@@ -167,9 +168,12 @@ PRESET_PACKAGES = ("laya", "laya_mlx")
 KNOWN_PRESETS = ("router", "guard", "moderation", "triage", "email")
 
 
-@functools.lru_cache(maxsize=1)
-def _preset_module():
-    for name in PRESET_PACKAGES:
+@functools.lru_cache(maxsize=2)
+def _preset_module(backend: str | None = None):
+    # prefer the runtime that is actually answering, so a host with both
+    # installed does not serve torch presets from an MLX service
+    order = ("laya_mlx", "laya") if backend == "mlx" else PRESET_PACKAGES
+    for name in order:
         try:
             return importlib.import_module(name)
         except ImportError:
@@ -184,7 +188,7 @@ def presets(name: str) -> dict[str, Any]:
     Resolved against whichever runtime is installed: the macOS venv has
     laya_mlx and no laya, so importing `laya` unconditionally 500s there.
     """
-    mod = _preset_module()
+    mod = _preset_module(model.backend)
     if mod is not None:
         fn = getattr(mod, f"{name}_questions", None)
         if fn is None:

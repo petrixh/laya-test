@@ -76,6 +76,8 @@ def reliability_table(confidences: list[float], correct: list[bool], bins: int =
 
 def summarise(records: list[dict]) -> dict:
     """records: {gold, pred, probabilities, confidence, top_prob, latency_ms, input_tokens}"""
+    if not records:
+        return {"n": 0}
     pairs = [(r["gold"], r["pred"]) for r in records]
     correct = [r["gold"] == r["pred"] for r in records]
     lat = sorted(r["latency_ms"] for r in records)

@@ -5,7 +5,7 @@
  * Any death here is a generator bug: a wave with no passable, reachable lane,
  * or one that cannot be executed in the time available.
  *
- *   node agent/check-solvable.mjs [--waves 200] [--runs 3]
+ *   node agent/check-solvable.mjs [--waves 200]
  */
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
@@ -46,7 +46,7 @@ const result = await page.evaluate(async (waves) => {
     let z = null;
     for (const o of rj.obstacles) {
       const oz = o.mesh.position.z;
-      if (oz > o.def.zHalf + rj.PLAYER_HALF_W + 0.65) continue;
+      if (oz > o.def.zHalf + 0.65) continue;   // zHalf + PLAYER_DEPTH, as the game's collider uses
       if (z === null || oz > z) z = oz;
     }
     if (z === null) return null;

@@ -64,9 +64,9 @@ HANGS_Q = {"type": "noul",
                            "resting on the ground?"}
 
 
-def classify(svc: Service, framing: str, style: str, obj: str) -> str:
+def classify(svc: Service, framing: str, style: str, obj: str, template: int = 0) -> str:
     g, a, b = LABELS[style]
-    state = TEMPLATES[0].format(o=obj)
+    state = TEMPLATES[template % len(TEMPLATES)].format(o=obj)
 
     if framing == "choice3":
         q = {"type": "choice", "instructions": INSTR,
@@ -100,11 +100,13 @@ def main() -> int:
             confusion: dict[str, int] = {}
             for group, cases in (("named", NAMED), ("held", HELD)):
                 for obj, want in cases:
-                    got = classify(svc, framing, style, obj)
-                    hits[group][1] += 1
-                    hits[group][0] += got == want
-                    if got != want:
-                        confusion[f"{want}->{got}"] = confusion.get(f"{want}->{got}", 0) + 1
+                    # both phrasings, so one sentence template cannot carry the result
+                    for ti in range(len(TEMPLATES)):
+                        got = classify(svc, framing, style, obj, ti)
+                        hits[group][1] += 1
+                        hits[group][0] += got == want
+                        if got != want:
+                            confusion[f"{want}->{got}"] = confusion.get(f"{want}->{got}", 0) + 1
             n = hits["named"][1] + hits["held"][1]
             rows.append({
                 "framing": framing, "labels": style,

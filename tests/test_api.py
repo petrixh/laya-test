@@ -109,9 +109,14 @@ def test_oversized_state_truncates_rather_than_failing(predict):
         {"state": "x", "questions": {"q": {"type": "choice", "instructions": "hi", "criteria": {"only": "one"}}}},
         {"state": "x", "questions": {"q": {"type": "score", "instructions": "hi", "criteria": {"not": "a list"}}}},
         {"state": "x", "questions": {"q": {"type": "choice", "instructions": ""}}},
+        # criteria omitted entirely: a field_validator never fires for a field
+        # that was not supplied, so this used to reach the model and 500
+        {"state": "x", "questions": {"q": {"type": "choice", "instructions": "which?"}}},
+        {"state": "x", "questions": {"q": {"type": "score", "instructions": "how urgent?"}}},
         {"questions": {"q": {"type": "noul", "instructions": "hi"}}},
     ],
-    ids=["empty", "bad_type", "one_label", "score_not_list", "blank_instructions", "no_state"],
+    ids=["empty", "bad_type", "one_label", "score_not_list", "blank_instructions",
+         "choice_no_criteria", "score_no_criteria", "no_state"],
 )
 def test_malformed_requests_rejected_with_422(client, payload):
     r = client.post("/predict", json=payload)

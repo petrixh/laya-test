@@ -45,6 +45,17 @@ def test_reliability_table_buckets():
     assert rows[1]["accuracy"] == 1.0
 
 
+def test_kendall_tau_penalises_ties():
+    """A ladder that is flat except for one step is not perfectly ordered.
+
+    Dropping ties from the denominator as well as the numerator scores this
+    1.0, which would hide exactly the collapse the ladders exist to catch.
+    """
+    flat = kendall_tau(list(range(9, 0, -1)), [0.5] * 8 + [0.4])
+    assert 0.2 < flat < 0.7, flat
+    assert kendall_tau([3, 2, 1], [0.5, 0.5, 0.5]) == 0.0
+
+
 def test_kendall_tau():
     assert kendall_tau([3, 2, 1], [3.0, 2.0, 1.0]) == 1.0
     assert kendall_tau([3, 2, 1], [1.0, 2.0, 3.0]) == -1.0

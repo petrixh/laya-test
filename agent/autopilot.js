@@ -26,7 +26,6 @@
     endpoint: 'http://127.0.0.1:8000',
     decideAt: 2.6,        // seconds-to-impact at which an obstacle gets classified
     maxInFlight: 4,       // obstacles are independent questions, so pipeline them
-    laneBy: 0.55,         // be in the chosen lane this many seconds before impact
     jumpAt: 0.30,
     duckFrom: 0.40,
     duckUntil: -0.12,
@@ -37,10 +36,6 @@
     // it scores no better than always answering "left" and drives into a wall
     // on a quarter of waves. See eval/lane_choice.py and the README.
     laneChoice: 'rule',
-    // Refuse a lane that stage one called a barrier. Off by default: the point
-    // is to measure stage two unguarded. When on it is still the model's own
-    // output doing the guarding, not ground truth.
-    laneShield: false,
   };
 
   // Plain English for the game's type names. Naming a thing is not a hint
@@ -112,6 +107,7 @@
   let inFlight = 0;
   let runIndex = 0;
   let lastSeen = null;
+  let wasPlaying = false;
   let laneCalls = new Map();   // wave key -> stage-two result
   let laneInFlight = 0;
 
@@ -193,6 +189,9 @@
         duck: man.probabilities.option_b * (1 - pBlock),
         block: pBlock,
       };
+      if (man.choice !== 'option_a' && man.choice !== 'option_b') {
+        throw new Error('unexpected manoeuvre label ' + man.choice);
+      }
       const klass = pBlock >= 0.5 ? 'block'
         : (man.choice === 'option_a' ? 'jump' : 'duck');
 
@@ -226,7 +225,9 @@
     } catch (err) {
       entry.status = 'error';
       entry.error = String((err && err.message) || err);
-      entry.action = 'jump';       // a guess, recorded as an error, never graded as skill
+      // No action. Inventing one here meant a service outage read as "jump"
+      // for every obstacle, ice walls included, while the HUD still showed a
+      // run in progress.
       api.stats.errors++;
       if (api.onUpdate) api.onUpdate(entry);
     } finally {
@@ -268,7 +269,10 @@
       const a = body.answers.lane;
       const wall = performance.now() - t0;
       const slot = LANE_LABELS.indexOf(a.choice);
-      const lane = candidates[slot] !== undefined ? candidates[slot] : candidates[0];
+      if (slot < 0 || slot >= candidates.length) {
+        throw new Error('unexpected lane label ' + a.choice);
+      }
+      const lane = candidates[slot];
       // probabilities indexed by lane, so the HUD can show them in lane order
       const probs = [0, 0, 0];
       candidates.forEach((l, k) => { probs[l] = a.probabilities[LANE_LABELS[k]] || 0; });
@@ -317,9 +321,13 @@
 
     if (s.mode !== 'playing') {
       rj.setDuck(false);
-      if (s.mode === 'over') {
-        const d = Math.floor(s.distance);
-        if (d !== api.stats.lastDistance) {
+      // Count on the playing -> over transition. Deduping on distance instead
+      // silently dropped any run that ended at the same integer distance as
+      // the previous one, which is common: it under-reported 14 deaths as 10.
+      if (s.mode === 'over' && wasPlaying) {
+        wasPlaying = false;
+        {
+          const d = Math.floor(s.distance);
           api.stats.deaths++;
           api.stats.lastDistance = d;
           api.stats.bestDistance = Math.max(api.stats.bestDistance, d);
@@ -334,10 +342,13 @@
           });
           if (api.onUpdate) api.onUpdate(null);
         }
-        if (api.config.autoRestart && !reachedLimit()) { runIndex++; rj.startGame(); }
+      }
+      if (s.mode === 'over' && api.config.autoRestart && !reachedLimit()) {
+        runIndex++; rj.startGame();
       }
       return;
     }
+    wasPlaying = true;
 
     if (s.distance > api.stats.bestDistance) api.stats.bestDistance = Math.floor(s.distance);
 
@@ -368,7 +379,9 @@
     const need = [null, null, null];
     for (const o of wave.group) {
       const d = decisions.get(idOf(o));
-      need[o.lane] = d ? (d.status === 'pending' ? 'unknown' : d.action) : 'unknown';
+      // only a completed classification yields an action; pending and errored
+      // both read as unknown, which the lane ranking treats as last resort
+      need[o.lane] = d && d.status === 'done' ? d.action : 'unknown';
       if (o.lane === s.lane) {
         lastSeen = { id: idOf(o), type: o.type, ttc };
       }

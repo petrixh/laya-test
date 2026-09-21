@@ -109,11 +109,15 @@ def run_pairs(svc, rng, reps=10):
                 confs.append(ans["confidence"])
             n += 1
             agree += picks[0] == picks[1]
-            want = lanes[0] if BETTER[a] >= BETTER[b] else lanes[1]
-            correct += sum(1 for p in picks if p == want) / 2
+            if BETTER[a] != BETTER[b]:
+                want = lanes[0] if BETTER[a] > BETTER[b] else lanes[1]
+                correct += sum(1 for p in picks if p == want) / 2
         label = f"{a or 'clear'} vs {b or 'clear'}"
+        # with two equally good options there is no better one to pick, so the
+        # column would otherwise report "picks whichever was listed as a"
+        comparable = BETTER[a] != BETTER[b]
         out.append({"pair": label, "order_consistent": round(agree / n, 3),
-                    "picks_better": round(correct / n, 3),
+                    "picks_better": round(correct / n, 3) if comparable else None,
                     "mean_confidence": round(sum(confs) / len(confs), 3)})
     return out
 
@@ -150,7 +154,8 @@ def main() -> int:
 
     print(f"\n{'pair (both orders)':<22} {'consistent':>11} {'picks better':>13} {'conf':>7}")
     for r in pairs:
-        print(f"{r['pair']:<22} {r['order_consistent']:>11.2f} {r['picks_better']:>13.2f} "
+        better = "          n/a" if r["picks_better"] is None else f"{r['picks_better']:>13.2f}"
+        print(f"{r['pair']:<22} {r['order_consistent']:>11.2f} {better} "
               f"{r['mean_confidence']:>7.3f}")
     print("\nconsistent = named the same lane with the options swapped. 0 means it is\n"
           "answering by position; 1 means it is reading the scene.")

@@ -71,19 +71,35 @@ def run_choice_task(svc: Service, examples: list[dict], labels: list[str],
 
 
 def kendall_tau(ranks: list[int], values: list[float]) -> float:
-    """Concordance between the intended ordering and the model's scores.
-    +1 = perfectly ordered, 0 = unrelated, -1 = exactly reversed."""
+    """Kendall tau-b between the intended ordering and the model's scores.
+
+    +1 perfectly ordered, 0 unrelated, -1 exactly reversed.
+
+    Tied values count against the score rather than being dropped. Excluding
+    them from the denominator as well as the numerator gives Goodman-Kruskal
+    gamma, under which a ladder that is flat except for one step scores a
+    perfect 1.0 -- and near-collapse is exactly what these ladders exist to
+    catch.
+    """
     n = len(ranks)
-    con = dis = 0
+    con = dis = tied_v = tied_r = 0
     for i in range(n):
         for j in range(i + 1, n):
-            a = (ranks[i] - ranks[j]) * (values[i] - values[j])
-            if a > 0:
+            dr = ranks[i] - ranks[j]
+            dv = values[i] - values[j]
+            if dv == 0:
+                tied_v += 1
+            if dr == 0:
+                tied_r += 1
+            if dr == 0 or dv == 0:
+                continue
+            if dr * dv > 0:
                 con += 1
-            elif a < 0:
+            else:
                 dis += 1
-    total = con + dis
-    return (con - dis) / total if total else 0.0
+    pairs = n * (n - 1) / 2
+    denom = ((pairs - tied_r) * (pairs - tied_v)) ** 0.5
+    return (con - dis) / denom if denom else 0.0
 
 
 def balanced_for_k(rows: list[dict], labels: list[str], n: int, seed: int = 0) -> list[dict]:

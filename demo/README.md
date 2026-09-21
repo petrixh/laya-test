@@ -82,7 +82,7 @@ game for 40 decisions, before the prompt sweep. Kept as the before-picture.
 | accuracy | **0.35** (chance is 0.33 on three labels) |
 | ground obstacles | **0 / 26** |
 | air obstacles | **14 / 14** |
-| crashes | 10, all attributed to wrong verdicts, none to latency |
+| crashes | 14 (see `correction` in summary.json), all from wrong verdicts, none from latency |
 | mean confidence | 0.13 |
 | latency p50 / p95 | 940ms / 1135ms |
 
