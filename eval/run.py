@@ -25,9 +25,15 @@ URL = os.environ.get("LAYA_URL", "http://127.0.0.1:8000")
 INSTRUCTIONS = "Which banking intent does this customer message express?"
 
 
-def tag(info: dict) -> str:
+def tag(info: dict, n: int | None = None) -> str:
+    """Filename stem for a result set.
+
+    Includes the sample size: an n=120 run once overwrote an n=150 baseline that
+    differed only in that, and the loss was silent.
+    """
     sub = info.get("subfolder") or "base"
-    return f"{sub}-{info.get('device', 'cpu')}"
+    stem = f"{sub}-{info.get('backend') or 'torch'}-{info.get('device', 'cpu')}"
+    return f"{stem}-n{n}" if n else stem
 
 
 def write(name: str, payload: dict) -> pathlib.Path:
@@ -74,7 +80,7 @@ def main() -> int:
 
         if args.task in ("labels", "all"):
             ks = [int(x) for x in args.k.split(",")]
-            write(f"{name}__labels", task_labels(svc, info, ks, args.n, args.seed))
+            write(f"{tag(info, args.n)}__labels", task_labels(svc, info, ks, args.n, args.seed))
 
         if args.task in ("probes", "all"):
             print("  probes: churn + urgency ladders", file=sys.stderr)

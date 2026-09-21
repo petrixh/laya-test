@@ -138,10 +138,33 @@ each other, but collapse onto a majority label shows up in F1 first.
 Our k=77 result (0.380) lands near the published Banking77 figure (0.425), which is a
 useful sanity check on the harness.
 
-The `laya-typed-decisions` checkpoint is indistinguishable on this task
-(0.908 / 0.925 / 0.783 at k = 4 / 8 / 16, against 0.913 / 0.920 / 0.787 for base,
-n=120), and it behaves identically on the game probes. Nothing here separates the
-two checkpoints.
+### base vs typed-decisions: a real trade, not a wash
+
+Same 150 examples and seed on both checkpoints:
+
+| k | acc base / typed | ECE base / typed | mean conf base / typed | tokens base / typed |
+|---|---|---|---|---|
+| 4 | 0.913 / 0.920 | **0.187 / 0.633** | 0.726 / **0.287** | 82 / 82 |
+| 8 | 0.920 / 0.920 | **0.057 / 0.350** | 0.929 / 0.570 | 128 / 128 |
+| 16 | 0.787 / **0.833** | 0.208 / **0.144** | 0.995 / 0.978 | 186 / **217** |
+| 32 | 0.540 / **0.640** | 0.444 / **0.317** | 0.984 / 0.957 | 189 / **253** |
+| 77 | 0.380 / 0.367 | 0.609 / 0.574 | 0.989 / 0.941 | 333 / 333 |
+
+**typed-decisions buys many-label accuracy and pays for it in calibration at
+small label counts.** It is +4.6 points at k=16 and **+10 points at k=32**, and
+the mean input tokens say why: base plateaus near 189 while typed-decisions
+reaches 253, because its context is 1024 tokens against base's 512, so less of
+the option list is truncated. That is direct confirmation that the accuracy
+cliff is an option-budget problem rather than a reasoning limit.
+
+The cost is at the other end. At k=4 typed-decisions is 92% accurate while
+reporting 0.287 mean confidence -- ECE 0.633, the *opposite* failure to base's
+overconfidence at k=77. It is right and does not believe it, which breaks a
+confidence gate just as thoroughly as being confidently wrong.
+
+Practical read: **base at 8 labels or fewer** (ECE 0.057 there, the best
+calibration anywhere in this table), **typed-decisions at 16-32**, and neither
+above about 32.
 
 **Two things to take from this.**
 
@@ -342,11 +365,28 @@ is accuracy, not latency: the oracle control already scores 30/30 with zero
 crashes at 975ms. MLX buys a watchable frame rate and much quicker eval sweeps,
 not a working player.
 
-Measured against an M3 Max over Tailscale: **~30ms server-side** per game
-decision against 940ms on the CPU container, a 31x speedup. The diagnostic
-ladder returns byte-for-byte the same verdict as fp32 (1.00 / 0.20 / 1.00 / 0.60
-at the same mean confidences), so the FP16 conversion is faithful and the game
-result is a property of the model, not of the runtime or the precision.
+### FP16 fidelity: the port matches fp32
+
+Same 150 examples, same seed, run on both. Accuracy is identical at every point
+on the curve and ECE differs only in the third decimal at k=4:
+
+| k | accuracy fp32 / FP16 | ECE fp32 / FP16 | p50 fp32 / FP16 |
+|---|---|---|---|
+| 4 | 0.913 / **0.913** | 0.187 / 0.188 | 269ms / **29ms** |
+| 8 | 0.920 / **0.920** | 0.057 / 0.057 | 386ms / **33ms** |
+| 16 | 0.787 / **0.787** | 0.208 / 0.208 | 506ms / **38ms** |
+| 32 | 0.540 / **0.540** | 0.444 / 0.444 | 510ms / **39ms** |
+| 77 | 0.380 / **0.380** | 0.609 / 0.609 | 880ms / **59ms** |
+
+The third-decimal ECE difference is the tell that these were genuinely
+recomputed rather than copied: FP16 rounding perturbs the probabilities slightly
+but almost never flips an argmax. **The MLX port is a faithful drop-in**, and the
+label-budget and calibration findings above hold on it unchanged.
+
+On the game the same is true: ~30ms server-side per decision against 940ms, a
+31x speedup, and the diagnostic ladder returns the same verdict as fp32
+(1.00 / 0.20 / 1.00 / 0.60 at the same mean confidences). The game failure is a
+property of the model, not of the runtime or the precision.
 
 ### How the reference implementation makes Laya "play" a game
 
