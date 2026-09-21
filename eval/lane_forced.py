@@ -1,17 +1,19 @@
-"""Stage two, gated: only ask when the reindeer must move, and only offer lanes
-it has not already called barriers.
+"""Two ways to ask which lane to move to, and why the autopilot uses the second.
 
-The first attempt asked on every wave and offered all three lanes, so it could
-override a perfectly good lane and could pick a wall it had itself identified.
-Gating changes the question in two ways that matter on this model:
+**As a choice between the candidate lanes.** This is what the agent used to do
+and it does not work: the model answers by option position. The control needs
+no baseline -- present the same pair with the options swapped, and a model
+reading the state names the same lane twice. Order-consistency comes out at
+0.00-0.20, and in a recorded run the agent took the first-listed option 12
+times out of 12.
 
-  * it only fires when the current lane is a barrier, so a wrong answer is the
-    difference between two viable lanes rather than between safety and a wall;
-  * the options are filtered to non-barrier lanes, which with three lanes means
-    the real decision is almost always binary -- and binary is where every
-    earlier sweep found this model strongest.
+**As one yes/no per lane**, each about that lane alone, lower score wins. No
+option list, so nothing to prefer the front of. This is what the autopilot
+does now, and `run_per_lane` below measures it as a decision rule over pairs
+across three wordings of each lane content.
 
-Survival is then inherited from stage one, so the metric has to be quality:
+The first section below also reports a quality metric for the choice framing.
+Survival there is inherited from stage one, so the metric has to be quality:
 when one candidate is clear and the other needs a manoeuvre, does it take the
 clear one? Chance is 0.50, and "always take the first option offered" is the
 other baseline that matters.

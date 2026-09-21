@@ -1,12 +1,15 @@
-"""Stage two: can the model pick the lane, given its own stage-one readings?
+"""The lane question asked as a choice -- the framing the autopilot rejected.
 
-Stage one classifies each obstacle (jump / duck / block). Stage two is handed a
-description of the three lanes built from those classifications -- the model's
-own output, not ground truth -- and asked which lane to take.
+Twenty variants of "here are the lanes and what is in each, which should the
+reindeer take?", swept over label names, criteria style, instruction wording
+and whether the current lane is stated, plus constant and random baselines.
 
-The preference itself (prefer a clear lane, never a barrier) is static guidance
-and may live in the instructions, the same way "logs sit on the ground" lives in
-the criteria. What may not happen is the scene pre-ranking the lanes for it.
+Kept because the baselines are the point. The best variant reaches 0.875
+picks-a-passable-lane, which reads well until you notice that always answering
+"left" scores 0.825 on the same scenes. The margin is noise: the model is not
+choosing, it is answering by option position. eval/lane_forced.py demonstrates
+that directly with a swapped-order control, and measures the per-lane framing
+the autopilot uses instead.
 
   python -m eval.lane_choice
 """

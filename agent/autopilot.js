@@ -3,13 +3,14 @@
  * Reads window.__rj, classifies each obstacle in the oncoming wave, picks a
  * lane, and executes.
  *
- * Division of labour, unchanged in spirit from the single-lane version:
- *   the model decides WHAT each obstacle is;
- *   the harness decides WHICH lane and WHEN to act.
- * The harness reads which lane an obstacle is in and what it is called -- both
- * mechanical facts it already had before -- and applies a fixed preference
- * (an empty lane beats a manoeuvre, never enter a barrier). Nothing pre-ranks
- * the options for the model.
+ * Division of labour:
+ *   the model decides WHAT each obstacle is, and WHICH lane to move to;
+ *   the harness decides only WHEN to act.
+ * The harness reads which lane an obstacle is in, what it is called and how
+ * far away it is -- the model takes text, not pixels, so something has to say
+ * what is there -- and it never reads the game's own obstacle class. It holds
+ * no lane preference of its own: see the stage-two comment below for how the
+ * destination is decided and what the harness does and does not contribute.
  *
  * The question is the `split` framing, which scored 0.800 in
  * eval/obstacle_class.py across two sentence phrasings (0.750 on named

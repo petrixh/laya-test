@@ -136,7 +136,8 @@ ordered:
 As a decision rule over pairs, across three different wordings of each content: it
 **avoids the barrier in 26 of 27**, and prefers a clear lane to one needing a manoeuvre
 **18 of 18** — which the choice framing never managed. `python -m eval.lane_forced`
-reproduces both halves.
+reproduces both halves; `make eval` runs it alongside the
+obstacle-classification sweep.
 
 The general shape: **this model answers a question about one described thing, and cannot
 rank several against each other.** That is how the obstacle classifier is built, it is
@@ -191,9 +192,12 @@ agent/hud.js            live telemetry panel
 agent/play.mjs          Playwright driver: serves, injects, records, writes the trace
 agent/check-page.mjs    verifies the ?autopilot=1 loader against a live service
 agent/check-solvable.mjs  the solvability proof above
+eval/runner.py          small HTTP client the evals share
 eval/obstacle_class.py  how to separate three classes without a third option
-eval/lane_choice.py     20 framings for the lane question, with constant baselines
-eval/lane_forced.py     order-consistency: the control that needs no baseline
+eval/lane_choice.py     the lane question as a choice -- the framing that failed
+eval/lane_forced.py     the swapped-order control, and the per-lane framing in use
+scripts/serve-macos.sh  native Apple-silicon service, no Docker
+scripts/introspect.py   print laya's real signatures after a version bump
 tests/test_api.py       HTTP contract against a live model
 demo/                   one recorded run: video, gif, trace, deaths, summary
 ```
