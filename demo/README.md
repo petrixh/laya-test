@@ -1,5 +1,28 @@
-> **Note:** these recordings are from the single-lane game on `main`. The
-> `three-lanes` branch changes the game, so they are a record of the old one.
+## `three-lanes/` — the lane-aware autopilot
+
+Laya on MLX driving the three-lane game: three lanes, walls that must be gone
+around, and a wave across all lanes at once.
+
+| | |
+|---|---|
+| decisions | 201 |
+| accuracy | **1.00** — jump 71/71, duck 60/60, block 70/70 |
+| crashes | **0** |
+| best distance | **1798m** |
+| lane changes | 51 |
+
+Each obstacle gets one forward pass carrying two questions: the validated
+two-option ground-versus-air `choice`, plus a `noul` asking whether it is a
+solid barrier. Mean P(block) comes out at 0.90 for walls, 0.24 for ground
+obstacles and 0.00 for hanging ones.
+
+The state still only names the object. The harness reads which lane it is in
+and applies a fixed preference (empty lane beats a manoeuvre, never enter a
+barrier); the model supplies the classification.
+
+> **Note:** the two recordings below are from the single-lane game. They are a
+> record of the old one, kept because they are what the prompt-triage result was
+> measured on.
 
 # Demo runs
 

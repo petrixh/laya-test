@@ -1,0 +1,44 @@
+{
+  "generated": "2026-09-21T12:24:14.468Z",
+  "options": {
+    "headed": false,
+    "endpoint": "http://100.121.51.97:8000",
+    "decisions": 200,
+    "seconds": 1500,
+    "out": "runs/lanes-long",
+    "video": true,
+    "width": 960,
+    "height": 640,
+    "mock": false,
+    "mockAccuracy": 0.85,
+    "mockLatency": 280
+  },
+  "decisions": 201,
+  "correct": 201,
+  "accuracy": 1,
+  "crashes": 0,
+  "best_distance_m": 1798,
+  "errors": 0,
+  "lane_changes": 51,
+  "latency_ms": {
+    "p50": 230.6,
+    "p95": 332.6,
+    "max": 639.2
+  },
+  "per_truth": {
+    "block": {
+      "n": 70,
+      "accuracy": 1
+    },
+    "duck": {
+      "n": 60,
+      "accuracy": 1
+    },
+    "jump": {
+      "n": 71,
+      "accuracy": 1
+    }
+  },
+  "deaths_with_correct_verdict": 0,
+  "deaths_by_verdict": {}
+}

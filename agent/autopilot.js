@@ -1,97 +1,90 @@
-/* Laya autopilot for Reindeer Jump.
+/* Laya autopilot for the three-lane Reindeer Jump.
  *
- * Reads window.__rj (exposed by the game), asks the Laya service what to do
- * about the nearest obstacle, and executes the answer.
+ * Reads window.__rj, classifies each obstacle in the oncoming wave, picks a
+ * lane, and executes.
  *
- * Design note -- the model decides WHAT, this file decides WHEN.
- * Inference costs ~280ms on CPU but the collision window at top speed is only
- * 65ms wide, so reacting on arrival of the response would be hopeless. Instead
- * we classify each obstacle once, early (it is visible ~3-6s out), cache the
- * verdict, and fire the action on a timer as the obstacle arrives. That is also
- * how you would build it for real: a System 1 model picks the action, trivial
- * logic handles the reflex timing.
+ * Division of labour, unchanged in spirit from the single-lane version:
+ *   the model decides WHAT each obstacle is;
+ *   the harness decides WHICH lane and WHEN to act.
+ * The harness reads which lane an obstacle is in and what it is called -- both
+ * mechanical facts it already had before -- and applies a fixed preference
+ * (an empty lane beats a manoeuvre, never enter a barrier). Nothing pre-ranks
+ * the options for the model.
  *
- * Every decision is graded against ground truth derived from the game's own
- * collision geometry, so the run doubles as a self-labelling benchmark.
+ * The question is the `split` framing, which scored 0.933 in
+ * eval/obstacle_class.py (1.000 on named objects, 0.889 on held-out ones):
+ * the validated two-option ground-versus-air choice, plus a separate noul for
+ * "is this a solid barrier?". Folding the barrier in as a third choice option
+ * instead collapses accuracy to 0.27-0.40 -- option count is the sharpest edge
+ * on this model, so the third class gets its own question rather than a third
+ * label. Both ride in one forward pass.
  */
 (function () {
   'use strict';
 
   const DEFAULTS = {
     endpoint: 'http://127.0.0.1:8000',
-    framing: 'guided',    // 'guided' | 'action'  -- see QUESTION_FOR below
-    encoding: 'json',     // 'json' | 'nl'  -- state shape for the 'action' framing
-    decideAt: 2.6,        // seconds-to-impact at which we ask the model
-    maxInFlight: 3,       // concurrent classifications (obstacles are independent)
-    jumpAt: 0.30,         // seconds-to-impact at which a 'jump' verdict fires
-    duckFrom: 0.40,       // duck is held across this window, in seconds
+    decideAt: 2.6,        // seconds-to-impact at which an obstacle gets classified
+    maxInFlight: 4,       // obstacles are independent questions, so pipeline them
+    laneBy: 0.55,         // be in the chosen lane this many seconds before impact
+    jumpAt: 0.30,
+    duckFrom: 0.40,
     duckUntil: -0.12,
     autoRestart: true,
-    maxDecisions: 0,      // 0 = unlimited
+    maxDecisions: 0,
   };
 
-  const ACTIONS = {
-    jump: 'leap over a ground-level obstacle such as a snowman, a pile of gifts or a log',
-    duck: 'crouch under a hanging obstacle such as a garland or a string of baubles',
-    run: 'keep running normally, nothing is close enough to need action yet',
-  };
-
-  // The 'guided' framing, chosen by eval/prompt_sweep.py and confirmed by
-  // eval/prompt_confirm.py on 36 scenes: 0.97 overall and 0.94 on objects the
-  // criteria never name, against 0.35 for the 'action' framing below.
-  //
-  // Three things earned that, all static and instance-independent -- the state
-  // still only names the object, and nothing pre-ranks the options:
-  //   - neutral label names. 'jump'/'duck' as label tokens actively hurt
-  //     (marginal accuracy 0.43 against 0.67 for neutral names).
-  //   - criteria that give both the examples and the mechanism (0.69 against
-  //     0.45 for bare criteria).
-  //   - two options, not three. Offering a 'nothing to do yet' option costs
-  //     0.14 accuracy, and the harness already knows when there is no obstacle.
-  const GUIDED = {
-    option_a: 'obstacles resting on the snow, such as a snowman, a pile of gifts or '
-      + 'a log: they block the space near the ground, so leave the ground to clear them',
-    option_b: 'obstacles suspended overhead, such as a garland or a string of baubles: '
-      + 'they block the space above head height, so lower yourself to pass beneath',
-  };
-  const GUIDED_TO_ACTION = { option_a: 'jump', option_b: 'duck' };
-
-  // Plain English for the game's internal type names. Naming the object is not
-  // a hint about where it sits.
+  // Plain English for the game's type names. Naming a thing is not a hint
+  // about what it does.
   const NOUN = {
     snowman: 'snowman', gifts: 'pile of gifts', log: 'log',
-    garland: 'garland', baubles: 'string of baubles',
+    garland: 'garland', baubles: 'string of baubles', wall: 'tall ice wall',
   };
 
-  const QUESTION_KEY = 'action';
+  const GROUND_TXT = 'obstacles resting on the snow, such as a snowman, a pile of gifts '
+    + 'or a log: they block the space near the ground, so leave the ground to clear them';
+  const AIR_TXT = 'obstacles suspended overhead, such as a garland or a string of baubles: '
+    + 'they block the space above head height, so lower yourself to pass beneath';
 
-  // From the game's collision test: it fires while |obstacle.z| < zHalf + PLAYER_DEPTH,
-  // so an obstacle stays dangerous for another 1.1m AFTER it draws level with us.
-  const PLAYER_DEPTH = 0.65;
+  const QUESTIONS = {
+    manoeuvre: {
+      type: 'choice',
+      instructions: 'Which manoeuvre clears the obstacle described?',
+      criteria: { option_a: GROUND_TXT, option_b: AIR_TXT },
+    },
+    barrier: {
+      type: 'noul',
+      instructions: 'Is this a solid barrier that fills the whole lane, too tall to leave '
+        + 'the ground over and too low to pass beneath?',
+    },
+  };
+
+  const PLAYER_DEPTH = 0.65;   // the game's collision half-depth
+  const WAVE_Z = 3;            // obstacles within this z of each other are one wave
 
   const api = {
     config: Object.assign({}, DEFAULTS),
     running: false,
     trace: [],
     stats: null,
-    onUpdate: null,     // hook for the HUD
+    onUpdate: null,
     start, stop, reset,
   };
 
   let rj = null;
   let raf = 0;
-  let threatIds = new WeakMap();
-  let nextThreatId = 1;
-  let decisions = new Map();   // threatId -> {status, action, probs, confidence, latency, truth}
+  let ids = new WeakMap();
+  let nextId = 1;
+  let decisions = new Map();
   let inFlight = 0;
   let runIndex = 0;
-  let lastSeen = null;      // snapshot of the threat we were acting on, for death forensics
+  let lastSeen = null;
 
   function freshStats() {
     return {
       decisions: 0, correct: 0, byAction: {}, latencies: [],
       deaths: 0, bestDistance: 0, lastDistance: 0,
-      errors: 0, timeouts: 0, deathLog: [],
+      errors: 0, deathLog: [], laneChanges: 0,
     };
   }
 
@@ -99,161 +92,93 @@
     api.trace = [];
     api.stats = freshStats();
     decisions = new Map();
-    threatIds = new WeakMap();
-    nextThreatId = 1;
+    ids = new WeakMap();
+    nextId = 1;
   }
 
-  // ---------------------------------------------------------------- state
-
-  /** Nearest obstacle that can still hit us.
-   *
-   * Note the exit test: not `z >= 0`. An obstacle level with the reindeer is
-   * still inside the collision box, and dropping it there made the autopilot
-   * release its duck a few centimetres too early and clip the garland it had
-   * just correctly classified. It stays the active threat until it is clear. */
-  function nearestThreat() {
-    let best = null;
-    for (const o of rj.obstacles) {
-      const z = o.mesh.position.z;
-      if (z > o.def.zHalf + PLAYER_DEPTH) continue;   // fully behind us
-      // largest z among the candidates is the most imminent
-      if (!best || z > best.mesh.position.z) best = o;
-    }
-    return best;
-  }
-
-  function threatId(o) {
-    // The game pools and reuses obstacle objects, so object identity is not
-    // appearance identity. Obstacles only ever travel forwards (z increases);
-    // a z that jumped backwards means this object was respawned at SPAWN_Z and
-    // deserves a fresh id, or we would reuse the previous verdict.
+  /** Obstacles are pooled, so identity is per-appearance: a z that jumped
+   *  backwards means this object was respawned and needs a fresh verdict. */
+  function idOf(o) {
     const z = o.mesh.position.z;
-    let rec = threatIds.get(o);
-    if (!rec || z < rec.lastZ - 1) {
-      rec = { id: nextThreatId++, lastZ: z };
-      threatIds.set(o, rec);
-    } else {
-      rec.lastZ = z;
-    }
+    let rec = ids.get(o);
+    if (!rec || z < rec.lastZ - 1) { rec = { id: nextId++, lastZ: z }; ids.set(o, rec); }
+    else rec.lastZ = z;
     return rec.id;
   }
 
-  /** What the game's collision geometry says is the right answer. */
-  function groundTruth(o) {
-    return o.def.kind === 'air' ? 'duck' : 'jump';
+  function truthOf(o) {
+    return o.def.kind === 'air' ? 'duck' : o.def.kind === 'block' ? 'block' : 'jump';
   }
 
-  function describe(o, ttc) {
-    const s = rj.state;
-    const kind = o.def.kind === 'air' ? 'hanging in the air' : 'sitting on the ground';
-    if (api.config.framing === 'guided') {
-      // Names the object and nothing else. Whether it sits or hangs is exactly
-      // what the model has to work out.
-      return `There is a ${NOUN[o.type] || o.type} on the track ahead of the running reindeer.`;
-    }
-    if (api.config.encoding === 'nl') {
-      return (
-        `The reindeer is running at ${s.speed.toFixed(0)} metres per second and is ` +
-        `${s.onGround ? 'on the ground' : 'in the air'}. ` +
-        `Ahead there is a ${o.type}, ${kind}, ` +
-        `${(-o.mesh.position.z).toFixed(1)} metres away, ` +
-        `about ${ttc.toFixed(2)} seconds from hitting the reindeer. ` +
-        `It spans from ${o.def.yMin.toFixed(2)} to ${o.def.yMax.toFixed(2)} metres above the snow. ` +
-        `The reindeer is ${(1.75).toFixed(2)} metres tall standing and 0.95 metres tall crouching.`
-      );
-    }
-    return {
-      obstacle: o.type,
-      obstacle_position: kind,
-      obstacle_bottom_m: Number(o.def.yMin.toFixed(2)),
-      obstacle_top_m: Number(o.def.yMax.toFixed(2)),
-      distance_m: Number((-o.mesh.position.z).toFixed(1)),
-      seconds_to_impact: Number(ttc.toFixed(2)),
-      speed_mps: Number(s.speed.toFixed(1)),
-      reindeer_airborne: !s.onGround,
-      reindeer_height_standing_m: 1.75,
-      reindeer_height_crouching_m: 0.95,
-    };
+  function describe(o) {
+    return `There is a ${NOUN[o.type] || o.type} on the track ahead of the running reindeer.`;
   }
 
-  const QUESTIONS = {
-    guided: {
-      [QUESTION_KEY]: {
-        type: 'choice',
-        instructions: 'Which manoeuvre clears the obstacle described?',
-        criteria: GUIDED,
-      },
-    },
-    action: {
-      [QUESTION_KEY]: {
-        type: 'choice',
-        instructions:
-          'A running reindeer must get past the obstacle ahead without touching it. ' +
-          'What should it do?',
-        criteria: ACTIONS,
-      },
-    },
-  };
+  /** The most imminent wave still able to hit us, and what each lane needs. */
+  function currentWave() {
+    let z = null;
+    for (const o of rj.obstacles) {
+      const oz = o.mesh.position.z;
+      if (oz > o.def.zHalf + PLAYER_DEPTH) continue;
+      if (z === null || oz > z) z = oz;
+    }
+    if (z === null) return null;
+    const group = rj.obstacles.filter(o => Math.abs(o.mesh.position.z - z) < WAVE_Z);
+    return { z, group };
+  }
 
   // ---------------------------------------------------------------- model
 
-  async function ask(o, ttc) {
-    const id = threatId(o);
-    const truth = groundTruth(o);
-    const entry = { status: 'pending', truth, asked: performance.now(), ttcAtAsk: ttc };
+  async function ask(o) {
+    const id = idOf(o);
+    const truth = truthOf(o);
+    const entry = { status: 'pending', truth };
     decisions.set(id, entry);
     inFlight++;
-
     try {
       const t0 = performance.now();
-      const questions = QUESTIONS[api.config.framing] || QUESTIONS.action;
       const res = await fetch(api.config.endpoint + '/predict', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ state: describe(o, ttc), questions }),
+        body: JSON.stringify({ state: describe(o), questions: QUESTIONS }),
       });
       if (!res.ok) throw new Error('HTTP ' + res.status + ' ' + (await res.text()).slice(0, 120));
       const body = await res.json();
-      const ans = body.answers[QUESTION_KEY];
       const wall = performance.now() - t0;
+      const man = body.answers.manoeuvre;
+      const pBlock = body.answers.barrier.noul;
 
-      // map the neutral option names back onto game actions for the HUD and grading
-      const action = GUIDED_TO_ACTION[ans.choice] || ans.choice;
-      const probs = {};
-      for (const k of Object.keys(ans.probabilities)) {
-        probs[GUIDED_TO_ACTION[k] || k] = ans.probabilities[k];
-      }
+      // one distribution over the three classes, for the HUD and the trace
+      const probs = {
+        jump: man.probabilities.option_a * (1 - pBlock),
+        duck: man.probabilities.option_b * (1 - pBlock),
+        block: pBlock,
+      };
+      const klass = pBlock >= 0.5 ? 'block'
+        : (man.choice === 'option_a' ? 'jump' : 'duck');
 
       Object.assign(entry, {
-        status: 'done',
-        action: action,
-        probs: probs,
-        confidence: ans.confidence,
-        serverMs: body.latency_ms,
+        status: 'done', action: klass, probs,
+        confidence: probs[klass],
+        correct: klass === truth,
         wallMs: wall,
-        correct: action === truth,
       });
 
       const st = api.stats;
       st.decisions++;
       if (entry.correct) st.correct++;
-      st.byAction[action] = (st.byAction[action] || 0) + 1;
+      st.byAction[klass] = (st.byAction[klass] || 0) + 1;
       st.latencies.push(wall);
 
       api.trace.push({
         run: runIndex,
-        t: Number((rj.state.time).toFixed(2)),
         distance: Math.floor(rj.state.distance),
         speed: Number(rj.state.speed.toFixed(1)),
-        obstacle: o.type,
-        kind: o.def.kind,
-        ttc_at_ask: Number(ttc.toFixed(3)),
-        framing: api.config.framing,
-        truth,
-        pred: action,
-        raw_choice: ans.choice,
-        correct: entry.correct,
-        confidence: ans.confidence,
+        obstacle: o.type, lane: o.lane, kind: o.def.kind,
+        truth, pred: klass, correct: entry.correct,
+        p_block: Number(pBlock.toFixed(4)),
+        manoeuvre_choice: man.choice,
+        manoeuvre_confidence: man.confidence,
         probabilities: probs,
         server_ms: body.latency_ms,
         wall_ms: Number(wall.toFixed(1)),
@@ -261,11 +186,9 @@
       if (api.onUpdate) api.onUpdate(entry);
     } catch (err) {
       entry.status = 'error';
-      entry.error = String(err && err.message || err);
+      entry.error = String((err && err.message) || err);
+      entry.action = 'jump';       // a guess, recorded as an error, never graded as skill
       api.stats.errors++;
-      // Falling back to ground truth would flatter the model; fall back to the
-      // safest generic action instead and record it as an error.
-      entry.action = 'run';
       if (api.onUpdate) api.onUpdate(entry);
     } finally {
       inFlight--;
@@ -273,6 +196,10 @@
   }
 
   // ---------------------------------------------------------------- loop
+
+  function reachedLimit() {
+    return api.config.maxDecisions > 0 && api.stats.decisions >= api.config.maxDecisions;
+  }
 
   function tick() {
     raf = requestAnimationFrame(tick);
@@ -287,91 +214,95 @@
           api.stats.deaths++;
           api.stats.lastDistance = d;
           api.stats.bestDistance = Math.max(api.stats.bestDistance, d);
-          // Forensics: a death with a correct verdict means the execution
-          // window was wrong, not the model. Worth telling apart.
           const v = lastSeen && decisions.get(lastSeen.id);
           api.stats.deathLog.push({
-            run: runIndex,
-            distance: d,
+            run: runIndex, distance: d, lane: s.lane, x: Number(s.x.toFixed(2)),
             obstacle: lastSeen ? lastSeen.type : null,
-            kind: lastSeen ? lastSeen.kind : null,
-            ttc: lastSeen ? Number(lastSeen.ttc.toFixed(3)) : null,
             verdict: v ? (v.status === 'pending' ? 'pending' : (v.action || v.status)) : 'none',
-            truth: v ? v.truth : (lastSeen ? (lastSeen.kind === 'air' ? 'duck' : 'jump') : null),
+            truth: v ? v.truth : null,
             correct: v ? v.action === v.truth : null,
-            airborne: lastSeen ? lastSeen.airborne : null,
-            duck: lastSeen ? Number(lastSeen.duck.toFixed(2)) : null,
+            ttc: lastSeen ? Number(lastSeen.ttc.toFixed(3)) : null,
           });
           if (api.onUpdate) api.onUpdate(null);
         }
-        if (api.config.autoRestart && !reachedLimit()) {
-          runIndex++;
-          rj.startGame();
-        }
+        if (api.config.autoRestart && !reachedLimit()) { runIndex++; rj.startGame(); }
       }
       return;
     }
 
+    if (s.distance > api.stats.bestDistance) api.stats.bestDistance = Math.floor(s.distance);
+
     if (decisions.size > 256) {
-      // verdicts for long-passed obstacles are dead weight
       const keep = new Map();
-      for (const [k, v] of decisions) if (k > nextThreatId - 32) keep.set(k, v);
+      for (const [k, v] of decisions) if (k > nextId - 48) keep.set(k, v);
       decisions = keep;
     }
 
-    // track the furthest we have got, not only at the moment of death
-    if (s.distance > api.stats.bestDistance) api.stats.bestDistance = Math.floor(s.distance);
-
-    // Pre-classify every obstacle already inside the decision horizon, not just
-    // the next one. Real inference is ~1s while obstacles can be 0.66s apart at
-    // top speed, so waiting until an obstacle is next in line means its verdict
-    // lands after it has already hit us. They are independent questions, so
-    // pipeline them.
+    // classify everything already inside the horizon, pipelined
     if (!reachedLimit()) {
       for (const cand of rj.obstacles) {
         if (inFlight >= api.config.maxInFlight) break;
         const cz = cand.mesh.position.z;
         if (cz > cand.def.zHalf + PLAYER_DEPTH) continue;
-        const cttc = -cz / Math.max(1e-3, s.speed);
-        if (cttc > api.config.decideAt) continue;
-        const cid = threatId(cand);
-        if (!decisions.has(cid)) ask(cand, cttc);
+        if (-cz / Math.max(1e-3, s.speed) > api.config.decideAt) continue;
+        if (!decisions.has(idOf(cand))) ask(cand);
       }
     }
 
-    const o = nearestThreat();
-    if (!o) { rj.setDuck(false); return; }
+    const wave = currentWave();
+    if (!wave) { rj.setDuck(false); return; }
 
-    const ttc = -o.mesh.position.z / Math.max(1e-3, s.speed);
-    const id = threatId(o);
-    lastSeen = { id, type: o.type, kind: o.def.kind, ttc,
-                 airborne: !s.onGround, duck: s.duck };
-    let d = decisions.get(id);
+    const ttc = -wave.z / Math.max(1e-3, s.speed);
 
-    if (!d && ttc <= api.config.decideAt && !reachedLimit()) {
-      ask(o, ttc);
-      d = decisions.get(id);
+    // what the model says each lane holds; absent means the lane is empty,
+    // which the harness can see for itself
+    const need = [null, null, null];
+    for (const o of wave.group) {
+      const d = decisions.get(idOf(o));
+      need[o.lane] = d ? (d.status === 'pending' ? 'unknown' : d.action) : 'unknown';
+      if (o.lane === s.lane) {
+        lastSeen = { id: idOf(o), type: o.type, ttc };
+      }
     }
-    if (!d || d.status === 'pending') { rj.setDuck(false); return; }
 
-    if (d.action === 'jump') {
+    // prefer an empty lane, then a manoeuvre we know, then an unclassified one;
+    // never a lane the model called a barrier
+    const usable = [0, 1, 2].filter(l => need[l] !== 'block');
+    const rank = l => (need[l] === null ? 0 : need[l] === 'unknown' ? 2 : 1);
+    const target = usable.length
+      ? usable.reduce((a, b) => {
+          const ra = rank(a), rb = rank(b);
+          if (ra !== rb) return ra < rb ? a : b;
+          return Math.abs(b - s.lane) < Math.abs(a - s.lane) ? b : a;
+        })
+      : s.lane;                       // every lane called blocked: hold and hope
+
+    if (s.lane !== target) {
+      rj.moveLane(Math.sign(target - s.lane));
+      api.stats.laneChanges++;
+    }
+
+    // Only commit to a manoeuvre once we are actually standing in the lane it
+    // belongs to -- jumping while still sliding clears the wrong obstacle.
+    const inLane = Math.abs(s.x - rj.LANES[target]) < 0.12;
+    const req = need[target];
+    if (!inLane || req === null || req === 'unknown' || req === 'block') {
+      rj.setDuck(false);
+      return;
+    }
+    if (req === 'jump') {
       rj.setDuck(false);
       if (ttc <= api.config.jumpAt && s.onGround) rj.jump();
-    } else if (d.action === 'duck') {
+    } else if (req === 'duck') {
       rj.setDuck(ttc <= api.config.duckFrom && ttc > api.config.duckUntil);
-    } else {
-      rj.setDuck(false);
     }
-  }
-
-  function reachedLimit() {
-    return api.config.maxDecisions > 0 && api.stats.decisions >= api.config.maxDecisions;
   }
 
   function start(cfg) {
     Object.assign(api.config, cfg || {});
     rj = window.__rj;
     if (!rj) throw new Error('window.__rj not found -- is the game loaded?');
+    if (!rj.LANES) throw new Error('this autopilot needs the three-lane game');
     if (!api.stats) reset();
     api.running = true;
     if (rj.state.mode !== 'playing') rj.startGame();

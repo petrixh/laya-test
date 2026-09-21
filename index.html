@@ -1007,8 +1007,6 @@ renderer.setAnimationLoop(() => {
       .then(function () {
         window.__autopilot.start({
           endpoint: endpoint,
-          encoding: q.get('encoding') || 'json',
-          framing: q.get('framing') || 'guided',
           maxDecisions: Number(q.get('decisions') || 0),
         });
         window.__layaHud.mount(window.__autopilot, endpoint);

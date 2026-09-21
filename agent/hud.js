@@ -12,8 +12,9 @@
 (function () {
   'use strict';
 
-  const ACTION_SLOT = { jump: 'var(--s1)', duck: 'var(--s2)', run: 'var(--s3)' };
-  const ORDER = ['jump', 'duck', 'run'];
+  const ACTION_SLOT = { jump: 'var(--s1)', duck: 'var(--s2)', block: 'var(--s3)' };
+  const ORDER = ['jump', 'duck', 'block'];
+  const HEX = { jump: '#3987e5', duck: '#d95926', block: '#199e70' };
   const SPARK_N = 60;
 
   const css = `
@@ -57,6 +58,15 @@
   #laya-hud .hero { display: flex; align-items: baseline; gap: 10px; }
   #laya-hud .hero .act { font-size: 30px; font-weight: 700; letter-spacing: 1px; line-height: 1; }
   #laya-hud .hero .cf { font-size: 11px; color: var(--ink-2); }
+
+  /* lane strip: which lane the reindeer is heading for */
+  #laya-hud .lanes { display: flex; gap: 6px; margin-top: 10px; }
+  #laya-hud .lanes span {
+    flex: 1; height: 7px; border-radius: 4px; background: var(--raised);
+    transition: background .15s;
+  }
+  #laya-hud .lanes span.on { background: var(--ink); }
+  #laya-hud .lanes span.no { background: var(--critical); }
 
   /* probability bars - direct-labelled, so identity never rests on colour */
   #laya-hud .bar { margin-bottom: 8px; }
@@ -120,9 +130,11 @@
     root.appendChild(el('div', 'hd', '<b>LAYA AUTOPILOT</b><span id="lh-dev">connecting</span>'));
 
     const hero = el('div', 'sec');
-    hero.appendChild(el('div', 'lbl', 'Executing'));
+    hero.appendChild(el('div', 'lbl', 'Reading'));
     hero.appendChild(el('div', 'hero',
       '<span class="act" id="lh-act">--</span><span class="cf" id="lh-cf"></span>'));
+    hero.appendChild(el('div', 'lanes', '<span data-l="0"></span><span data-l="1"></span>'
+      + '<span data-l="2"></span>'));
     root.appendChild(hero);
 
     const bars = el('div', 'sec');
@@ -229,7 +241,7 @@
     function paintDecision(d) {
       if (!d || d.status !== 'done') return;
       $('lh-act').textContent = d.action.toUpperCase();
-      $('lh-act').style.color = ({ jump: '#3987e5', duck: '#d95926', run: '#199e70' })[d.action] || '#fff';
+      $('lh-act').style.color = HEX[d.action] || '#fff';
       $('lh-cf').textContent = 'confidence ' + d.confidence.toFixed(3);
       for (const a of ORDER) {
         const p = (d.probs && d.probs[a]) || 0;
@@ -249,7 +261,20 @@
       $('lh-acc').textContent = st.decisions
         ? (100 * st.correct / st.decisions).toFixed(1) + '%' : '--';
       const rj = window.__rj;
-      if (rj) $('lh-dist').innerHTML = Math.floor(rj.state.distance) + '<small> m</small>';
+      if (rj) {
+        $('lh-dist').innerHTML = Math.floor(rj.state.distance) + '<small> m</small>';
+        // lane strip: filled = heading there, red = the model called it a barrier
+        const blocked = new Set();
+        for (const o of rj.obstacles) {
+          if (o.mesh.position.z < -40) continue;
+          if (o.def.kind === 'block') blocked.add(o.lane);
+        }
+        for (const node of document.querySelectorAll('#laya-hud .lanes span')) {
+          const l = Number(node.dataset.l);
+          node.classList.toggle('on', l === rj.state.lane);
+          node.classList.toggle('no', blocked.has(l) && l !== rj.state.lane);
+        }
+      }
       drawSpark(spark, st.latencies.slice(-SPARK_N));
 
       while (lastLogged < autopilot.trace.length) {

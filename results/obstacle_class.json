@@ -1,0 +1,77 @@
+{
+  "service": {
+    "checkpoint": "convaiinnovations/laya",
+    "subfolder": null,
+    "backend": "mlx",
+    "backend_requested": "mlx",
+    "runtime": "laya-mlx 0.1.0",
+    "dtype": "float16",
+    "device": "mlx",
+    "device_requested": "auto",
+    "torch": null,
+    "threads": 0,
+    "ready": true,
+    "load_seconds": 0.6117500830441713,
+    "question_types": [
+      "choice",
+      "score",
+      "noul"
+    ]
+  },
+  "rows": [
+    {
+      "framing": "split",
+      "labels": "neutral",
+      "accuracy": 0.933,
+      "named": 1.0,
+      "held_out": 0.889,
+      "errors": {
+        "jump->block": 1
+      }
+    },
+    {
+      "framing": "split",
+      "labels": "descriptive",
+      "accuracy": 0.8,
+      "named": 0.833,
+      "held_out": 0.778,
+      "errors": {
+        "jump->duck": 2,
+        "jump->block": 1
+      }
+    },
+    {
+      "framing": "two_noul",
+      "labels": "neutral",
+      "accuracy": 0.6,
+      "named": 0.667,
+      "held_out": 0.556,
+      "errors": {
+        "duck->jump": 5,
+        "jump->block": 1
+      }
+    },
+    {
+      "framing": "choice3",
+      "labels": "neutral",
+      "accuracy": 0.4,
+      "named": 0.5,
+      "held_out": 0.333,
+      "errors": {
+        "jump->block": 4,
+        "duck->block": 5
+      }
+    },
+    {
+      "framing": "choice3",
+      "labels": "descriptive",
+      "accuracy": 0.267,
+      "named": 0.167,
+      "held_out": 0.333,
+      "errors": {
+        "jump->block": 6,
+        "duck->block": 5
+      }
+    }
+  ]
+}

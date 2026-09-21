@@ -235,6 +235,53 @@ while still inside a garland it had correctly classified.
 The state encoding is switchable (`--encoding json|nl`) so the JSON-dict and
 natural-language framings can be compared on the same task.
 
+### Three lanes: a third class, and why it needs a second question
+
+The three-lane game adds walls, which can be neither jumped nor ducked, so the
+model now has to separate three classes instead of two. The obvious move --
+adding a third option to the working question -- fails badly:
+
+| framing | all | named objects | held-out objects |
+|---|---|---|---|
+| **split** (2-option choice + a `noul` barrier question) | **0.933** | 1.000 | 0.889 |
+| two_noul (barrier? hangs overhead?) | 0.600 | 0.667 | 0.556 |
+| choice3 (one 3-option question) | 0.400 | 0.500 | 0.333 |
+
+`choice3` mostly answers "impassable" to everything, which is the same collapse
+the single-lane sweep found when a third option was added (two 0.65, three 0.51).
+**Option count is the sharpest edge on this model**, so the third class gets its
+own question rather than a third label. Both questions ride in one forward pass,
+so it costs nothing.
+
+`two_noul` shows the other half of the picture: the barrier `noul` is reliable,
+but "does this hang overhead?" as a `noul` is not (five duck objects read as
+jump). Consistent with the churn ladder much earlier -- `noul` is good at a
+sharp factual property, weak at a graded one. Keep the validated `choice` for
+ground-versus-air and use `noul` only for the crisp question.
+
+A separate framing sweep (`eval/lane_probes.py`) also asked whether the model
+could bind objects to lanes from a single scene description -- "Left lane: a
+log. Middle lane: nothing. Right lane: a garland." It manages 0.633 per-lane
+accuracy that way, well short of classifying one named object at a time. The
+autopilot therefore reads which lane an obstacle is in from the game, exactly as
+it already read the obstacle's name, and asks the model only what the object
+requires.
+
+### Result: three lanes, 201 decisions, no mistakes
+
+`demo/three-lanes/`, against the MLX backend:
+
+| | |
+|---|---|
+| decisions | 201 |
+| accuracy | **1.00** -- jump 71/71, duck 60/60, block 70/70 |
+| crashes | **0** |
+| best distance | **1798m** |
+| lane changes | 51 |
+
+The barrier signal separates cleanly: mean P(block) is 0.90 for walls, 0.24 for
+ground obstacles and 0.00 for hanging ones.
+
 ### Result: framing decides everything
 
 The first attempt scored **0.35** against a 0.33 chance baseline and answered
