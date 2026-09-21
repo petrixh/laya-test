@@ -1,0 +1,46 @@
+[
+  {
+    "run": 0,
+    "distance": 103,
+    "lane": 0,
+    "x": -2.3,
+    "obstacle": "wall",
+    "verdict": "block",
+    "truth": "block",
+    "correct": true,
+    "ttc": 0.06
+  },
+  {
+    "run": 1,
+    "distance": 322,
+    "lane": 0,
+    "x": -2.3,
+    "obstacle": "wall",
+    "verdict": "block",
+    "truth": "block",
+    "correct": true,
+    "ttc": 0.051
+  },
+  {
+    "run": 2,
+    "distance": 182,
+    "lane": 0,
+    "x": -2.3,
+    "obstacle": "wall",
+    "verdict": "block",
+    "truth": "block",
+    "correct": true,
+    "ttc": 0.072
+  },
+  {
+    "run": 3,
+    "distance": 155,
+    "lane": 0,
+    "x": -2.3,
+    "obstacle": "wall",
+    "verdict": "block",
+    "truth": "block",
+    "correct": true,
+    "ttc": 0.075
+  }
+]

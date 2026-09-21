@@ -1,8 +1,9 @@
-"""Drives the Laya service over HTTP and collects per-example records."""
+"""HTTP client for the Laya service.
+
+Everything else that lived here -- the Banking77 task runner, the ladder
+statistics -- went with the scripts that used it."""
 from __future__ import annotations
 
-import math
-import sys
 import time
 
 import httpx
@@ -36,76 +37,3 @@ class Service:
         r = self.client.post("/predict", json={"state": state, "questions": questions})
         r.raise_for_status()
         return r.json()
-
-
-def run_choice_task(svc: Service, examples: list[dict], labels: list[str],
-                    instructions: str, key: str = "intent", progress: bool = True) -> list[dict]:
-    """examples: [{text, label_text}]. One choice question over `labels`."""
-    from .data import humanise
-
-    questions = {key: {
-        "type": "choice",
-        "instructions": instructions,
-        "criteria": {lab: humanise(lab) for lab in labels},
-    }}
-
-    records = []
-    for i, ex in enumerate(examples, 1):
-        res = svc.predict(ex["text"], questions)
-        ans = res["answers"][key]
-        probs = ans["probabilities"]
-        records.append({
-            "text": ex["text"],
-            "gold": ex["label_text"],
-            "pred": ans["choice"],
-            "probabilities": probs,
-            "confidence": ans["confidence"],
-            "top_prob": probs[ans["choice"]],
-            "latency_ms": res["latency_ms"],
-            "input_tokens": res.get("usage", {}).get("input_tokens"),
-        })
-        if progress and (i % 25 == 0 or i == len(examples)):
-            acc = sum(r["gold"] == r["pred"] for r in records) / len(records)
-            print(f"    {i}/{len(examples)}  running acc={acc:.3f}", file=sys.stderr, flush=True)
-    return records
-
-
-def kendall_tau(ranks: list[int], values: list[float]) -> float:
-    """Kendall tau-b between the intended ordering and the model's scores.
-
-    +1 perfectly ordered, 0 unrelated, -1 exactly reversed.
-
-    Tied values count against the score rather than being dropped. Excluding
-    them from the denominator as well as the numerator gives Goodman-Kruskal
-    gamma, under which a ladder that is flat except for one step scores a
-    perfect 1.0 -- and near-collapse is exactly what these ladders exist to
-    catch.
-    """
-    n = len(ranks)
-    con = dis = tied_v = tied_r = 0
-    for i in range(n):
-        for j in range(i + 1, n):
-            dr = ranks[i] - ranks[j]
-            dv = values[i] - values[j]
-            if dv == 0:
-                tied_v += 1
-            if dr == 0:
-                tied_r += 1
-            if dr == 0 or dv == 0:
-                continue
-            if dr * dv > 0:
-                con += 1
-            else:
-                dis += 1
-    pairs = n * (n - 1) / 2
-    denom = ((pairs - tied_r) * (pairs - tied_v)) ** 0.5
-    return (con - dis) / denom if denom else 0.0
-
-
-def balanced_for_k(rows: list[dict], labels: list[str], n: int, seed: int = 0) -> list[dict]:
-    """Roughly balanced sample of total size ~n across `labels`."""
-    from .data import balanced_sample
-
-    per = max(1, math.ceil(n / len(labels)))
-    sample = balanced_sample(rows, labels, per, seed=seed)
-    return sample[:n]

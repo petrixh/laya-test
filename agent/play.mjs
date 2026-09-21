@@ -27,7 +27,6 @@ const opts = {
   endpoint: String(arg('endpoint', 'http://127.0.0.1:8000')),
 
   decisions: Number(arg('decisions', 40)),
-  laneChoice: String(arg('lane-choice', 'rule')),
   seconds: Number(arg('seconds', 180)),
   out: String(arg('out', 'runs/latest')),
   video: arg('video', true) !== 'false',
@@ -199,8 +198,7 @@ const main = async () => {
   await page.addScriptTag({ path: join(ROOT, 'agent/autopilot.js') });
   await page.addScriptTag({ path: join(ROOT, 'agent/hud.js') });
   await page.evaluate((o) => {
-    window.__autopilot.start({ endpoint: o.endpoint, maxDecisions: o.decisions,
-                               laneChoice: o.laneChoice });
+    window.__autopilot.start({ endpoint: o.endpoint, maxDecisions: o.decisions });
     window.__layaHud.mount(window.__autopilot, o.endpoint);
   }, opts);
   console.log(`autopilot started (target ${opts.decisions} decisions)`);
@@ -250,12 +248,10 @@ const main = async () => {
     best_distance_m: result.stats.bestDistance,
     errors: result.stats.errors,
     lane_changes: result.stats.laneChanges,
-    stage_two: {
-      mode: opts.laneChoice,
+    lane_choice: {
       decisions: result.stats.laneDecisions,
-      forced: result.stats.laneForced,
-      chose_a_wall: result.stats.laneContradictions,
-      forced_single_candidate: result.stats.laneForcedSingle,
+      chose_the_barrier_it_was_in: result.stats.laneChoseBarrier,
+      chose_a_barrier: result.stats.laneContradictions,
       took_first_option: result.stats.laneDecisions
         ? +(result.stats.laneTookFirst / result.stats.laneDecisions).toFixed(4) : null,
       passed_up_a_clear_lane: result.stats.laneDecisions

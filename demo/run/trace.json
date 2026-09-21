@@ -1,0 +1,3002 @@
+[
+  {
+    "run": 0,
+    "distance": 42,
+    "speed": 17.8,
+    "obstacle": "baubles",
+    "lane": 0,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0954,
+    "probabilities": {
+      "jump": 0.32016797999999996,
+      "duck": 0.67973202,
+      "block": 0.0001
+    },
+    "server_ms": 61.5,
+    "wall_ms": 435.4
+  },
+  {
+    "run": 0,
+    "distance": 42,
+    "speed": 17.8,
+    "obstacle": "snowman",
+    "lane": 1,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.0376,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0284,
+    "probabilities": {
+      "jump": 0.57628512,
+      "duck": 0.38611488,
+      "block": 0.0376
+    },
+    "server_ms": 29.5,
+    "wall_ms": 474.1
+  },
+  {
+    "run": 0,
+    "distance": 43,
+    "speed": 17.8,
+    "obstacle": "snowman",
+    "lane": 2,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.0376,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0284,
+    "probabilities": {
+      "jump": 0.57628512,
+      "duck": 0.38611488,
+      "block": 0.0376
+    },
+    "server_ms": 29.4,
+    "wall_ms": 506.3
+  },
+  {
+    "run": 0,
+    "distance": 52,
+    "speed": 18.2,
+    "obstacle": "garland",
+    "lane": 0,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 82.6,
+    "wall_ms": 221.9
+  },
+  {
+    "run": 0,
+    "distance": 53,
+    "speed": 18.2,
+    "obstacle": "log",
+    "lane": 2,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.4124,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0437,
+    "probabilities": {
+      "jump": 0.365781,
+      "duck": 0.22181900000000002,
+      "block": 0.4124
+    },
+    "server_ms": 29.2,
+    "wall_ms": 259.7
+  },
+  {
+    "run": 0,
+    "distance": 53,
+    "speed": 18.2,
+    "obstacle": "wall",
+    "lane": 1,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 28.3,
+    "wall_ms": 287.4
+  },
+  {
+    "run": 0,
+    "distance": 66,
+    "speed": 18.7,
+    "obstacle": "wall",
+    "lane": 2,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 85.8,
+    "wall_ms": 331.9
+  },
+  {
+    "run": 0,
+    "distance": 66,
+    "speed": 18.7,
+    "obstacle": "gifts",
+    "lane": 1,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 28.4,
+    "wall_ms": 335.4
+  },
+  {
+    "stage": "lane",
+    "run": 0,
+    "distance": 66,
+    "lanes": [
+      "duck",
+      "block",
+      "jump"
+    ],
+    "candidates": [
+      0,
+      1,
+      2
+    ],
+    "chose": 0,
+    "contradiction": false,
+    "took_first_option": true,
+    "passed_up_a_clear_lane": false,
+    "probabilities": {
+      "left": 0.6672,
+      "middle": 0.1412,
+      "right": 0.1916
+    },
+    "confidence": 0.2145,
+    "server_ms": 17.1,
+    "wall_ms": 102.3
+  },
+  {
+    "run": 0,
+    "distance": 75,
+    "speed": 19,
+    "obstacle": "wall",
+    "lane": 0,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 43.1,
+    "wall_ms": 177.5
+  },
+  {
+    "run": 0,
+    "distance": 76,
+    "speed": 19.1,
+    "obstacle": "log",
+    "lane": 2,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.4124,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0437,
+    "probabilities": {
+      "jump": 0.365781,
+      "duck": 0.22181900000000002,
+      "block": 0.4124
+    },
+    "server_ms": 33.1,
+    "wall_ms": 214.8
+  },
+  {
+    "run": 0,
+    "distance": 76,
+    "speed": 19.1,
+    "obstacle": "garland",
+    "lane": 1,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 31.2,
+    "wall_ms": 241.8
+  },
+  {
+    "run": 0,
+    "distance": 89,
+    "speed": 19.5,
+    "obstacle": "baubles",
+    "lane": 0,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0954,
+    "probabilities": {
+      "jump": 0.32016797999999996,
+      "duck": 0.67973202,
+      "block": 0.0001
+    },
+    "server_ms": 63.6,
+    "wall_ms": 163.6
+  },
+  {
+    "run": 0,
+    "distance": 89,
+    "speed": 19.5,
+    "obstacle": "garland",
+    "lane": 2,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 28.9,
+    "wall_ms": 180.6
+  },
+  {
+    "stage": "lane",
+    "run": 0,
+    "distance": 93,
+    "lanes": [
+      "block",
+      "duck",
+      "jump"
+    ],
+    "candidates": [
+      0,
+      1,
+      2
+    ],
+    "chose": 0,
+    "contradiction": true,
+    "took_first_option": true,
+    "passed_up_a_clear_lane": false,
+    "probabilities": {
+      "left": 0.8187,
+      "middle": 0.074,
+      "right": 0.1073
+    },
+    "confidence": 0.4576,
+    "server_ms": 26.3,
+    "wall_ms": 139.7
+  },
+  {
+    "run": 1,
+    "distance": 0,
+    "speed": 16,
+    "obstacle": "baubles",
+    "lane": 0,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0954,
+    "probabilities": {
+      "jump": 0.32016797999999996,
+      "duck": 0.67973202,
+      "block": 0.0001
+    },
+    "server_ms": 47.1,
+    "wall_ms": 180.7
+  },
+  {
+    "run": 1,
+    "distance": 1,
+    "speed": 16.1,
+    "obstacle": "log",
+    "lane": 1,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.4124,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0437,
+    "probabilities": {
+      "jump": 0.365781,
+      "duck": 0.22181900000000002,
+      "block": 0.4124
+    },
+    "server_ms": 32.1,
+    "wall_ms": 196.8
+  },
+  {
+    "run": 1,
+    "distance": 1,
+    "speed": 16.1,
+    "obstacle": "gifts",
+    "lane": 2,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 31.9,
+    "wall_ms": 246.3
+  },
+  {
+    "run": 1,
+    "distance": 39,
+    "speed": 17.7,
+    "obstacle": "wall",
+    "lane": 0,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 75.9,
+    "wall_ms": 205.6
+  },
+  {
+    "run": 1,
+    "distance": 39,
+    "speed": 17.7,
+    "obstacle": "wall",
+    "lane": 1,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 29.1,
+    "wall_ms": 233.2
+  },
+  {
+    "run": 1,
+    "distance": 40,
+    "speed": 17.7,
+    "obstacle": "gifts",
+    "lane": 2,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 28.6,
+    "wall_ms": 263.2
+  },
+  {
+    "stage": "lane",
+    "run": 1,
+    "distance": 41,
+    "lanes": [
+      "block",
+      "block",
+      "jump"
+    ],
+    "candidates": [
+      0,
+      1,
+      2
+    ],
+    "chose": 2,
+    "contradiction": false,
+    "took_first_option": false,
+    "passed_up_a_clear_lane": false,
+    "probabilities": {
+      "left": 0.2279,
+      "middle": 0.3246,
+      "right": 0.4475
+    },
+    "confidence": 0.0333,
+    "server_ms": 38.6,
+    "wall_ms": 130.8
+  },
+  {
+    "run": 1,
+    "distance": 54,
+    "speed": 18.2,
+    "obstacle": "garland",
+    "lane": 2,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 45.8,
+    "wall_ms": 231
+  },
+  {
+    "run": 1,
+    "distance": 64,
+    "speed": 18.6,
+    "obstacle": "wall",
+    "lane": 0,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 46.5,
+    "wall_ms": 159.4
+  },
+  {
+    "run": 1,
+    "distance": 65,
+    "speed": 18.7,
+    "obstacle": "garland",
+    "lane": 1,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 32.8,
+    "wall_ms": 211.9
+  },
+  {
+    "run": 1,
+    "distance": 65,
+    "speed": 18.7,
+    "obstacle": "wall",
+    "lane": 2,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 31.3,
+    "wall_ms": 229.3
+  },
+  {
+    "run": 1,
+    "distance": 79,
+    "speed": 19.2,
+    "obstacle": "gifts",
+    "lane": 0,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 64.6,
+    "wall_ms": 208.2
+  },
+  {
+    "run": 1,
+    "distance": 80,
+    "speed": 19.2,
+    "obstacle": "log",
+    "lane": 1,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.4124,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0437,
+    "probabilities": {
+      "jump": 0.365781,
+      "duck": 0.22181900000000002,
+      "block": 0.4124
+    },
+    "server_ms": 29.3,
+    "wall_ms": 228.6
+  },
+  {
+    "stage": "lane",
+    "run": 1,
+    "distance": 84,
+    "lanes": [
+      "block",
+      "duck",
+      "block"
+    ],
+    "candidates": [
+      0,
+      1,
+      2
+    ],
+    "chose": 0,
+    "contradiction": true,
+    "took_first_option": true,
+    "passed_up_a_clear_lane": false,
+    "probabilities": {
+      "left": 0.9391,
+      "middle": 0.0349,
+      "right": 0.026
+    },
+    "confidence": 0.7532,
+    "server_ms": 24,
+    "wall_ms": 312.5
+  },
+  {
+    "run": 1,
+    "distance": 92,
+    "speed": 19.6,
+    "obstacle": "wall",
+    "lane": 0,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 54.7,
+    "wall_ms": 178.7
+  },
+  {
+    "run": 1,
+    "distance": 92,
+    "speed": 19.6,
+    "obstacle": "wall",
+    "lane": 2,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 34.1,
+    "wall_ms": 201.4
+  },
+  {
+    "run": 1,
+    "distance": 92,
+    "speed": 19.6,
+    "obstacle": "gifts",
+    "lane": 1,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 33.8,
+    "wall_ms": 221.9
+  },
+  {
+    "run": 1,
+    "distance": 105,
+    "speed": 20.1,
+    "obstacle": "wall",
+    "lane": 0,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 39.8,
+    "wall_ms": 216.7
+  },
+  {
+    "run": 1,
+    "distance": 105,
+    "speed": 20.1,
+    "obstacle": "gifts",
+    "lane": 1,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 33,
+    "wall_ms": 254.3
+  },
+  {
+    "run": 1,
+    "distance": 106,
+    "speed": 20.1,
+    "obstacle": "wall",
+    "lane": 2,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 33.2,
+    "wall_ms": 277.2
+  },
+  {
+    "run": 1,
+    "distance": 122,
+    "speed": 20.7,
+    "obstacle": "wall",
+    "lane": 0,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 69.2,
+    "wall_ms": 246.6
+  },
+  {
+    "run": 1,
+    "distance": 122,
+    "speed": 20.7,
+    "obstacle": "baubles",
+    "lane": 1,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0954,
+    "probabilities": {
+      "jump": 0.32016797999999996,
+      "duck": 0.67973202,
+      "block": 0.0001
+    },
+    "server_ms": 28.8,
+    "wall_ms": 297.3
+  },
+  {
+    "run": 1,
+    "distance": 122,
+    "speed": 20.7,
+    "obstacle": "wall",
+    "lane": 2,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 28.6,
+    "wall_ms": 310.7
+  },
+  {
+    "run": 1,
+    "distance": 134,
+    "speed": 21.1,
+    "obstacle": "gifts",
+    "lane": 0,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 38.4,
+    "wall_ms": 244
+  },
+  {
+    "run": 1,
+    "distance": 134,
+    "speed": 21.1,
+    "obstacle": "garland",
+    "lane": 2,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 33.3,
+    "wall_ms": 246.3
+  },
+  {
+    "run": 1,
+    "distance": 134,
+    "speed": 21.1,
+    "obstacle": "baubles",
+    "lane": 1,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0954,
+    "probabilities": {
+      "jump": 0.32016797999999996,
+      "duck": 0.67973202,
+      "block": 0.0001
+    },
+    "server_ms": 31.8,
+    "wall_ms": 265.9
+  },
+  {
+    "run": 1,
+    "distance": 146,
+    "speed": 21.5,
+    "obstacle": "wall",
+    "lane": 0,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 45.6,
+    "wall_ms": 137.6
+  },
+  {
+    "run": 1,
+    "distance": 147,
+    "speed": 21.5,
+    "obstacle": "garland",
+    "lane": 2,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 33.6,
+    "wall_ms": 179.1
+  },
+  {
+    "run": 1,
+    "distance": 148,
+    "speed": 21.5,
+    "obstacle": "gifts",
+    "lane": 1,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 33.7,
+    "wall_ms": 220
+  },
+  {
+    "run": 1,
+    "distance": 163,
+    "speed": 22,
+    "obstacle": "gifts",
+    "lane": 2,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 80.2,
+    "wall_ms": 210.7
+  },
+  {
+    "run": 1,
+    "distance": 164,
+    "speed": 22,
+    "obstacle": "garland",
+    "lane": 1,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 29,
+    "wall_ms": 228.7
+  },
+  {
+    "run": 1,
+    "distance": 181,
+    "speed": 22.6,
+    "obstacle": "garland",
+    "lane": 0,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 74.2,
+    "wall_ms": 261.1
+  },
+  {
+    "run": 1,
+    "distance": 181,
+    "speed": 22.6,
+    "obstacle": "snowman",
+    "lane": 1,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.0376,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0284,
+    "probabilities": {
+      "jump": 0.57628512,
+      "duck": 0.38611488,
+      "block": 0.0376
+    },
+    "server_ms": 29.2,
+    "wall_ms": 270.5
+  },
+  {
+    "run": 1,
+    "distance": 182,
+    "speed": 22.6,
+    "obstacle": "snowman",
+    "lane": 2,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.0376,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0284,
+    "probabilities": {
+      "jump": 0.57628512,
+      "duck": 0.38611488,
+      "block": 0.0376
+    },
+    "server_ms": 28.8,
+    "wall_ms": 313.8
+  },
+  {
+    "run": 1,
+    "distance": 203,
+    "speed": 23.3,
+    "obstacle": "garland",
+    "lane": 0,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 71.5,
+    "wall_ms": 417.9
+  },
+  {
+    "run": 1,
+    "distance": 203,
+    "speed": 23.3,
+    "obstacle": "gifts",
+    "lane": 1,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 29.2,
+    "wall_ms": 417.7
+  },
+  {
+    "run": 1,
+    "distance": 203,
+    "speed": 23.3,
+    "obstacle": "wall",
+    "lane": 2,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 28.6,
+    "wall_ms": 418.1
+  },
+  {
+    "run": 1,
+    "distance": 211,
+    "speed": 23.5,
+    "obstacle": "garland",
+    "lane": 0,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 42.4,
+    "wall_ms": 140.4
+  },
+  {
+    "run": 1,
+    "distance": 212,
+    "speed": 23.5,
+    "obstacle": "wall",
+    "lane": 2,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 32.8,
+    "wall_ms": 181.1
+  },
+  {
+    "run": 1,
+    "distance": 212,
+    "speed": 23.5,
+    "obstacle": "garland",
+    "lane": 1,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 33.3,
+    "wall_ms": 199.2
+  },
+  {
+    "run": 1,
+    "distance": 224,
+    "speed": 23.9,
+    "obstacle": "wall",
+    "lane": 1,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 43.2,
+    "wall_ms": 183.5
+  },
+  {
+    "run": 1,
+    "distance": 225,
+    "speed": 23.9,
+    "obstacle": "wall",
+    "lane": 2,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 33.3,
+    "wall_ms": 220.1
+  },
+  {
+    "run": 1,
+    "distance": 238,
+    "speed": 24.3,
+    "obstacle": "log",
+    "lane": 2,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.4124,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0437,
+    "probabilities": {
+      "jump": 0.365781,
+      "duck": 0.22181900000000002,
+      "block": 0.4124
+    },
+    "server_ms": 37.9,
+    "wall_ms": 161.3
+  },
+  {
+    "run": 1,
+    "distance": 239,
+    "speed": 24.3,
+    "obstacle": "garland",
+    "lane": 0,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 32,
+    "wall_ms": 193
+  },
+  {
+    "stage": "lane",
+    "run": 1,
+    "distance": 249,
+    "lanes": [
+      "clear",
+      "block",
+      "block"
+    ],
+    "candidates": [
+      0,
+      1,
+      2
+    ],
+    "chose": 0,
+    "contradiction": false,
+    "took_first_option": true,
+    "passed_up_a_clear_lane": false,
+    "probabilities": {
+      "left": 0.7636,
+      "middle": 0.1439,
+      "right": 0.0925
+    },
+    "confidence": 0.3582,
+    "server_ms": 32.5,
+    "wall_ms": 155.9
+  },
+  {
+    "run": 1,
+    "distance": 258,
+    "speed": 24.9,
+    "obstacle": "snowman",
+    "lane": 1,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.0376,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0284,
+    "probabilities": {
+      "jump": 0.57628512,
+      "duck": 0.38611488,
+      "block": 0.0376
+    },
+    "server_ms": 35.4,
+    "wall_ms": 156.3
+  },
+  {
+    "run": 1,
+    "distance": 259,
+    "speed": 24.9,
+    "obstacle": "log",
+    "lane": 0,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.4124,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0437,
+    "probabilities": {
+      "jump": 0.365781,
+      "duck": 0.22181900000000002,
+      "block": 0.4124
+    },
+    "server_ms": 29.1,
+    "wall_ms": 196.6
+  },
+  {
+    "run": 1,
+    "distance": 259,
+    "speed": 24.9,
+    "obstacle": "baubles",
+    "lane": 2,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0954,
+    "probabilities": {
+      "jump": 0.32016797999999996,
+      "duck": 0.67973202,
+      "block": 0.0001
+    },
+    "server_ms": 29.3,
+    "wall_ms": 226.9
+  },
+  {
+    "run": 1,
+    "distance": 272,
+    "speed": 25.2,
+    "obstacle": "baubles",
+    "lane": 0,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0954,
+    "probabilities": {
+      "jump": 0.32016797999999996,
+      "duck": 0.67973202,
+      "block": 0.0001
+    },
+    "server_ms": 42.2,
+    "wall_ms": 223.7
+  },
+  {
+    "run": 1,
+    "distance": 272,
+    "speed": 25.2,
+    "obstacle": "gifts",
+    "lane": 1,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 35.3,
+    "wall_ms": 237.9
+  },
+  {
+    "run": 1,
+    "distance": 273,
+    "speed": 25.3,
+    "obstacle": "gifts",
+    "lane": 2,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 32.2,
+    "wall_ms": 323.9
+  },
+  {
+    "run": 1,
+    "distance": 285,
+    "speed": 25.6,
+    "obstacle": "wall",
+    "lane": 0,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 43.3,
+    "wall_ms": 210.7
+  },
+  {
+    "run": 1,
+    "distance": 286,
+    "speed": 25.6,
+    "obstacle": "gifts",
+    "lane": 2,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 33.3,
+    "wall_ms": 234
+  },
+  {
+    "run": 1,
+    "distance": 286,
+    "speed": 25.7,
+    "obstacle": "baubles",
+    "lane": 1,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0954,
+    "probabilities": {
+      "jump": 0.32016797999999996,
+      "duck": 0.67973202,
+      "block": 0.0001
+    },
+    "server_ms": 32.9,
+    "wall_ms": 282.7
+  },
+  {
+    "run": 1,
+    "distance": 306,
+    "speed": 26.2,
+    "obstacle": "snowman",
+    "lane": 0,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.0376,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0284,
+    "probabilities": {
+      "jump": 0.57628512,
+      "duck": 0.38611488,
+      "block": 0.0376
+    },
+    "server_ms": 70.2,
+    "wall_ms": 173
+  },
+  {
+    "run": 1,
+    "distance": 306,
+    "speed": 26.2,
+    "obstacle": "log",
+    "lane": 1,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.4124,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0437,
+    "probabilities": {
+      "jump": 0.365781,
+      "duck": 0.22181900000000002,
+      "block": 0.4124
+    },
+    "server_ms": 29.2,
+    "wall_ms": 191.8
+  },
+  {
+    "run": 1,
+    "distance": 306,
+    "speed": 26.2,
+    "obstacle": "garland",
+    "lane": 2,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 28.6,
+    "wall_ms": 223.3
+  },
+  {
+    "stage": "lane",
+    "run": 1,
+    "distance": 311,
+    "lanes": [
+      "block",
+      "duck",
+      "jump"
+    ],
+    "candidates": [
+      0,
+      1,
+      2
+    ],
+    "chose": 0,
+    "contradiction": true,
+    "took_first_option": true,
+    "passed_up_a_clear_lane": false,
+    "probabilities": {
+      "left": 0.8187,
+      "middle": 0.074,
+      "right": 0.1073
+    },
+    "confidence": 0.4576,
+    "server_ms": 26.2,
+    "wall_ms": 185.8
+  },
+  {
+    "run": 1,
+    "distance": 321,
+    "speed": 26.6,
+    "obstacle": "garland",
+    "lane": 0,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 42.5,
+    "wall_ms": 146.5
+  },
+  {
+    "run": 1,
+    "distance": 322,
+    "speed": 26.6,
+    "obstacle": "snowman",
+    "lane": 1,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.0376,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0284,
+    "probabilities": {
+      "jump": 0.57628512,
+      "duck": 0.38611488,
+      "block": 0.0376
+    },
+    "server_ms": 33.5,
+    "wall_ms": 210
+  },
+  {
+    "run": 1,
+    "distance": 322,
+    "speed": 26.6,
+    "obstacle": "baubles",
+    "lane": 2,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0954,
+    "probabilities": {
+      "jump": 0.32016797999999996,
+      "duck": 0.67973202,
+      "block": 0.0001
+    },
+    "server_ms": 34.6,
+    "wall_ms": 210.2
+  },
+  {
+    "run": 2,
+    "distance": 40,
+    "speed": 17.7,
+    "obstacle": "garland",
+    "lane": 1,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 77.2,
+    "wall_ms": 285.4
+  },
+  {
+    "run": 2,
+    "distance": 40,
+    "speed": 17.7,
+    "obstacle": "baubles",
+    "lane": 0,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0954,
+    "probabilities": {
+      "jump": 0.32016797999999996,
+      "duck": 0.67973202,
+      "block": 0.0001
+    },
+    "server_ms": 28.6,
+    "wall_ms": 299
+  },
+  {
+    "run": 2,
+    "distance": 47,
+    "speed": 18,
+    "obstacle": "log",
+    "lane": 0,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.4124,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0437,
+    "probabilities": {
+      "jump": 0.365781,
+      "duck": 0.22181900000000002,
+      "block": 0.4124
+    },
+    "server_ms": 39.1,
+    "wall_ms": 160.1
+  },
+  {
+    "run": 2,
+    "distance": 47,
+    "speed": 18,
+    "obstacle": "gifts",
+    "lane": 2,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 34.4,
+    "wall_ms": 165.6
+  },
+  {
+    "run": 2,
+    "distance": 59,
+    "speed": 18.4,
+    "obstacle": "wall",
+    "lane": 2,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 47.3,
+    "wall_ms": 178.9
+  },
+  {
+    "run": 2,
+    "distance": 70,
+    "speed": 18.8,
+    "obstacle": "snowman",
+    "lane": 0,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.0376,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0284,
+    "probabilities": {
+      "jump": 0.57628512,
+      "duck": 0.38611488,
+      "block": 0.0376
+    },
+    "server_ms": 45.9,
+    "wall_ms": 296
+  },
+  {
+    "run": 2,
+    "distance": 70,
+    "speed": 18.8,
+    "obstacle": "wall",
+    "lane": 1,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 30.8,
+    "wall_ms": 298.1
+  },
+  {
+    "run": 2,
+    "distance": 70,
+    "speed": 18.8,
+    "obstacle": "wall",
+    "lane": 2,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 31.2,
+    "wall_ms": 340
+  },
+  {
+    "run": 2,
+    "distance": 78,
+    "speed": 19.1,
+    "obstacle": "wall",
+    "lane": 2,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 43.3,
+    "wall_ms": 159.1
+  },
+  {
+    "stage": "lane",
+    "run": 2,
+    "distance": 90,
+    "lanes": [
+      "jump",
+      "block",
+      "block"
+    ],
+    "candidates": [
+      0,
+      1,
+      2
+    ],
+    "chose": 0,
+    "contradiction": false,
+    "took_first_option": true,
+    "passed_up_a_clear_lane": false,
+    "probabilities": {
+      "left": 0.9321,
+      "middle": 0.0391,
+      "right": 0.0288
+    },
+    "confidence": 0.7319,
+    "server_ms": 40.9,
+    "wall_ms": 262.6
+  },
+  {
+    "run": 2,
+    "distance": 96,
+    "speed": 19.8,
+    "obstacle": "wall",
+    "lane": 2,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 44.9,
+    "wall_ms": 241.2
+  },
+  {
+    "run": 2,
+    "distance": 109,
+    "speed": 20.2,
+    "obstacle": "gifts",
+    "lane": 0,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 37.6,
+    "wall_ms": 267
+  },
+  {
+    "run": 2,
+    "distance": 109,
+    "speed": 20.2,
+    "obstacle": "wall",
+    "lane": 1,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 33.6,
+    "wall_ms": 266.8
+  },
+  {
+    "run": 2,
+    "distance": 123,
+    "speed": 20.7,
+    "obstacle": "garland",
+    "lane": 0,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 88.3,
+    "wall_ms": 342.3
+  },
+  {
+    "run": 2,
+    "distance": 124,
+    "speed": 20.7,
+    "obstacle": "baubles",
+    "lane": 2,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0954,
+    "probabilities": {
+      "jump": 0.32016797999999996,
+      "duck": 0.67973202,
+      "block": 0.0001
+    },
+    "server_ms": 29.1,
+    "wall_ms": 359.9
+  },
+  {
+    "run": 2,
+    "distance": 124,
+    "speed": 20.7,
+    "obstacle": "wall",
+    "lane": 1,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 28.5,
+    "wall_ms": 386.4
+  },
+  {
+    "run": 2,
+    "distance": 135,
+    "speed": 21.1,
+    "obstacle": "gifts",
+    "lane": 0,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 40.2,
+    "wall_ms": 154.3
+  },
+  {
+    "run": 2,
+    "distance": 136,
+    "speed": 21.1,
+    "obstacle": "baubles",
+    "lane": 1,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0954,
+    "probabilities": {
+      "jump": 0.32016797999999996,
+      "duck": 0.67973202,
+      "block": 0.0001
+    },
+    "server_ms": 33.5,
+    "wall_ms": 201.4
+  },
+  {
+    "run": 2,
+    "distance": 136,
+    "speed": 21.1,
+    "obstacle": "gifts",
+    "lane": 2,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 33.7,
+    "wall_ms": 215.6
+  },
+  {
+    "run": 2,
+    "distance": 150,
+    "speed": 21.6,
+    "obstacle": "wall",
+    "lane": 0,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 39.4,
+    "wall_ms": 147.3
+  },
+  {
+    "run": 2,
+    "distance": 150,
+    "speed": 21.6,
+    "obstacle": "snowman",
+    "lane": 2,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.0376,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0284,
+    "probabilities": {
+      "jump": 0.57628512,
+      "duck": 0.38611488,
+      "block": 0.0376
+    },
+    "server_ms": 32.2,
+    "wall_ms": 167.4
+  },
+  {
+    "run": 2,
+    "distance": 171,
+    "speed": 22.3,
+    "obstacle": "baubles",
+    "lane": 0,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0954,
+    "probabilities": {
+      "jump": 0.32016797999999996,
+      "duck": 0.67973202,
+      "block": 0.0001
+    },
+    "server_ms": 83.3,
+    "wall_ms": 308.7
+  },
+  {
+    "run": 2,
+    "distance": 171,
+    "speed": 22.3,
+    "obstacle": "wall",
+    "lane": 2,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 28.9,
+    "wall_ms": 328.4
+  },
+  {
+    "stage": "lane",
+    "run": 2,
+    "distance": 171,
+    "lanes": [
+      "block",
+      "clear",
+      "jump"
+    ],
+    "candidates": [
+      0,
+      1,
+      2
+    ],
+    "chose": 0,
+    "contradiction": true,
+    "took_first_option": true,
+    "passed_up_a_clear_lane": true,
+    "probabilities": {
+      "left": 0.8576,
+      "middle": 0.0336,
+      "right": 0.1088
+    },
+    "confidence": 0.5565,
+    "server_ms": 15.9,
+    "wall_ms": 310.7
+  },
+  {
+    "run": 2,
+    "distance": 181,
+    "speed": 22.6,
+    "obstacle": "garland",
+    "lane": 1,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 47,
+    "wall_ms": 183.6
+  },
+  {
+    "run": 3,
+    "distance": 39,
+    "speed": 17.6,
+    "obstacle": "wall",
+    "lane": 0,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 71.2,
+    "wall_ms": 176.4
+  },
+  {
+    "run": 3,
+    "distance": 39,
+    "speed": 17.6,
+    "obstacle": "log",
+    "lane": 1,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.4124,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0437,
+    "probabilities": {
+      "jump": 0.365781,
+      "duck": 0.22181900000000002,
+      "block": 0.4124
+    },
+    "server_ms": 29.1,
+    "wall_ms": 211.9
+  },
+  {
+    "run": 3,
+    "distance": 39,
+    "speed": 17.6,
+    "obstacle": "gifts",
+    "lane": 2,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 29,
+    "wall_ms": 230.9
+  },
+  {
+    "run": 3,
+    "distance": 54,
+    "speed": 18.2,
+    "obstacle": "garland",
+    "lane": 0,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 84.8,
+    "wall_ms": 227.4
+  },
+  {
+    "run": 3,
+    "distance": 54,
+    "speed": 18.2,
+    "obstacle": "garland",
+    "lane": 2,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 28.7,
+    "wall_ms": 257.2
+  },
+  {
+    "run": 3,
+    "distance": 66,
+    "speed": 18.7,
+    "obstacle": "baubles",
+    "lane": 1,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0954,
+    "probabilities": {
+      "jump": 0.32016797999999996,
+      "duck": 0.67973202,
+      "block": 0.0001
+    },
+    "server_ms": 74.3,
+    "wall_ms": 198.8
+  },
+  {
+    "run": 3,
+    "distance": 66,
+    "speed": 18.7,
+    "obstacle": "wall",
+    "lane": 0,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 29.1,
+    "wall_ms": 232.8
+  },
+  {
+    "run": 3,
+    "distance": 80,
+    "speed": 19.2,
+    "obstacle": "baubles",
+    "lane": 1,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0954,
+    "probabilities": {
+      "jump": 0.32016797999999996,
+      "duck": 0.67973202,
+      "block": 0.0001
+    },
+    "server_ms": 83.3,
+    "wall_ms": 192.5
+  },
+  {
+    "run": 3,
+    "distance": 97,
+    "speed": 19.8,
+    "obstacle": "baubles",
+    "lane": 0,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0954,
+    "probabilities": {
+      "jump": 0.32016797999999996,
+      "duck": 0.67973202,
+      "block": 0.0001
+    },
+    "server_ms": 74.8,
+    "wall_ms": 193.2
+  },
+  {
+    "run": 3,
+    "distance": 97,
+    "speed": 19.8,
+    "obstacle": "wall",
+    "lane": 1,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 29.2,
+    "wall_ms": 205
+  },
+  {
+    "run": 3,
+    "distance": 98,
+    "speed": 19.8,
+    "obstacle": "wall",
+    "lane": 2,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 28.8,
+    "wall_ms": 233.9
+  },
+  {
+    "stage": "lane",
+    "run": 3,
+    "distance": 111,
+    "lanes": [
+      "duck",
+      "block",
+      "block"
+    ],
+    "candidates": [
+      0,
+      1,
+      2
+    ],
+    "chose": 0,
+    "contradiction": false,
+    "took_first_option": true,
+    "passed_up_a_clear_lane": false,
+    "probabilities": {
+      "left": 0.8113,
+      "middle": 0.1261,
+      "right": 0.0626
+    },
+    "confidence": 0.45,
+    "server_ms": 58.9,
+    "wall_ms": 277.2
+  },
+  {
+    "run": 3,
+    "distance": 112,
+    "speed": 20.3,
+    "obstacle": "log",
+    "lane": 0,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.4124,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0437,
+    "probabilities": {
+      "jump": 0.365781,
+      "duck": 0.22181900000000002,
+      "block": 0.4124
+    },
+    "server_ms": 32.4,
+    "wall_ms": 252
+  },
+  {
+    "run": 3,
+    "distance": 112,
+    "speed": 20.3,
+    "obstacle": "wall",
+    "lane": 1,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 28.7,
+    "wall_ms": 288.8
+  },
+  {
+    "run": 3,
+    "distance": 112,
+    "speed": 20.3,
+    "obstacle": "log",
+    "lane": 2,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.4124,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0437,
+    "probabilities": {
+      "jump": 0.365781,
+      "duck": 0.22181900000000002,
+      "block": 0.4124
+    },
+    "server_ms": 29.4,
+    "wall_ms": 308.8
+  },
+  {
+    "run": 3,
+    "distance": 126,
+    "speed": 20.8,
+    "obstacle": "wall",
+    "lane": 0,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 38.2,
+    "wall_ms": 148.2
+  },
+  {
+    "run": 3,
+    "distance": 126,
+    "speed": 20.8,
+    "obstacle": "snowman",
+    "lane": 1,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.0376,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0284,
+    "probabilities": {
+      "jump": 0.57628512,
+      "duck": 0.38611488,
+      "block": 0.0376
+    },
+    "server_ms": 31.2,
+    "wall_ms": 193.7
+  },
+  {
+    "run": 3,
+    "distance": 126,
+    "speed": 20.8,
+    "obstacle": "gifts",
+    "lane": 2,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 30.2,
+    "wall_ms": 212.6
+  },
+  {
+    "run": 3,
+    "distance": 137,
+    "speed": 21.2,
+    "obstacle": "baubles",
+    "lane": 0,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0954,
+    "probabilities": {
+      "jump": 0.32016797999999996,
+      "duck": 0.67973202,
+      "block": 0.0001
+    },
+    "server_ms": 45.9,
+    "wall_ms": 161.3
+  },
+  {
+    "run": 3,
+    "distance": 137,
+    "speed": 21.2,
+    "obstacle": "log",
+    "lane": 1,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.4124,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0437,
+    "probabilities": {
+      "jump": 0.365781,
+      "duck": 0.22181900000000002,
+      "block": 0.4124
+    },
+    "server_ms": 32.3,
+    "wall_ms": 175.3
+  },
+  {
+    "run": 3,
+    "distance": 137,
+    "speed": 21.2,
+    "obstacle": "garland",
+    "lane": 2,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 33.3,
+    "wall_ms": 235.7
+  },
+  {
+    "stage": "lane",
+    "run": 3,
+    "distance": 144,
+    "lanes": [
+      "block",
+      "jump",
+      "jump"
+    ],
+    "candidates": [
+      0,
+      1,
+      2
+    ],
+    "chose": 0,
+    "contradiction": true,
+    "took_first_option": true,
+    "passed_up_a_clear_lane": false,
+    "probabilities": {
+      "left": 0.8076,
+      "middle": 0.1051,
+      "right": 0.0873
+    },
+    "confidence": 0.4336,
+    "server_ms": 34.7,
+    "wall_ms": 249.1
+  },
+  {
+    "run": 3,
+    "distance": 153,
+    "speed": 21.7,
+    "obstacle": "wall",
+    "lane": 0,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 45.9,
+    "wall_ms": 282
+  },
+  {
+    "run": 3,
+    "distance": 153,
+    "speed": 21.7,
+    "obstacle": "garland",
+    "lane": 2,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 31.9,
+    "wall_ms": 284.2
+  },
+  {
+    "run": 4,
+    "distance": 40,
+    "speed": 17.7,
+    "obstacle": "wall",
+    "lane": 0,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 70.1,
+    "wall_ms": 274.1
+  },
+  {
+    "run": 4,
+    "distance": 40,
+    "speed": 17.7,
+    "obstacle": "baubles",
+    "lane": 1,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0954,
+    "probabilities": {
+      "jump": 0.32016797999999996,
+      "duck": 0.67973202,
+      "block": 0.0001
+    },
+    "server_ms": 29.2,
+    "wall_ms": 301.9
+  },
+  {
+    "run": 4,
+    "distance": 41,
+    "speed": 17.7,
+    "obstacle": "wall",
+    "lane": 2,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 28.5,
+    "wall_ms": 346.6
+  },
+  {
+    "run": 4,
+    "distance": 48,
+    "speed": 18,
+    "obstacle": "wall",
+    "lane": 0,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 42.1,
+    "wall_ms": 152.6
+  },
+  {
+    "run": 4,
+    "distance": 59,
+    "speed": 18.4,
+    "obstacle": "wall",
+    "lane": 0,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 38.2,
+    "wall_ms": 237.7
+  },
+  {
+    "run": 4,
+    "distance": 59,
+    "speed": 18.4,
+    "obstacle": "wall",
+    "lane": 2,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 33.6,
+    "wall_ms": 265.4
+  },
+  {
+    "run": 4,
+    "distance": 59,
+    "speed": 18.4,
+    "obstacle": "snowman",
+    "lane": 1,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.0376,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0284,
+    "probabilities": {
+      "jump": 0.57628512,
+      "duck": 0.38611488,
+      "block": 0.0376
+    },
+    "server_ms": 34.3,
+    "wall_ms": 293.1
+  },
+  {
+    "run": 4,
+    "distance": 67,
+    "speed": 18.7,
+    "obstacle": "baubles",
+    "lane": 2,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0954,
+    "probabilities": {
+      "jump": 0.32016797999999996,
+      "duck": 0.67973202,
+      "block": 0.0001
+    },
+    "server_ms": 44.6,
+    "wall_ms": 206.2
+  },
+  {
+    "run": 4,
+    "distance": 75,
+    "speed": 19,
+    "obstacle": "gifts",
+    "lane": 2,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 42.3,
+    "wall_ms": 145.1
+  },
+  {
+    "run": 4,
+    "distance": 92,
+    "speed": 19.6,
+    "obstacle": "gifts",
+    "lane": 1,
+    "kind": "ground",
+    "truth": "jump",
+    "pred": "jump",
+    "correct": true,
+    "p_block": 0.305,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0614,
+    "probabilities": {
+      "jump": 0.44820550000000003,
+      "duck": 0.24679450000000003,
+      "block": 0.305
+    },
+    "server_ms": 71.6,
+    "wall_ms": 243.4
+  },
+  {
+    "run": 4,
+    "distance": 92,
+    "speed": 19.6,
+    "obstacle": "wall",
+    "lane": 2,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 29.3,
+    "wall_ms": 261.4
+  },
+  {
+    "run": 4,
+    "distance": 103,
+    "speed": 20,
+    "obstacle": "baubles",
+    "lane": 0,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0954,
+    "probabilities": {
+      "jump": 0.32016797999999996,
+      "duck": 0.67973202,
+      "block": 0.0001
+    },
+    "server_ms": 67.7,
+    "wall_ms": 221.7
+  },
+  {
+    "run": 4,
+    "distance": 117,
+    "speed": 20.5,
+    "obstacle": "garland",
+    "lane": 2,
+    "kind": "air",
+    "truth": "duck",
+    "pred": "duck",
+    "correct": true,
+    "p_block": 0.0001,
+    "manoeuvre_choice": "option_b",
+    "manoeuvre_confidence": 0.0781,
+    "probabilities": {
+      "jump": 0.33696630000000005,
+      "duck": 0.6629337000000001,
+      "block": 0.0001
+    },
+    "server_ms": 65.6,
+    "wall_ms": 172.1
+  },
+  {
+    "run": 4,
+    "distance": 135,
+    "speed": 21.1,
+    "obstacle": "wall",
+    "lane": 0,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 78.7,
+    "wall_ms": 194.8
+  },
+  {
+    "run": 4,
+    "distance": 136,
+    "speed": 21.1,
+    "obstacle": "wall",
+    "lane": 1,
+    "kind": "block",
+    "truth": "block",
+    "pred": "block",
+    "correct": true,
+    "p_block": 0.903,
+    "manoeuvre_choice": "option_a",
+    "manoeuvre_confidence": 0.0148,
+    "probabilities": {
+      "jump": 0.055445199999999986,
+      "duck": 0.04155479999999999,
+      "block": 0.903
+    },
+    "server_ms": 29.3,
+    "wall_ms": 226.2
+  }
+]

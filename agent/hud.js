@@ -309,12 +309,14 @@
       }
       // say plainly when stage two is not being consulted, so the panel is not
       // mistaken for a live decision when it is only showing the last one
-      if (autopilot.config.laneChoice === 'model' && autopilot.laneNeed === 'not needed') {
-        const tag = $('lh-lanetag');
-        if (tag.textContent !== 'not needed') {
-          tag.textContent = 'not needed';
-          tag.className = 'tag';
-        }
+      // The reindeer never moves except on an answer, so the tag tracks the
+      // real state: not needed, waiting on the model, or answered.
+      const st2 = autopilot.laneNeed;
+      const tag = $('lh-lanetag');
+      if (st2 === 'not needed' && tag.textContent !== 'not needed') {
+        tag.textContent = 'not needed'; tag.className = 'tag';
+      } else if (st2 === 'waiting' && tag.textContent !== 'asking…') {
+        tag.textContent = 'asking\u2026'; tag.className = 'tag forced';
       }
       const rj = window.__rj;
       if (rj) {
@@ -358,8 +360,8 @@
       const tag = $('lh-lanetag');
       // "forced" = the lane the reindeer is standing in was called a barrier,
       // so stage two had to move it. Otherwise the choice was optional.
-      tag.textContent = d.contradiction ? 'CHOSE A WALL' : d.forced ? 'FORCED' : 'optional';
-      tag.className = 'tag' + (d.contradiction ? ' bad' : d.forced ? ' forced' : '');
+      tag.textContent = d.contradiction ? 'CHOSE A WALL' : 'MODEL PICKED';
+      tag.className = 'tag' + (d.contradiction ? ' bad' : ' forced');
       for (let i = 0; i < 3; i++) {
         const p = d.probs[i] || 0;
         $('lh-lp-' + i).textContent = p.toFixed(2);
@@ -378,9 +380,7 @@
       clearInterval(timer);
       return wrappedStop.apply(this, arguments);
     };
-    if (autopilot.config.laneChoice !== 'model') {
-      $('lh-lanetag').textContent = 'harness rule';
-    }
+
     const timer = setInterval(paintStats, 120);
     addEventListener('resize', () => drawSpark(spark, autopilot.stats.latencies.slice(-SPARK_N)));
   }

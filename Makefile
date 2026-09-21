@@ -1,12 +1,9 @@
 # Laya container: build, run, test.
 COMPOSE := docker compose
-K ?= 4,8,16,32,77
-N ?= 150
-PLAYS ?= 40
+PLAYS ?= 120
 
 .PHONY: help volume build up down logs ready test bench smoke shell clean rebuild \
-        eval eval-labels eval-probes eval-typed report introspect \
-        agent-deps play play-mock play-watch
+        introspect agent-deps play play-mock play-watch solvable eval
 
 help:
 	@grep -E '^[a-z-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-10s\033[0m %s\n",$$1,$$2}'
@@ -31,29 +28,6 @@ ready: ## Block until the checkpoint is loaded
 test: up ## Run the HTTP test suite in a container
 	$(COMPOSE) --profile test run --rm --build tests
 
-bench: up ## Report latency at 1 / 3 / 10 questions per pass
-	$(COMPOSE) --profile test run --rm --entrypoint python tests bench.py
-
-smoke: ## Load + predict directly in-process, bypassing HTTP
-	docker run --rm -v laya-models:/models -v "$$PWD/scripts:/srv/scripts:ro" laya:cpu python scripts/smoke.py
-
-eval: eval-probes eval-labels ## Run the full eval suite against the running checkpoint
-
-eval-labels: up ## Accuracy + calibration vs number of choice labels (Banking77)
-	$(COMPOSE) --profile eval run --rm eval labels --k $(K) --n $(N)
-
-eval-probes: up ## Graded intensity ladders (churn, urgency)
-	$(COMPOSE) --profile eval run --rm eval probes
-
-eval-typed: ## Re-run the whole eval against the laya-typed-decisions checkpoint
-	LAYA_SUBFOLDER=typed-decisions $(COMPOSE) up -d --force-recreate laya
-	$(MAKE) ready
-	LAYA_SUBFOLDER=typed-decisions $(COMPOSE) --profile eval run --rm eval all --k $(K) --n $(N)
-	@echo "note: service is still on typed-decisions; 'make up' restores the base checkpoint"
-
-report: ## Render a comparison table from everything in results/
-	$(COMPOSE) --profile eval run --rm --entrypoint python eval -m eval.report
-
 introspect: ## Print laya's real signatures (run after a version bump)
 	docker run --rm -v laya-models:/models -v "$$PWD/scripts:/srv/scripts:ro" laya:cpu python scripts/introspect.py
 
@@ -65,6 +39,13 @@ play: up ## Autopilot plays Reindeer Jump against the live model (records video)
 
 play-mock: ## Same harness, fake decision service -- proves the rig without the model
 	node agent/play.mjs --mock --decisions $(PLAYS) --out runs/mock
+
+solvable: ## Prove every wave has a passable, reachable lane (no model needed)
+	node agent/check-solvable.mjs --waves 400
+
+eval: up ## The measurements behind the prompt design
+	$(COMPOSE) --profile eval run --rm --no-deps --entrypoint python eval -m eval.obstacle_class
+	$(COMPOSE) --profile eval run --rm --no-deps --entrypoint python eval -m eval.lane_forced
 
 play-watch: up ## Open a real browser and watch it play (needs a display)
 	node agent/play.mjs --headed --decisions 0 --seconds 600 --video false

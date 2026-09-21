@@ -1,118 +1,25 @@
-## `lane-choice/` — the model choosing the lane, gated
+# Recorded run
 
-Same game and same stage-one classifier, but when the reindeer's lane is a
-barrier the *lane* is chosen by a second Laya question rather than by the
-harness rule. Options are filtered to lanes stage one did not call barriers.
+One run of the autopilot against Laya on the MLX backend, so the result can be seen
+without standing the service up.
 
-| | |
-|---|---|
-| stage-one accuracy | 1.00 |
-| crashes | **0** |
-| best distance | 902m |
-| stage-two calls | 4 (plus 6 waves with a single candidate) |
-| **took the first option** | **4 / 4** |
-
-It survives, and that is the point worth noticing: the filter guarantees
-survival from stage one, while stage two took whichever option was listed
-first every time. Asked the same question with the options swapped
-(`eval/lane_forced.py`) it names the other lane 80-100% of the time. The panel
-tags each wave `FORCED`, `optional` or `not needed`.
-
-## `three-lanes/` — the lane-aware autopilot
-
-Laya on MLX driving the three-lane game: three lanes, walls that must be gone
-around, and a wave across all lanes at once.
+- `reindeer.gif` — nine seconds of it, the version embedded in the README
+- `run.webm` — the whole 90-second run
+- `summary.json` — headline figures
+- `trace.json` — every decision: the obstacle, what the model answered, the
+  probabilities, server and wall latency. Rows tagged `stage: "lane"` are lane choices.
+- `deaths.json` — one row per crash, with the verdict that preceded it, so a death after
+  a *correct* reading (an execution bug) is distinguishable from one after a wrong
+  reading (a model error)
 
 | | |
 |---|---|
-| decisions | 201 |
-| accuracy | **1.00** — jump 71/71, duck 60/60, block 70/70 |
-| crashes | **0** |
-| best distance | **1798m** |
-| lane changes | 51 |
+| obstacles classified | 130, accuracy **1.00** (jump 44/44, duck 43/43, block 43/43) |
+| lane choices by the model | 10 |
+| chose the barrier it was standing in | **5** |
+| took the first option offered | 90% |
+| crashes | 4 |
+| furthest run | 322m |
+| latency p50 | 249ms wall, ~30ms of it inference |
 
-Each obstacle gets one forward pass carrying two questions: the validated
-two-option ground-versus-air `choice`, plus a `noul` asking whether it is a
-solid barrier. Mean P(block) comes out at 0.90 for walls, 0.24 for ground
-obstacles and 0.00 for hanging ones.
-
-The state still only names the object. The harness reads which lane it is in
-and applies a fixed preference (empty lane beats a manoeuvre, never enter a
-barrier); the model supplies the classification.
-
-> **Note:** the two recordings below are from the single-lane game. They are a
-> record of the old one, kept because they are what the prompt-triage result was
-> measured on.
-
-# Demo runs
-
-Two recorded runs of the Reindeer Jump autopilot. Both are real captures from
-`agent/play.mjs`; each folder has `run.webm`, a `frame.png` still, and the
-`summary.json` / `trace.json` / `deaths.json` the run produced.
-
-## `laya-guided/` — the same model, after prompt triage
-
-Laya on MLX (M3 Max), 40 decisions with the `guided` framing chosen by
-`eval/prompt_sweep.py` and confirmed by `eval/prompt_confirm.py`.
-
-| | |
-|---|---|
-| accuracy | **1.00** (40/40) |
-| ground obstacles | 29 / 29 |
-| air obstacles | 11 / 11 |
-| crashes | **0** |
-| best distance | **721m** |
-| mean confidence | 0.057 |
-
-No leak: the state is only `There is a log on the track ahead of the running
-reindeer.` The model still decides whether that sits or hangs. What changed is
-static and instance-independent -- neutral label names instead of `jump`/`duck`,
-criteria giving both examples and mechanism, and two options instead of three.
-
-Note the confidence: 0.057 while scoring 1.00. It is right and does not believe
-it, so none of this is gateable on confidence.
-
-## `laya-cpu/` — the same model, first framing
-
-Laya `convaiinnovations/laya` (base checkpoint, fp32, CPU, 4 threads) driving the
-game for 40 decisions, before the prompt sweep. Kept as the before-picture.
-
-| | |
-|---|---|
-| accuracy | **0.35** (chance is 0.33 on three labels) |
-| ground obstacles | **0 / 26** |
-| air obstacles | **14 / 14** |
-| crashes | 14 (see `correction` in summary.json), all from wrong verdicts, none from latency |
-| mean confidence | 0.13 |
-| latency p50 / p95 | 940ms / 1135ms |
-
-**It answers `duck` to everything.** The 0.35 is just the base rate of air
-obstacles. The still frame shows it plainly: `DUCK` at confidence 0.092, with a
-near-flat distribution (jump 0.41 / duck 0.45 / run 0.14) and a decision log of
-`log → duck`, `snowman → duck`, `snowman → duck`.
-
-The model is not confused, it is *abstaining*: 0.13 mean confidence here versus
-0.73 on Banking77 at four labels. Run `python -m eval.game_probes` for the
-diagnosis — the short version is that Laya reads text, and this task needs
-spatial reasoning it does not have.
-
-## `oracle-reference/` — what the harness can do
-
-The identical harness driven by a perfect oracle at Laya's *measured* CPU latency
-(975ms), so only the decision quality differs.
-
-| | |
-|---|---|
-| accuracy | 1.00 |
-| crashes | **0** |
-| best distance | 556m |
-
-This is the control. It shows the game, the hook, the decide-early/act-late
-timing and the grading are all sound at ~1s inference, and isolates the 10
-crashes in the other run to the model's answers.
-
-It also earned its keep: at 975ms an *earlier* version of the autopilot crashed
-11 times in 30 even with a perfect oracle, because it only classified the next
-obstacle and the verdict arrived after impact. Pipelining the lookahead — every
-obstacle inside the 2.6s horizon gets classified as it enters, up to three in
-flight — took that to zero.
+Every crash traces to the lane question. Reading obstacles did not fail once.

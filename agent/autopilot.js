@@ -31,11 +31,6 @@
     duckUntil: -0.12,
     autoRestart: true,
     maxDecisions: 0,
-    // 'model' asks Laya which lane to take (two-stage); 'rule' uses the
-    // harness preference. Defaults to 'rule' because stage two does not work:
-    // it scores no better than always answering "left" and drives into a wall
-    // on a quarter of waves. See eval/lane_choice.py and the README.
-    laneChoice: 'rule',
   };
 
   // Plain English for the game's type names. Naming a thing is not a hint
@@ -63,10 +58,17 @@
     },
   };
 
-  // Stage two. Best of 20 framings in eval/lane_choice.py at 0.875
-  // picks-passable: neutral labels, bare criteria, plain instruction, and the
-  // reindeer's current lane left unstated -- all four of those helped. Putting
-  // the preference into the instruction actively hurt (0.700).
+  // Stage two: which lane to move to.
+  //
+  // The harness may notice that a move is needed -- the model called the lane
+  // the reindeer is standing in a barrier -- but it does not choose where to
+  // go, does not narrow the options, and does not move on a guess while the
+  // answer is in flight. All three lanes are offered every time, including the
+  // one being vacated; if the model picks a barrier, the reindeer hits it.
+  //
+  // Framing is the best of 20 in eval/lane_choice.py: neutral labels, bare
+  // criteria, plain instruction, and the current lane left unstated. Putting
+  // the preference into the instruction actively hurt (0.700 against 0.875).
   const LANE_LABELS = ['option_a', 'option_b', 'option_c'];
   const LANE_WORDS = ['left', 'middle', 'right'];
   const LANE_DESC = {
@@ -117,8 +119,8 @@
       decisions: 0, correct: 0, byAction: {}, latencies: [],
       deaths: 0, bestDistance: 0, lastDistance: 0,
       errors: 0, deathLog: [], laneChanges: 0,
-      laneDecisions: 0, laneForced: 0, laneContradictions: 0,
-      laneTookFirst: 0, laneCostlier: 0, laneForcedSingle: 0,
+      laneDecisions: 0, laneContradictions: 0,
+      laneTookFirst: 0, laneCostlier: 0, laneChoseBarrier: 0,
       laneLatencies: [],
     };
   }
@@ -230,6 +232,7 @@
       // for every obstacle, ice walls included, while the HUD still showed a
       // run in progress.
       api.stats.errors++;
+      console.error('[autopilot] classification failed:', err);
       if (api.onUpdate) api.onUpdate(entry);
     } finally {
       inFlight--;
@@ -251,8 +254,9 @@
    * it names the other lane 80-100% of the time, so it is answering by option
    * position and not by reading the scene.
    */
-  async function askLane(key, need, candidates, forced) {
-    const entry = { status: 'pending', forced, candidates };
+  async function askLane(key, need) {
+    const candidates = [0, 1, 2];
+    const entry = { status: 'pending', forced: true, candidates };
     laneCalls.set(key, entry);
     laneInFlight++;
     try {
@@ -282,19 +286,22 @@
         status: 'done', lane, probs, confidence: a.confidence, wallMs: wall,
         contradiction: need[lane] === 'block',      // impossible now, kept as an assertion
         tookFirst: slot === 0,
+        // did it name the lane it was already standing in, which is the one
+        // known to be a barrier?
+        choseTheBarrier: need[lane] === 'block',
         costlier: need[lane] !== null && candidates.some(l => need[l] === null),
       });
       const st = api.stats;
       st.laneDecisions++;
       st.laneLatencies.push(wall);
-      if (forced) st.laneForced++;
       if (entry.contradiction) st.laneContradictions++;
       if (entry.tookFirst) st.laneTookFirst++;
       if (entry.costlier) st.laneCostlier++;
+      if (entry.choseTheBarrier) st.laneChoseBarrier++;
       api.trace.push({
         stage: 'lane', run: runIndex, distance: Math.floor(rj.state.distance),
         lanes: need.map(n => n === null ? 'clear' : n),
-        forced, candidates, chose: lane, contradiction: entry.contradiction,
+        candidates, chose: lane, contradiction: entry.contradiction,
         took_first_option: entry.tookFirst, passed_up_a_clear_lane: entry.costlier,
         probabilities: { left: probs[0], middle: probs[1], right: probs[2] },
         confidence: a.confidence, server_ms: body.latency_ms,
@@ -303,7 +310,12 @@
       if (api.onLane) api.onLane(entry, need);
     } catch (err) {
       entry.status = 'error';
+      entry.error = String((err && err.message) || err);
       api.stats.errors++;
+      // Loud on purpose: a ReferenceError in this handler once counted itself
+      // as a service failure, so every lane question "failed" and the reindeer
+      // never moved, with nothing in the summary saying why.
+      console.error('[autopilot] lane question failed:', err);
     } finally {
       laneInFlight--;
     }
@@ -390,51 +402,39 @@
     // what the model says about the wave in front of us, right now, for the HUD
     api.currentNeed = need.slice();
 
-    // harness preference, used directly in 'rule' mode and as the fallback
-    // while stage two is still in flight
-    const usable = [0, 1, 2].filter(l => need[l] !== 'block');
-    const rank = l => (need[l] === null ? 0 : need[l] === 'unknown' ? 2 : 1);
-    const ruleTarget = usable.length
-      ? usable.reduce((a, b) => {
-          const ra = rank(a), rb = rank(b);
-          if (ra !== rb) return ra < rb ? a : b;
-          return Math.abs(b - s.lane) < Math.abs(a - s.lane) ? b : a;
-        })
-      : s.lane;                       // every lane called blocked: hold and hope
+    const settled = wave.group.every(o => {
+      const d = decisions.get(idOf(o));
+      return d && d.status !== 'pending';
+    });
+    // The harness's only say in lane changes: noticing that the lane the model
+    // called a barrier is the one we are standing in.
+    const mustMove = settled && need[s.lane] === 'block';
 
-    let target = ruleTarget;
-    if (api.config.laneChoice === 'model') {
-      const settled = wave.group.every(o => {
-        const d = decisions.get(idOf(o));
-        return d && d.status !== 'pending';
-      });
-      // Stay put unless the current lane is a barrier. Moving for its own sake
-      // was the first version's mistake: it gave a biased chooser a chance to
-      // do harm on every single wave.
-      const mustMove = settled && need[s.lane] === 'block';
-      api.laneNeed = !settled ? 'waiting' : mustMove ? 'needed' : 'not needed';
-      if (mustMove) {
-        const candidates = [0, 1, 2].filter(l => need[l] !== 'block');
-        if (candidates.length === 1) {
-          target = candidates[0];               // no choice to make
-          api.stats.laneForcedSingle++;
-        } else if (candidates.length > 1) {
-          const key = Math.min(...wave.group.map(idOf));
-          let lc = laneCalls.get(key);
-          if (!lc && laneInFlight < 2 && !reachedLimit()) {
-            askLane(key, need, candidates, true);
-            lc = laneCalls.get(key);
-          }
-          target = lc && lc.status === 'done' ? lc.lane : ruleTarget;
-        }
-      } else if (settled && need[s.lane] !== 'unknown') {
-        target = s.lane;                        // current lane is fine, hold it
+    let target = s.lane;              // hold, unless the model names somewhere else
+    if (mustMove) {
+      const key = Math.min(...wave.group.map(idOf));
+      let lc = laneCalls.get(key);
+      if (!lc && laneInFlight < 2 && !reachedLimit()) {
+        askLane(key, need);
+        lc = laneCalls.get(key);
       }
-      if (laneCalls.size > 64) {
-        const keep = new Map();
-        for (const [k, v] of laneCalls) if (k > nextId - 48) keep.set(k, v);
-        laneCalls = keep;
+      if (lc && lc.status === 'done') {
+        target = lc.lane;
+        api.laneNeed = 'answered';
+      } else {
+        // Waiting. Do NOT edge toward a guess: moving here, and only later
+        // showing a lane verdict in the panel, is precisely the mismatch
+        // between what the reindeer does and what the model said.
+        api.laneNeed = 'waiting';
       }
+    } else {
+      api.laneNeed = settled ? 'not needed' : 'waiting';
+    }
+
+    if (laneCalls.size > 64) {
+      const keep = new Map();
+      for (const [k, v] of laneCalls) if (k > nextId - 48) keep.set(k, v);
+      laneCalls = keep;
     }
 
     if (s.lane !== target) {
