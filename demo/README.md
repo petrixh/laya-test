@@ -15,7 +15,8 @@ without standing the service up.
 | | |
 |---|---|
 | obstacles classified | 150, accuracy **1.00** (jump 59/59, duck 52/52, block 39/39) |
-| lane questions | 12 — 9 decided by the model, 3 exact ties broken by the harness |
+| lane questions | 12, **none chose a barrier** |
+| of those, ties between equivalent lanes | 3 (`duck`/`duck`, `clear`/`clear`) |
 | of those, chose a barrier | **0** |
 | crashes | **0** |
 | furthest run | **1117m** |

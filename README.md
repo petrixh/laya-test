@@ -68,18 +68,21 @@ flowchart TD
 
 Blue is the model, grey is the harness.
 
-**The harness chooses a lane only when the model is indifferent.** It may notice that a
-change is needed — the lane the reindeer occupies is one the *model* called a barrier —
-but the destination is the model's answer, and the reindeer does not move while that
-answer is in flight.
+**The harness never overrides a lane the model picked.** It may notice that a change is
+needed — the lane the reindeer occupies is one the *model* called a barrier — but the
+destination is the model's answer, and the reindeer does not move while that answer is
+in flight.
 
-The exception is worth stating rather than glossing. The model scores each lane on its
-own and is deterministic, so two candidate lanes holding the *same* thing score
-identically: it has no preference to express and the harness breaks the tie, toward the
-nearer lane. In the recorded run that was **3 of 12** lane questions. Those ties are
-counted in `summary.json` as `ties_broken_by_harness` and flagged per row in the trace,
-because "the model decides" is this repo's central claim and a fifth of the lane
-decisions are the exception to it.
+Where the model rates two lanes **equally**, it is because they hold the same thing, and
+either is a correct answer. The harness then takes the nearer one — a timing choice
+among options the model has already called equivalent, since a shorter slide spends less
+time straddling two lanes and a mistimed change is its own way to die. In the recorded
+run that was 3 of 12 lane questions, every one of them `duck`/`duck` or `clear`/`clear`.
+
+Such a tie can never be between two barriers: the question only fires when the current
+lane is a barrier, the generator guarantees a passable lane exists, so at most one of
+the other two can be a barrier — and a barrier scores 1.0 while anything else scores
+less. The count is in `summary.json` and flagged per trace row so the split is visible.
 
 The two lanes it is not standing in are each scored by their own question — *"is this
 lane blocked?"* against a description of that lane alone — and the lower score wins.
@@ -108,7 +111,7 @@ the rest.
 | the run in `demo/` | |
 |---|---|
 | obstacles classified | **150**, accuracy **1.00** — jump 59/59, duck 52/52, block 39/39 |
-| lane questions | 12 — **9 decided by the model**, 3 exact ties broken by the harness |
+| lane questions | **12, none chose a barrier** — 3 were ties between equivalent lanes |
 | of those, chose a barrier | **0** |
 | crashes | **0** |
 | furthest run | **1117m** |

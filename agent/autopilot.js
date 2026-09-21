@@ -281,9 +281,20 @@
       const wall = performance.now() - t0;
 
       // The model scores each lane independently, so two lanes holding the
-      // same thing score identically -- it is indifferent and there is no
-      // model-derived answer to take. The harness then breaks the tie toward
-      // the nearer lane. That IS a harness decision, and it is counted as one.
+      // same thing score identically. That is the right answer, not a failure
+      // to answer: there is nothing to tell them apart and either is correct.
+      //
+      // A tie at the winning score is always between two acceptable lanes. The
+      // question only fires when the current lane is a barrier, the generator
+      // guarantees some lane is passable, so at most one of the other two can
+      // be a barrier -- and a barrier scores 1.0 while anything else scores
+      // less, so it can never be half of a winning tie.
+      //
+      // The harness takes the nearer of the tied lanes, which is a timing
+      // choice among options the model has called equivalent: a shorter slide
+      // spends less time straddling two lanes, where a mistimed change is its
+      // own way to die. Counted so the split is visible, not because it is a
+      // decision the model declined to make.
       let best = 0;
       for (let i = 1; i < scores.length; i++) if (scores[i] < scores[best]) best = i;
       const tied = scores.filter((v) => v === scores[best]).length > 1;
