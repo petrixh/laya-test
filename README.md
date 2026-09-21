@@ -342,6 +342,27 @@ is accuracy, not latency: the oracle control already scores 30/30 with zero
 crashes at 975ms. MLX buys a watchable frame rate and much quicker eval sweeps,
 not a working player.
 
+Measured against an M3 Max over Tailscale: **~30ms server-side** per game
+decision against 940ms on the CPU container, a 31x speedup. The diagnostic
+ladder returns byte-for-byte the same verdict as fp32 (1.00 / 0.20 / 1.00 / 0.60
+at the same mean confidences), so the FP16 conversion is faithful and the game
+result is a property of the model, not of the runtime or the precision.
+
+### How the reference implementation makes Laya "play" a game
+
+`laya-mlx` ships a Snake demo, and it is worth knowing how it works before
+reading too much into any "Laya plays X" claim. A rule-based planner solves the
+game first, then hands Laya pre-scored options: the state reads
+`Safe route: yes. Food reachable through empty cells: yes.` and the four
+direction criteria read `Safe. Eat food now. Best.` / `Blocked. Collision.`
+A shield then overrides unsafe picks, and removing it drops scores from 20/24/23
+to 9/24/19.
+
+That is the same effect as rung 3 above -- the answer is in the option text --
+plus a safety net. This repo deliberately does not do that: the reindeer agent
+gets the scene and must choose the action itself, which is why it fails. Both
+results are consistent; they are measuring different things.
+
 ## Running on a GPU
 
 `laya.load()` takes `device` directly and `LAYA_DEVICE=auto` already resolves to

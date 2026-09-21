@@ -6,6 +6,8 @@ readiness honestly so callers never race the (slow) first load.
 """
 from __future__ import annotations
 
+import functools
+import importlib
 import logging
 import os
 import threading
@@ -115,15 +117,37 @@ def info() -> dict[str, Any]:
     }
 
 
+# Both runtimes ship the same preset helpers, under different package names.
+PRESET_PACKAGES = ("laya", "laya_mlx")
+KNOWN_PRESETS = ("router", "guard", "moderation", "triage", "email")
+
+
+@functools.lru_cache(maxsize=1)
+def _preset_module():
+    for name in PRESET_PACKAGES:
+        try:
+            return importlib.import_module(name)
+        except ImportError:
+            continue
+    return None
+
+
 @app.get("/presets/{name}")
 def presets(name: str) -> dict[str, Any]:
-    """Expose laya's built-in question sets so tests and demos share one source."""
-    import laya
+    """Expose the built-in question sets so tests and demos share one source.
 
-    fn = getattr(laya, f"{name}_questions", None)
-    if fn is None:
-        raise HTTPException(404, f"unknown preset '{name}'")
-    return {"name": name, "questions": fn()}
+    Resolved against whichever runtime is installed: the macOS venv has
+    laya_mlx and no laya, so importing `laya` unconditionally 500s there.
+    """
+    mod = _preset_module()
+    if mod is not None:
+        fn = getattr(mod, f"{name}_questions", None)
+        if fn is None:
+            raise HTTPException(404, f"unknown preset '{name}'")
+        return {"name": name, "questions": fn()}
+    if name in KNOWN_PRESETS:
+        raise HTTPException(503, f"no laya runtime installed to supply preset '{name}'")
+    raise HTTPException(404, f"unknown preset '{name}'")
 
 
 @app.post("/predict", response_model=PredictResponse)
