@@ -55,7 +55,7 @@ flowchart TD
   C["jump · duck · block"]
   C --> G{"is the lane I am in<br/>a barrier?"}
   G -->|no| T
-  G -->|yes| L["Laya — which lane?<br/>all three offered, described from its own readings"]
+  G -->|yes| L["Laya — which of the other two lanes?<br/>described from its own readings, unfiltered"]
   L --> T["Harness: when<br/>jump at 0.30s, duck from 0.40s, hold until the answer lands"]
   T --> A["slide · jump · duck"]
 
@@ -69,9 +69,13 @@ Blue is the model, grey is the harness.
 
 **The harness never chooses a lane.** It may notice that a change is needed — the lane
 the reindeer occupies is one the *model* called a barrier — but the destination is always
-the model's answer, all three lanes are offered including the one being vacated, and the
-reindeer does not move while the answer is in flight. If the model names a barrier, the
-reindeer hits it.
+the model's answer, and the reindeer does not move while that answer is in flight.
+
+The two lanes it is not standing in are offered. Leaving out the current one is not the
+harness narrowing the choice: that lane having been read as a barrier is the entire
+reason the question is being asked, so offering "stay here" as a destination would be
+incoherent. The two that remain are **not** filtered by what the model said about them —
+either may be a barrier too, and picking one is the model's mistake to make.
 
 The harness also never reads the game's own obstacle class: `def.kind` appears in
 `agent/autopilot.js` only for grading and logging. Everything it knows about passability
@@ -87,12 +91,12 @@ the rest.
 
 | the run in `demo/` | |
 |---|---|
-| obstacles classified | **130**, accuracy **1.00** — jump 44/44, duck 43/43, block 43/43 |
-| lane choices made by the model | 10 |
-| of those, it chose the barrier it was standing in | **5** |
-| it took whichever lane was listed first | **90%** of the time |
-| crashes | 4 |
-| furthest run | 322m |
+| obstacles classified | **131**, accuracy **1.00** — jump 44/44, duck 39/39, block 48/48 |
+| lane choices made by the model | 12 |
+| it took the first of the two lanes offered | **12 / 12** |
+| of those, the first lane was itself a barrier | 3 |
+| crashes | **3** — the same three |
+| furthest run | 488m |
 
 **Choosing between described alternatives: no better than chance.** Offered three lanes
 whose contents are spelled out in the state, it answers by option *position*. The clean
@@ -108,14 +112,16 @@ model that is reading the state names the same lane twice:
 Swap the options and it names the other lane, even when one is a wall and the other is
 empty. `python -m eval.lane_forced` reproduces it.
 
-That is the whole reason the reindeer still crashes. Reading obstacles is perfect and
-every crash in the recording traces to the lane question — five of its ten answers named
-the barrier the reindeer was already standing in.
+The recording makes this unusually legible. The two lanes offered alternate between
+`[left, right]` and `[middle, right]` depending on where the reindeer is standing, and
+it picked the first-listed one **every single time** — twelve for twelve. Three of those
+first-listed lanes happened to be barriers, and those are exactly the three crashes.
+Reading obstacles did not fail once.
 
-It would be easy to hide this. Filtering the offered lanes down to ones the model has
+It would be easy to hide this. Filtering the two offered lanes down to ones the model has
 already called safe takes the crash count to zero, because survival is then inherited
-from the classifier upstream and the chooser cannot do any harm. That is not done here:
-a component with no signal should not be made to look like one that works.
+from the classifier upstream and the chooser cannot do harm either way. That is not done
+here: a component with no signal should not be dressed up as one that works.
 
 ## Three classes, two questions
 

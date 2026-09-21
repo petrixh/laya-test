@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-21T14:46:06.438Z",
+  "generated": "2026-09-21T14:58:49.009Z",
   "options": {
     "headed": false,
     "endpoint": "http://100.121.51.97:8000",
@@ -13,29 +13,28 @@
     "mockAccuracy": 0.85,
     "mockLatency": 280
   },
-  "decisions": 130,
-  "correct": 130,
+  "decisions": 131,
+  "correct": 131,
   "accuracy": 1,
-  "crashes": 4,
-  "best_distance_m": 322,
+  "crashes": 3,
+  "best_distance_m": 488,
   "errors": 0,
-  "lane_changes": 6,
+  "lane_changes": 12,
   "lane_choice": {
-    "decisions": 10,
-    "chose_the_barrier_it_was_in": 5,
-    "chose_a_barrier": 5,
-    "took_first_option": 0.9,
-    "passed_up_a_clear_lane": 0.1,
-    "latency_p50_ms": 249.1
+    "decisions": 12,
+    "chose_a_barrier": 3,
+    "took_first_option": 1,
+    "passed_up_a_clear_lane": 0,
+    "latency_p50_ms": 168.2
   },
   "latency_ms": {
-    "p50": 227.4,
-    "p95": 386.4,
-    "max": 506.3
+    "p50": 208.8,
+    "p95": 320.3,
+    "max": 439.8
   },
   "per_truth": {
     "duck": {
-      "n": 43,
+      "n": 39,
       "accuracy": 1
     },
     "jump": {
@@ -43,12 +42,12 @@
       "accuracy": 1
     },
     "block": {
-      "n": 43,
+      "n": 48,
       "accuracy": 1
     }
   },
-  "deaths_with_correct_verdict": 4,
+  "deaths_with_correct_verdict": 3,
   "deaths_by_verdict": {
-    "correct": 4
+    "correct": 3
   }
 }

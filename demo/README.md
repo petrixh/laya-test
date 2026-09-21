@@ -14,12 +14,15 @@ without standing the service up.
 
 | | |
 |---|---|
-| obstacles classified | 130, accuracy **1.00** (jump 44/44, duck 43/43, block 43/43) |
-| lane choices by the model | 10 |
-| chose the barrier it was standing in | **5** |
-| took the first option offered | 90% |
-| crashes | 4 |
-| furthest run | 322m |
-| latency p50 | 249ms wall, ~30ms of it inference |
+| obstacles classified | 131, accuracy **1.00** (jump 44/44, duck 39/39, block 48/48) |
+| lane choices by the model | 12 |
+| took the first of the two lanes offered | **12 / 12** |
+| of those, the first lane was a barrier | 3 |
+| crashes | **3** — the same three |
+| furthest run | 488m |
+| latency p50 | 168ms wall, ~30ms of it inference |
 
-Every crash traces to the lane question. Reading obstacles did not fail once.
+Every crash traces to the lane question; reading obstacles did not fail once. The
+offered pair alternates between `[left, right]` and `[middle, right]` depending on where
+the reindeer is standing, so always taking the first is a position preference rather
+than a lane preference. `trace.json` rows tagged `stage: "lane"` show each one.

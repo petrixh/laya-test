@@ -250,7 +250,6 @@ const main = async () => {
     lane_changes: result.stats.laneChanges,
     lane_choice: {
       decisions: result.stats.laneDecisions,
-      chose_the_barrier_it_was_in: result.stats.laneChoseBarrier,
       chose_a_barrier: result.stats.laneContradictions,
       took_first_option: result.stats.laneDecisions
         ? +(result.stats.laneTookFirst / result.stats.laneDecisions).toFixed(4) : null,

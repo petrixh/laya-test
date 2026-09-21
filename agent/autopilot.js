@@ -62,9 +62,9 @@
   //
   // The harness may notice that a move is needed -- the model called the lane
   // the reindeer is standing in a barrier -- but it does not choose where to
-  // go, does not narrow the options, and does not move on a guess while the
-  // answer is in flight. All three lanes are offered every time, including the
-  // one being vacated; if the model picks a barrier, the reindeer hits it.
+  // go and does not move on a guess while the answer is in flight. The two
+  // lanes it is not standing in are offered, unfiltered: either may itself be
+  // a barrier, and if the model picks one the reindeer hits it.
   //
   // Framing is the best of 20 in eval/lane_choice.py: neutral labels, bare
   // criteria, plain instruction, and the current lane left unstated. Putting
@@ -120,7 +120,7 @@
       deaths: 0, bestDistance: 0, lastDistance: 0,
       errors: 0, deathLog: [], laneChanges: 0,
       laneDecisions: 0, laneContradictions: 0,
-      laneTookFirst: 0, laneCostlier: 0, laneChoseBarrier: 0,
+      laneTookFirst: 0, laneCostlier: 0,
       laneLatencies: [],
     };
   }
@@ -239,23 +239,17 @@
     }
   }
 
-  /** Stage two, gated.
-   *
-   * Only fires when the lane the reindeer is standing in was read as a
-   * barrier, and only offers lanes stage one did not call barriers. Both
-   * restrictions come from the model's own output, not from ground truth.
-   *
-   * The first version asked on every wave and offered all three lanes, so it
-   * could drag the reindeer out of a good lane and into a wall it had itself
-   * identified. Gated and filtered, a wrong answer costs a manoeuvre rather
-   * than a life -- which is worth knowing, because it means the harness can
-   * make a non-functional stage two look fine. eval/lane_forced.py measures it
-   * without that cover: asked the same question with the two options swapped,
-   * it names the other lane 80-100% of the time, so it is answering by option
-   * position and not by reading the scene.
-   */
-  async function askLane(key, need) {
-    const candidates = [0, 1, 2];
+  /** Ask the model which lane to move to. */
+  async function askLane(key, need, here) {
+    // Every lane except the one we are standing in. Excluding it is not the
+    // harness narrowing the model's choice: that lane having been read as a
+    // barrier is the whole reason the question is being asked, so offering
+    // "stay here" as a destination would be incoherent.
+    //
+    // The remaining lanes are NOT filtered by what the model said about them.
+    // One of them may be a barrier too, and choosing it is the model's
+    // mistake to make -- which is the thing being measured.
+    const candidates = [0, 1, 2].filter(l => l !== here);
     const entry = { status: 'pending', forced: true, candidates };
     laneCalls.set(key, entry);
     laneInFlight++;
@@ -286,9 +280,6 @@
         status: 'done', lane, probs, confidence: a.confidence, wallMs: wall,
         contradiction: need[lane] === 'block',      // impossible now, kept as an assertion
         tookFirst: slot === 0,
-        // did it name the lane it was already standing in, which is the one
-        // known to be a barrier?
-        choseTheBarrier: need[lane] === 'block',
         costlier: need[lane] !== null && candidates.some(l => need[l] === null),
       });
       const st = api.stats;
@@ -297,7 +288,6 @@
       if (entry.contradiction) st.laneContradictions++;
       if (entry.tookFirst) st.laneTookFirst++;
       if (entry.costlier) st.laneCostlier++;
-      if (entry.choseTheBarrier) st.laneChoseBarrier++;
       api.trace.push({
         stage: 'lane', run: runIndex, distance: Math.floor(rj.state.distance),
         lanes: need.map(n => n === null ? 'clear' : n),
@@ -415,7 +405,7 @@
       const key = Math.min(...wave.group.map(idOf));
       let lc = laneCalls.get(key);
       if (!lc && laneInFlight < 2 && !reachedLimit()) {
-        askLane(key, need);
+        askLane(key, need, s.lane);
         lc = laneCalls.get(key);
       }
       if (lc && lc.status === 'done') {
