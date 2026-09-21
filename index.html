@@ -99,9 +99,10 @@
     <div class="keys">
       <div class="key"><b>SPACE / &uarr;</b>jump the snowmen</div>
       <div class="key"><b>&darr; / S</b>duck the garlands</div>
+      <div class="key"><b>&larr; &rarr; / A D</b>change lane, walls need one</div>
     </div>
     <button class="cta" id="start">START</button>
-    <div class="hint">on touch: tap upper half to jump, lower half to duck</div>
+    <div class="hint">on touch: tap the edges to change lane, middle upper to jump, middle lower to duck</div>
   </div>
 </div>
 
@@ -142,7 +143,11 @@ if (!document.createElement('canvas').getContext('webgl2')) {
 }
 
 // ---------------------------------------------------------------- constants
-const TRACK_HALF   = 2.4;   // playable width
+const LANE_W        = 2.3;              // distance between lane centres
+const LANES         = [-LANE_W, 0, LANE_W];
+const TRACK_HALF    = LANE_W * 1.5;     // playable width across three lanes
+const LANE_TIME     = 0.18;             // seconds to slide one lane across
+const PLAYER_HALF_W = 0.5;              // collision half-width
 const GRAVITY      = 42;
 const JUMP_V       = 12;
 const DUCK_RATE    = 9;     // how fast the duck pose blends
@@ -165,7 +170,7 @@ scene.fog = new THREE.FogExp2(0x24406f, 0.0135);
 scene.background = makeNightSky();
 
 const camera = new THREE.PerspectiveCamera(58, innerWidth / innerHeight, 0.1, 400);
-camera.position.set(0, 3.1, 8.4);
+camera.position.set(0, 3.9, 11.2);
 camera.lookAt(0, 1.4, -4);
 
 addEventListener('resize', () => {
@@ -261,6 +266,17 @@ const track = new THREE.Mesh(
 track.rotation.x = -Math.PI / 2;
 track.position.set(0, 0.012, -140);
 scene.add(track);
+
+// lane dividers
+for (const dx of [-LANE_W / 2, LANE_W / 2]) {
+  const line = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.07, 320),
+    new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, transparent: true, opacity: 0.30 })
+  );
+  line.rotation.x = -Math.PI / 2;
+  line.position.set(dx, 0.02, -140);
+  scene.add(line);
+}
 
 // ---------------------------------------------------------------- scenery
 const MAT = {
@@ -572,6 +588,26 @@ function makeGarland() {
   return g;
 }
 
+function makeWall() {
+  const g = new THREE.Group();
+  const ice = new THREE.MeshStandardMaterial({
+    color: 0x9fd6ff, roughness: 0.35, metalness: 0.1, transparent: true, opacity: 0.93
+  });
+  for (let row = 0; row < 5; row++) {
+    const n = 2 + (row % 2);
+    for (let i = 0; i < n; i++) {
+      const w = 1.9 / n;
+      const b = new THREE.Mesh(new THREE.BoxGeometry(w * 0.94, 0.66, 0.5), ice);
+      b.position.set(-0.95 + w * (i + 0.5), 0.33 + row * 0.66, 0);
+      g.add(b);
+    }
+  }
+  const cap = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.14, 0.62), MAT.snow);
+  cap.position.y = 3.36;
+  g.add(cap);
+  return g;
+}
+
 function makeBaubles() {
   const g = new THREE.Group();
   const colors = [0xd8353a, 0xe8b64c, 0x67d3ff, 0x8ce99a];
@@ -591,30 +627,88 @@ function makeBaubles() {
   return g;
 }
 
+// xScale squeezes the wider props down to a single lane; xHalf is the collision
+// half-width after that squeeze.
 const BUILDERS = {
-  snowman: { make: makeSnowman, yMin: 0, yMax: 0.95, zHalf: 0.45, kind: 'ground' },
-  gifts:   { make: makeGifts,   yMin: 0, yMax: 0.62, zHalf: 0.45, kind: 'ground' },
-  log:     { make: makeLog,     yMin: 0, yMax: 0.70, zHalf: 0.45, kind: 'ground' },
-  garland: { make: makeGarland, yMin: 1.20, yMax: 2.9, zHalf: 0.4, kind: 'air' },
-  baubles: { make: makeBaubles, yMin: 1.15, yMax: 2.6, zHalf: 0.45, kind: 'air' },
+  snowman: { make: makeSnowman, yMin: 0, yMax: 0.95, zHalf: 0.45, kind: 'ground', xScale: 1.00, xHalf: 0.38 },
+  gifts:   { make: makeGifts,   yMin: 0, yMax: 0.62, zHalf: 0.45, kind: 'ground', xScale: 1.00, xHalf: 0.80 },
+  log:     { make: makeLog,     yMin: 0, yMax: 0.70, zHalf: 0.45, kind: 'ground', xScale: 0.60, xHalf: 0.86 },
+  garland: { make: makeGarland, yMin: 1.20, yMax: 2.9, zHalf: 0.40, kind: 'air',    xScale: 0.30, xHalf: 0.94 },
+  baubles: { make: makeBaubles, yMin: 1.15, yMax: 2.6, zHalf: 0.45, kind: 'air',    xScale: 0.42, xHalf: 0.90 },
+  wall:    { make: makeWall,    yMin: 0, yMax: 3.40, zHalf: 0.45, kind: 'block',  xScale: 1.00, xHalf: 1.00 },
 };
 const GROUND_TYPES = ['snowman', 'gifts', 'log'];
 const AIR_TYPES = ['garland', 'baubles'];
 
-function spawn(type) {
+function spawn(type, lane) {
   const def = BUILDERS[type];
   let entry = pool.find(o => o.type === type && !o.active);
   if (!entry) {
     entry = { type, mesh: def.make(), active: false, def };
+    entry.mesh.scale.x = def.xScale;
     scene.add(entry.mesh);
     pool.push(entry);
   }
   entry.active = true;
+  entry.lane = lane;
   entry.mesh.visible = true;
   entry.mesh.position.z = SPAWN_Z;
-  entry.mesh.position.x = def.kind === 'ground' ? (Math.random() - 0.5) * 0.9 : 0;
+  entry.mesh.position.x = LANES[lane];
   entry.passed = false;
   obstacles.push(entry);
+}
+
+function shuffled(a) {
+  const c = a.slice();
+  for (let i = c.length - 1; i > 0; i--) {
+    const j = (Math.random() * (i + 1)) | 0;
+    [c[i], c[j]] = [c[j], c[i]];
+  }
+  return c;
+}
+const pickOne = a => a[(Math.random() * a.length) | 0];
+
+/** Lanes the reindeer could stand in after `seconds` of sliding from `from`. */
+function reachable(from, seconds) {
+  const span = Math.floor(seconds / LANE_TIME + 1e-6);
+  const out = new Set();
+  for (const l of from) {
+    for (let d = -span; d <= span; d++) {
+      const n = l + d;
+      if (n >= 0 && n < LANES.length) out.add(n);
+    }
+  }
+  return out.size ? [...out] : [...from];
+}
+
+/**
+ * One wave across all three lanes, solvable by construction.
+ *
+ * A wall cannot be jumped or ducked, so a wave is only fair if some lane
+ * without one is still reachable in the time since the last wave. We pick that
+ * lane first out of the reachable set and refuse to wall it, then fill the rest
+ * freely. `state.safeLanes` carries the guarantee forward: it is where the
+ * reindeer can legally be standing when the next wave arrives.
+ */
+function spawnWave(gapSeconds) {
+  const reach = reachable(state.safeLanes, gapSeconds);
+  const guaranteed = pickOne(reach);
+
+  const walls = Math.random() < 0.20 ? 2 : Math.random() < 0.50 ? 1 : 0;
+  const candidates = shuffled([0, 1, 2].filter(l => l !== guaranteed));
+  const walled = new Set(candidates.slice(0, walls));
+
+  const plan = [];
+  for (let l = 0; l < LANES.length; l++) {
+    if (walled.has(l)) { plan[l] = 'wall'; continue; }
+    const r = Math.random();
+    plan[l] = r < 0.30 ? null : r < 0.68 ? pickOne(GROUND_TYPES) : pickOne(AIR_TYPES);
+  }
+  if (plan.every(t => t === null)) plan[guaranteed] = pickOne(GROUND_TYPES);
+
+  for (let l = 0; l < LANES.length; l++) if (plan[l]) spawn(plan[l], l);
+  state.safeLanes = [0, 1, 2].filter(l => plan[l] !== 'wall');
+  state.wave++;
 }
 
 function clearObstacles() {
@@ -635,8 +729,12 @@ const state = {
   runPhase: 0,
   squash: 0,
   gapLeft: 14,
-  lastKind: null,
+  lastGap: 14,
   time: 0,
+  lane: 1,             // target lane, 0 left .. 2 right
+  x: 0,                // current lateral position, eases toward LANES[lane]
+  safeLanes: [1],      // lanes the reindeer can legally occupy at the next wave
+  wave: 0,
 };
 
 const best = { value: Number(localStorage.getItem('reindeerJumpBest') || 0) };
@@ -659,7 +757,10 @@ function startGame() {
   state.y = 0; state.vy = 0;
   state.duck = 0; state.ducking = false; state.onGround = true; state.squash = 0;
   state.gapLeft = 14;
-  state.lastKind = null;
+  state.lastGap = 14;
+  state.lane = 1; state.x = 0;
+  state.safeLanes = [1];
+  state.wave = 0;
   el.panel.classList.add('hidden');
   el.score.firstChild.nodeValue = '0';
 }
@@ -692,6 +793,10 @@ function setDuck(on) {
   if (state.mode !== 'playing') return;
   state.ducking = on;
 }
+function moveLane(dir) {
+  if (state.mode !== 'playing') return;
+  state.lane = Math.max(0, Math.min(LANES.length - 1, state.lane + dir));
+}
 function primary() {
   if (state.mode === 'playing') jump();
   else startGame();
@@ -704,6 +809,10 @@ addEventListener('keydown', e => {
       e.preventDefault(); primary(); break;
     case 'ArrowDown': case 'KeyS':
       e.preventDefault(); setDuck(true); break;
+    case 'ArrowLeft': case 'KeyA':
+      e.preventDefault(); moveLane(-1); break;
+    case 'ArrowRight': case 'KeyD':
+      e.preventDefault(); moveLane(1); break;
     case 'Enter':
       if (state.mode !== 'playing') startGame(); break;
   }
@@ -715,11 +824,13 @@ addEventListener('keyup', e => {
 el.start.addEventListener('click', e => { e.stopPropagation(); startGame(); });
 el.panel.addEventListener('pointerdown', () => { if (state.mode !== 'playing') startGame(); });
 
-function touchAt(y) {
+function touchAt(x, y) {
   if (state.mode !== 'playing') { startGame(); return; }
+  if (x < innerWidth * 0.25) { moveLane(-1); return; }
+  if (x > innerWidth * 0.75) { moveLane(1); return; }
   if (y < innerHeight * 0.55) jump(); else setDuck(true);
 }
-renderer.domElement.addEventListener('pointerdown', e => touchAt(e.clientY));
+renderer.domElement.addEventListener('pointerdown', e => touchAt(e.clientX, e.clientY));
 addEventListener('pointerup', () => setDuck(false));
 addEventListener('pointercancel', () => setDuck(false));
 addEventListener('blur', () => setDuck(false));
@@ -764,6 +875,13 @@ function update(dt) {
   }
   state.squash = Math.max(0, state.squash - dt * 5);
 
+  // slide toward the target lane at a constant rate, so LANE_TIME is honest
+  const targetX = LANES[state.lane];
+  const step = (LANE_W / LANE_TIME) * dt;
+  state.x += Math.max(-step, Math.min(step, targetX - state.x));
+  reindeer.position.x = state.x;
+  reindeer.rotation.z = (targetX - state.x) * 0.18;   // lean into the turn
+
   reindeer.position.y = state.y;
   upper.position.y = -0.55 * state.duck - 0.12 * state.squash;
   upper.rotation.x = -0.34 * state.duck;   // negative tips the nose down
@@ -781,10 +899,11 @@ function update(dt) {
     l.pivot.scale.y = 1 - 0.78 * state.duck;   // legs tuck so the feet stay on the snow
   }
   reindeer.position.y += state.onGround ? Math.abs(Math.sin(state.runPhase)) * 0.05 : 0;
-  reindeer.rotation.z = Math.sin(state.runPhase * 0.5) * 0.03;
+  reindeer.rotation.z += Math.sin(state.runPhase * 0.5) * 0.03;
   nose.material.emissiveIntensity = 1.8 + Math.sin(state.time * 6) * 0.5;
   noseGlow.intensity = 2.6 + Math.sin(state.time * 6) * 0.9;
 
+  shadow.position.x = state.x;
   shadow.position.z = 0;
   const shrink = Math.max(0.25, 1 - state.y * 0.4);
   shadow.scale.setScalar(shrink);
@@ -813,13 +932,10 @@ function update(dt) {
   // ---- obstacles
   state.gapLeft -= scroll * dt;
   if (state.gapLeft <= 0) {
-    const forceGround = state.lastKind === 'air' && Math.random() < 0.7;
-    const kind = forceGround ? 'ground' : (Math.random() < 0.55 ? 'ground' : 'air');
-    const list = kind === 'ground' ? GROUND_TYPES : AIR_TYPES;
-    spawn(list[(Math.random() * list.length) | 0]);
-    state.lastKind = kind;
+    spawnWave(state.lastGap / state.speed);
     const tight = Math.max(0.62, 1.15 - state.speed / 70);
-    state.gapLeft = state.speed * (tight + Math.random() * 0.75);
+    state.lastGap = state.speed * (tight + Math.random() * 0.75);
+    state.gapLeft = state.lastGap;
   }
 
   const footY = state.y;
@@ -831,7 +947,8 @@ function update(dt) {
     if (o.def.kind === 'air') o.mesh.position.y = Math.sin(state.time * 1.6 + o.mesh.position.z * 0.1) * 0.05;
 
     const zOverlap = Math.abs(o.mesh.position.z) < o.def.zHalf + PLAYER_DEPTH;
-    if (zOverlap) {
+    const xOverlap = Math.abs(state.x - o.mesh.position.x) < o.def.xHalf + PLAYER_HALF_W;
+    if (zOverlap && xOverlap) {
       const yMin = o.def.yMin + o.mesh.position.y;
       const yMax = o.def.yMax + o.mesh.position.y;
       if (topY > yMin && footY < yMax) { endGame(); return; }
@@ -847,20 +964,60 @@ function update(dt) {
 function render() {
   // camera eases back a touch as speed rises
   const t = (state.speed - SPEED_START) / (SPEED_MAX - SPEED_START);
-  camera.position.z += (8.4 + t * 1.3 - camera.position.z) * 0.05;
-  camera.position.y += (3.1 + state.y * 0.28 - camera.position.y) * 0.08;
-  camera.lookAt(0, 1.4 + state.y * 0.3, -4);
+  camera.position.z += (11.2 + t * 1.5 - camera.position.z) * 0.05;
+  camera.position.y += (3.9 + state.y * 0.28 - camera.position.y) * 0.08;
+  camera.position.x += (state.x * 0.35 - camera.position.x) * 0.10;
+  camera.lookAt(state.x * 0.25, 1.4 + state.y * 0.3, -4);
   renderer.render(scene, camera);
 }
 
 // exposed so the game can be driven/inspected by automated tests
-window.__rj = { state, obstacles, BUILDERS, reindeer, jump, setDuck, startGame };
+window.__rj = { state, obstacles, BUILDERS, reindeer, jump, setDuck, moveLane,
+                startGame, LANES, LANE_W, LANE_TIME, PLAYER_HALF_W };
 
 renderer.setAnimationLoop(() => {
   const dt = Math.min(clock.getDelta(), 0.05);
   update(dt);
   render();
 });
+</script>
+<!-- Optional Laya autopilot. Dormant unless ?autopilot=1 is in the URL, so the
+     game is untouched for a human player. Point it at any Laya service with
+     ?laya=<url>, e.g. a Mac running the MLX backend on the same network:
+       index.html?autopilot=1&laya=http://192.168.1.20:8000            -->
+<script>
+(function () {
+  var q = new URLSearchParams(location.search);
+  if (!q.has('autopilot')) return;
+  var endpoint = (q.get('laya') || 'http://127.0.0.1:8000').replace(/\/$/, '');
+
+  function add(src) {
+    return new Promise(function (ok, bad) {
+      var s = document.createElement('script');
+      s.src = src; s.onload = ok;
+      s.onerror = function () { bad(new Error('could not load ' + src)); };
+      document.body.appendChild(s);
+    });
+  }
+
+  (function boot() {
+    if (!window.__rj) { setTimeout(boot, 100); return; }   // wait for the game module
+    add('agent/autopilot.js')
+      .then(function () { return add('agent/hud.js'); })
+      .then(function () {
+        window.__autopilot.start({
+          endpoint: endpoint,
+          maxDecisions: Number(q.get('decisions') || 0),
+        });
+        window.__layaHud.mount(window.__autopilot, endpoint);
+      })
+      .catch(function (e) {
+        window.__fatal('Autopilot failed to start: ' + e.message +
+          '. Serve this folder over HTTP (python3 -m http.server 8080) rather ' +
+          'than opening the file directly.');
+      });
+  })();
+})();
 </script>
 </body>
 </html>

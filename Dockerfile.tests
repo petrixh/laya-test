@@ -1,0 +1,9 @@
+# syntax=docker/dockerfile:1
+# Test runner: deliberately does not depend on torch or laya, so it verifies the
+# service only through its HTTP contract.
+FROM python:3.12-slim
+ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1
+RUN pip install pytest==8.* httpx==0.28.*
+WORKDIR /tests
+COPY tests/ /tests/
+CMD ["pytest"]

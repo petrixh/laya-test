@@ -1,0 +1,8 @@
+# Native macOS / Apple silicon stack. No torch, no laya: the MLX port is a
+# separate runtime with the same predict() contract.
+#   python3.11 -m venv .venv && source .venv/bin/activate
+#   pip install -r requirements-mlx.txt
+laya-mlx==0.1.0
+fastapi>=0.115
+uvicorn[standard]>=0.32
+pydantic>=2.9
