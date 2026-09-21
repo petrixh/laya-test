@@ -1,7 +1,10 @@
 # Laya container: build, run, test.
 COMPOSE := docker compose
+K ?= 4,8,16,32,77
+N ?= 150
 
-.PHONY: help volume build up down logs ready test bench smoke shell clean rebuild
+.PHONY: help volume build up down logs ready test bench smoke shell clean rebuild \
+        eval eval-labels eval-probes eval-typed report introspect
 
 help:
 	@grep -E '^[a-z-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-10s\033[0m %s\n",$$1,$$2}'
@@ -31,6 +34,26 @@ bench: up ## Report latency at 1 / 3 / 10 questions per pass
 
 smoke: ## Load + predict directly in-process, bypassing HTTP
 	docker run --rm -v laya-models:/models -v "$$PWD/scripts:/srv/scripts:ro" laya:cpu python scripts/smoke.py
+
+eval: eval-probes eval-labels ## Run the full eval suite against the running checkpoint
+
+eval-labels: up ## Accuracy + calibration vs number of choice labels (Banking77)
+	$(COMPOSE) --profile eval run --rm eval labels --k $(K) --n $(N)
+
+eval-probes: up ## Graded intensity ladders (churn, urgency)
+	$(COMPOSE) --profile eval run --rm eval probes
+
+eval-typed: ## Re-run the whole eval against the laya-typed-decisions checkpoint
+	LAYA_SUBFOLDER=typed-decisions $(COMPOSE) up -d --force-recreate laya
+	$(MAKE) ready
+	LAYA_SUBFOLDER=typed-decisions $(COMPOSE) --profile eval run --rm eval all --k $(K) --n $(N)
+	@echo "note: service is still on typed-decisions; 'make up' restores the base checkpoint"
+
+report: ## Render a comparison table from everything in results/
+	$(COMPOSE) --profile eval run --rm --entrypoint python eval -m eval.report
+
+introspect: ## Print laya's real signatures (run after a version bump)
+	docker run --rm -v laya-models:/models -v "$$PWD/scripts:/srv/scripts:ro" laya:cpu python scripts/introspect.py
 
 logs: ## Tail service logs
 	$(COMPOSE) logs -f laya

@@ -38,8 +38,27 @@ services:
     environment:
       LAYA_URL: http://laya:8000
       LAYA_READY_TIMEOUT: ${LAYA_READY_TIMEOUT:-900}
+      PYTHONPATH: /work
     volumes:
       - ./tests:/tests:ro
+      - ./eval:/work/eval:ro   # metrics module, imported by the unit tests
+    depends_on:
+      - laya
+
+  eval:
+    profiles: ["eval"]
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    image: laya-tests:latest
+    working_dir: /work
+    entrypoint: ["python", "-m", "eval.run"]
+    environment:
+      LAYA_URL: http://laya:8000
+      RESULTS_DIR: /work/results
+    volumes:
+      - ./eval:/work/eval
+      - ./results:/work/results
     depends_on:
       - laya
 
