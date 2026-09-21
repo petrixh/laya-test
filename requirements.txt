@@ -1,0 +1,11 @@
+# Laya + serving stack. torch is installed separately in the Dockerfile
+# so the build can point at a CPU or CUDA/ROCm wheel index.
+laya==0.3.4
+# ModernBERT support landed in transformers 4.48; laya's own floor (4.45) is too low.
+transformers>=4.48,<5
+safetensors>=0.4.0
+huggingface_hub>=0.20.0
+numpy>=1.20.0
+fastapi>=0.115
+uvicorn[standard]>=0.32
+pydantic>=2.9

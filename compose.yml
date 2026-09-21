@@ -1,0 +1,49 @@
+services:
+  laya:
+    build:
+      context: .
+      target: runtime
+      args:
+        # CPU default. GPU hosts: https://download.pytorch.org/whl/cu124 (NVIDIA)
+        # or https://download.pytorch.org/whl/rocm6.2 (AMD).
+        TORCH_INDEX: ${TORCH_INDEX:-https://download.pytorch.org/whl/cpu}
+    image: laya:${LAYA_TAG:-cpu}
+    ports:
+      - "${LAYA_PORT:-8000}:8000"
+    environment:
+      LAYA_CHECKPOINT: ${LAYA_CHECKPOINT:-convaiinnovations/laya}
+      LAYA_SUBFOLDER: ${LAYA_SUBFOLDER:-}
+      LAYA_DEVICE: ${LAYA_DEVICE:-auto}
+      TORCH_NUM_THREADS: ${TORCH_NUM_THREADS:-4}
+      OMP_NUM_THREADS: ${TORCH_NUM_THREADS:-4}
+      HF_HOME: /models
+    volumes:
+      - laya-models:/models
+    mem_limit: ${LAYA_MEM:-5g}
+    # Uncomment on an NVIDIA host (with nvidia-container-toolkit installed):
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  tests:
+    profiles: ["test"]
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    image: laya-tests:latest
+    environment:
+      LAYA_URL: http://laya:8000
+      LAYA_READY_TIMEOUT: ${LAYA_READY_TIMEOUT:-900}
+    volumes:
+      - ./tests:/tests:ro
+    depends_on:
+      - laya
+
+volumes:
+  laya-models:
+    external: true
+    name: laya-models
