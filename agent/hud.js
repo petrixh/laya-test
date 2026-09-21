@@ -307,6 +307,15 @@
         $('lh-lanesec').querySelector('.lbl > span').textContent =
           `Lane choice · ${st.laneDecisions}`;
       }
+      // say plainly when stage two is not being consulted, so the panel is not
+      // mistaken for a live decision when it is only showing the last one
+      if (autopilot.config.laneChoice === 'model' && autopilot.laneNeed === 'not needed') {
+        const tag = $('lh-lanetag');
+        if (tag.textContent !== 'not needed') {
+          tag.textContent = 'not needed';
+          tag.className = 'tag';
+        }
+      }
       const rj = window.__rj;
       if (rj) {
         $('lh-dist').innerHTML = Math.floor(rj.state.distance) + '<small> m</small>';

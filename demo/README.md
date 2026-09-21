@@ -1,20 +1,22 @@
-## `two-stage-lane/` — asking the model to pick the lane, which fails
+## `lane-choice/` — the model choosing the lane, gated
 
-The same game and the same stage-one classifier, but the lane is chosen by a
-second Laya question instead of by the harness rule.
+Same game and same stage-one classifier, but when the reindeer's lane is a
+barrier the *lane* is chosen by a second Laya question rather than by the
+harness rule. Options are filtered to lanes stage one did not call barriers.
 
 | | |
 |---|---|
-| stage-one accuracy | 1.00 (120/120) |
-| stage-two decisions | 36 |
-| **chose a wall** | **25% of waves** |
-| crashes | 9 |
-| best distance | 167m (against 1798m on the rule) |
+| stage-one accuracy | 1.00 |
+| crashes | **0** |
+| best distance | 902m |
+| stage-two calls | 4 (plus 6 waves with a single candidate) |
+| **took the first option** | **4 / 4** |
 
-The frame shows why: the lane panel reads L 0.92, M 0.06, R 0.02, and it reads
-close to that whatever the lanes actually contain. The model is answering
-"left", not choosing. A constant "always left" baseline scores 0.825 on the
-offline sweep against the best framing's 0.875.
+It survives, and that is the point worth noticing: the filter guarantees
+survival from stage one, while stage two took whichever option was listed
+first every time. Asked the same question with the options swapped
+(`eval/lane_forced.py`) it names the other lane 80-100% of the time. The panel
+tags each wave `FORCED`, `optional` or `not needed`.
 
 ## `three-lanes/` — the lane-aware autopilot
 

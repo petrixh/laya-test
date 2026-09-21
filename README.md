@@ -267,53 +267,77 @@ autopilot therefore reads which lane an obstacle is in from the game, exactly as
 it already read the obstacle's name, and asks the model only what the object
 requires.
 
-### Stage two: asking the model to pick the lane does not work
+### Stage two: the model cannot choose between described alternatives
 
-Stage one classifies each obstacle. The obvious next step is to hand the model
-its own readings -- "The left lane is a solid barrier that cannot be passed at
-all. The middle lane is clear..." -- and ask which lane to take. It is built
-(`--lane-choice model`) and it fails.
+Stage one classifies each obstacle. Stage two hands the model its own readings
+-- "The left lane is a solid barrier that cannot be passed at all. The middle
+lane is clear..." -- and asks which lane to take. It is built
+(`--lane-choice model`, or `?lane=model`) and shown in the HUD as its own panel.
 
-| strategy | picks a passable lane |
-|---|---|
-| best of 20 model framings | 0.875 |
-| **constant: always answer "left"** | **0.825** |
-| random | 0.750 |
+**The clean test needs no baseline: ask the same question with the two options
+swapped.** A model reading the scene names the same lane twice.
 
-**Include a constant baseline or the number means nothing.** I nearly shipped
-the 0.875 as a result. It beats always-answering-left by 0.05 on 40 scenes,
-which is inside the noise. The sweep was measuring how often the left lane
-happens to be passable, not whether the model was choosing.
-
-In the game it is plainer still. Over 36 stage-two decisions it drove into a
-wall on **25%** of waves, and where exactly one lane was clear it found that
-lane **4 times out of 19** -- worse than chance. Every contradiction picked
-lane 0, at 0.73-0.95 probability. It is answering "left", not reading the scene.
-
-| | harness rule | model picks the lane |
+| pair, both orders | order-consistent | picks better (chance 0.50) |
 |---|---|---|
-| stage-one accuracy | 1.00 | 1.00 |
-| crashes | **0** | 9 |
-| best distance | **1798m** | 167m |
-| chose a wall | n/a | 25% of waves |
+| barrier vs clear | 0.10 | 0.45 |
+| barrier vs jump | 0.20 | 0.60 |
+| barrier vs duck | 0.00 | 0.50 |
+| clear vs jump | 0.00 | 0.50 |
+| clear vs duck | 0.00 | 0.50 |
+| jump vs duck | 0.00 | 0.50 |
 
-Stage one is unaffected in both -- 120/120 in the two-stage run -- so this is
-cleanly a stage-two failure, and it is why `laneChoice` defaults to `rule`.
-`demo/two-stage-lane/` records it; the HUD's lane panel shows the bias directly,
-with the left bar at 0.92 wave after wave.
+Swap the options and it names the other lane. It is answering by **option
+position**, not by reading the state, even when one option is a wall and the
+other is empty.
 
-Two general lessons, both of which cost something to learn here:
+That also caught a mistake in my own method. The first sweep of this question
+reported 0.875 picks-a-passable-lane and had no constant baseline in it.
+"Always answer left" scores 0.825 on the same scenes. I nearly shipped the
+difference as a result.
 
-**This model answers questions about a described thing, and does not choose
-among described alternatives.** Classifying "a tall ice wall" is 1.00. Picking
-between three lanes whose contents are spelled out in the state is at baseline.
-Put the alternatives in the criteria, one question per thing, and it works; put
-them in the state and ask for a selection, and it does not.
+#### Gating makes it survive, which is the dangerous part
 
-**Option position is a real confound.** A three-way choice where the answer
-should be uniformly distributed came back 0.92 on the first option. Any
-`choice` question worth trusting needs either a shuffled-order control or a
-constant baseline next to it.
+The first version asked on every wave and offered all three lanes, so a biased
+chooser could drag the reindeer out of a good lane into a wall it had itself
+identified: **25% of waves ended in a wall**, nine crashes, 167m.
+
+Gating it -- only ask when the current lane is a barrier, and only offer lanes
+stage one did not call barriers -- fixes the *play* completely:
+
+| | ask every wave, all 3 lanes | gated + filtered | harness rule |
+|---|---|---|---|
+| crashes | 9 | **0** | **0** |
+| best distance | 167m | 902-1300m | 1798m |
+| chose a wall | 25% of waves | 0% | n/a |
+| stage-two calls | 36 | 18 | 0 |
+| **took the first option** | -- | **18 / 18** | -- |
+
+Both filters come from the model's own stage-one output rather than ground
+truth, so this is legitimate composition. But note what it buys: survival is
+now inherited from stage one, and stage two took the first option offered in
+every single one of its eighteen choices. **A safety filter turned a component
+with no signal into one that looks fine.** That is exactly how the laya-mlx
+Snake demo's shield works, and it is why the shielded and unshielded scores
+there differ so much.
+
+`laneChoice` therefore defaults to `rule`. `demo/lane-choice/` records the
+gated version; the HUD panel tags each wave `FORCED`, `optional` or
+`not needed`, so it is visible when stage two is consulted at all -- in a
+150-decision run it fired 14 times, and 9 of those had only one candidate, so
+there was no choice to make.
+
+#### What this says about the model
+
+**It answers questions about a described thing; it does not choose among
+described alternatives.** "Is this a barrier?" about a named object is 1.00.
+"Which of these two lanes?" with the contents spelled out in the state is at
+chance and order-dependent. Alternatives belong in the criteria, one question
+per thing -- which is exactly how stage one is built, and stage one does not
+miss.
+
+**Option position is a first-class confound.** Any `choice` result on this
+model needs a swapped-order control or a constant baseline beside it, or it is
+not a result.
 
 ### Result: three lanes, 201 decisions, no mistakes
 

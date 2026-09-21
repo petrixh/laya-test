@@ -1,0 +1,163 @@
+"""Stage two, gated: only ask when the reindeer must move, and only offer lanes
+it has not already called barriers.
+
+The first attempt asked on every wave and offered all three lanes, so it could
+override a perfectly good lane and could pick a wall it had itself identified.
+Gating changes the question in two ways that matter on this model:
+
+  * it only fires when the current lane is a barrier, so a wrong answer is the
+    difference between two viable lanes rather than between safety and a wall;
+  * the options are filtered to non-barrier lanes, which with three lanes means
+    the real decision is almost always binary -- and binary is where every
+    earlier sweep found this model strongest.
+
+Survival is then inherited from stage one, so the metric has to be quality:
+when one candidate is clear and the other needs a manoeuvre, does it take the
+clear one? Chance is 0.50, and "always take the first option offered" is the
+other baseline that matters.
+
+  python -m eval.lane_forced
+"""
+from __future__ import annotations
+
+import json
+import os
+import pathlib
+import random
+import sys
+
+from .runner import Service
+
+URL = os.environ.get("LAYA_URL", "http://127.0.0.1:8000")
+RESULTS = pathlib.Path(os.environ.get("RESULTS_DIR", "/results"))
+LANE_WORDS = ["left", "middle", "right"]
+DESC = {None: "clear, with nothing in it",
+        "jump": "something resting on the snow that has to be jumped over",
+        "duck": "something hanging overhead that has to be ducked under",
+        "block": "a solid barrier that cannot be passed at all"}
+LABELS = ["option_a", "option_b"]
+
+
+def make_scene(rng):
+    """Current lane is a barrier; the other two differ in quality, one clear
+    and one needing a manoeuvre. That is the case where the choice matters."""
+    here = rng.randrange(3)
+    others = [i for i in range(3) if i != here]
+    rng.shuffle(others)
+    lanes = [None, None, None]
+    lanes[here] = "block"
+    lanes[others[0]] = None                       # the clear one
+    lanes[others[1]] = rng.choice(["jump", "duck"])
+    return {"lanes": lanes, "here": here, "good": others[0], "meh": others[1]}
+
+
+def state_of(sc, candidates):
+    return " ".join(f"The {LANE_WORDS[i]} lane is {DESC[sc['lanes'][i]]}."
+                    for i in candidates)
+
+
+def run(svc, scenes, shuffle_options, rng):
+    hits = first = n = 0
+    confs = []
+    for sc in scenes:
+        cands = sorted([sc["good"], sc["meh"]])
+        if shuffle_options:
+            cands = cands[:]
+            rng.shuffle(cands)
+        crit = {LABELS[k]: f"the {LANE_WORDS[cands[k]]} lane" for k in range(2)}
+        q = {"type": "choice", "instructions": "Which lane should the reindeer take?",
+             "criteria": crit}
+        a = svc.predict(state_of(sc, cands), {"m": q})["answers"]["m"]
+        pick = cands[LABELS.index(a["choice"])]
+        confs.append(a["confidence"])
+        n += 1
+        hits += pick == sc["good"]
+        first += pick == cands[0]
+    return {"picks_clear": round(hits / n, 3),
+            "picks_first_option": round(first / n, 3),
+            "mean_confidence": round(sum(confs) / len(confs), 3)}
+
+
+PAIRS = [("block", None), ("block", "jump"), ("block", "duck"),
+         (None, "jump"), (None, "duck"), ("jump", "duck")]
+BETTER = {"block": 0, None: 3, "jump": 2, "duck": 2}   # higher is better to be in
+
+
+def run_pairs(svc, rng, reps=10):
+    """Every pair type, each presented in both orders.
+
+    Order-consistency is the bias test that needs no baseline: ask the same
+    question with the options swapped, and a model that is reading the scene
+    names the same lane twice. A model keyed on position names whichever lane
+    is listed first, and scores 0.
+    """
+    out = []
+    for a, b in PAIRS:
+        agree = correct = n = 0
+        confs = []
+        for _ in range(reps):
+            lanes = rng.sample(range(3), 2)
+            content = {lanes[0]: a, lanes[1]: b}
+            picks = []
+            for order in ([lanes[0], lanes[1]], [lanes[1], lanes[0]]):
+                crit = {LABELS[k]: f"the {LANE_WORDS[order[k]]} lane" for k in range(2)}
+                st = " ".join(f"The {LANE_WORDS[i]} lane is {DESC[content[i]]}." for i in order)
+                ans = svc.predict(st, {"m": {"type": "choice",
+                                             "instructions": "Which lane should the reindeer take?",
+                                             "criteria": crit}})["answers"]["m"]
+                picks.append(order[LABELS.index(ans["choice"])])
+                confs.append(ans["confidence"])
+            n += 1
+            agree += picks[0] == picks[1]
+            want = lanes[0] if BETTER[a] >= BETTER[b] else lanes[1]
+            correct += sum(1 for p in picks if p == want) / 2
+        label = f"{a or 'clear'} vs {b or 'clear'}"
+        out.append({"pair": label, "order_consistent": round(agree / n, 3),
+                    "picks_better": round(correct / n, 3),
+                    "mean_confidence": round(sum(confs) / len(confs), 3)})
+    return out
+
+
+def main() -> int:
+    rng = random.Random(23)
+    scenes = [make_scene(rng) for _ in range(60)]
+    with Service(URL) as svc:
+        info = svc.wait_ready()
+        print(f"backend={info.get('backend')} scenes={len(scenes)}\n", file=sys.stderr)
+        fixed = run(svc, scenes, False, random.Random(1))
+        shuf = run(svc, scenes, True, random.Random(2))
+        pairs = run_pairs(svc, random.Random(31))
+
+    # baselines on the same scenes
+    r = random.Random(4)
+    coin = sum(1 for sc in scenes if r.random() < 0.5) / len(scenes)
+    const = sum(1 for sc in scenes if sorted([sc["good"], sc["meh"]])[0] == sc["good"]) / len(scenes)
+
+    rows = {"fixed order": fixed, "shuffled order": shuf,
+            "BASELINE always first option": {"picks_clear": round(const, 3),
+                                             "picks_first_option": 1.0, "mean_confidence": 0.0},
+            "BASELINE coin flip": {"picks_clear": round(coin, 3),
+                                   "picks_first_option": None, "mean_confidence": 0.0}}
+    RESULTS.mkdir(parents=True, exist_ok=True)
+    (RESULTS / "lane_forced.json").write_text(json.dumps({"service": info, "rows": rows}, indent=2))
+
+    print(f"{'variant':<30} {'picks clear':>12} {'picks 1st':>10} {'conf':>7}")
+    for k, v in rows.items():
+        pf = "  -" if v["picks_first_option"] is None else f"{v['picks_first_option']:>10.3f}"
+        print(f"{k:<30} {v['picks_clear']:>12.3f} {pf} {v['mean_confidence']:>7.3f}")
+    print("\npicks clear = took the empty lane over the one needing a manoeuvre (chance 0.50).\n"
+          "picks 1st   = how often it just took whichever option was listed first.")
+
+    print(f"\n{'pair (both orders)':<22} {'consistent':>11} {'picks better':>13} {'conf':>7}")
+    for r in pairs:
+        print(f"{r['pair']:<22} {r['order_consistent']:>11.2f} {r['picks_better']:>13.2f} "
+              f"{r['mean_confidence']:>7.3f}")
+    print("\nconsistent = named the same lane with the options swapped. 0 means it is\n"
+          "answering by position; 1 means it is reading the scene.")
+    (RESULTS / "lane_forced.json").write_text(json.dumps(
+        {"service": info, "rows": rows, "pairs": pairs}, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

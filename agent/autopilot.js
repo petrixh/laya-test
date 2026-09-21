@@ -81,15 +81,14 @@
     block: 'a solid barrier that cannot be passed at all',
     unknown: 'not yet identified',
   };
-  const LANE_QUESTION = {
+  const laneQuestion = (candidates) => ({
     lane: {
       type: 'choice',
       instructions: 'Which lane should the reindeer take?',
-      criteria: {
-        option_a: 'the left lane', option_b: 'the middle lane', option_c: 'the right lane',
-      },
+      criteria: Object.fromEntries(
+        candidates.map((l, k) => [LANE_LABELS[k], `the ${LANE_WORDS[l]} lane`])),
     },
-  };
+  });
 
   const PLAYER_DEPTH = 0.65;   // the game's collision half-depth
   const WAVE_Z = 3;            // obstacles within this z of each other are one wave
@@ -97,6 +96,7 @@
   const api = {
     config: Object.assign({}, DEFAULTS),
     running: false,
+    laneNeed: 'idle',
     trace: [],
     stats: null,
     onUpdate: null,
@@ -121,6 +121,7 @@
       deaths: 0, bestDistance: 0, lastDistance: 0,
       errors: 0, deathLog: [], laneChanges: 0,
       laneDecisions: 0, laneForced: 0, laneContradictions: 0,
+      laneTookFirst: 0, laneCostlier: 0, laneForcedSingle: 0,
       laneLatencies: [],
     };
   }
@@ -233,43 +234,63 @@
     }
   }
 
-  /** Stage two: hand the model its own stage-one readings and ask for a lane. */
-  async function askLane(key, need, forced) {
-    const entry = { status: 'pending', forced };
+  /** Stage two, gated.
+   *
+   * Only fires when the lane the reindeer is standing in was read as a
+   * barrier, and only offers lanes stage one did not call barriers. Both
+   * restrictions come from the model's own output, not from ground truth.
+   *
+   * The first version asked on every wave and offered all three lanes, so it
+   * could drag the reindeer out of a good lane and into a wall it had itself
+   * identified. Gated and filtered, a wrong answer costs a manoeuvre rather
+   * than a life -- which is worth knowing, because it means the harness can
+   * make a non-functional stage two look fine. eval/lane_forced.py measures it
+   * without that cover: asked the same question with the two options swapped,
+   * it names the other lane 80-100% of the time, so it is answering by option
+   * position and not by reading the scene.
+   */
+  async function askLane(key, need, candidates, forced) {
+    const entry = { status: 'pending', forced, candidates };
     laneCalls.set(key, entry);
     laneInFlight++;
     try {
-      const sentence = [0, 1, 2].map(i =>
+      const sentence = candidates.map(i =>
         `The ${LANE_WORDS[i]} lane is ${LANE_DESC[need[i] === null ? 'clear' : need[i]]}.`
       ).join(' ');
       const t0 = performance.now();
       const res = await fetch(api.config.endpoint + '/predict', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ state: sentence, questions: LANE_QUESTION }),
+        body: JSON.stringify({ state: sentence, questions: laneQuestion(candidates) }),
       });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const body = await res.json();
       const a = body.answers.lane;
       const wall = performance.now() - t0;
-      const lane = LANE_LABELS.indexOf(a.choice);
-      const probs = LANE_LABELS.map(l => a.probabilities[l] || 0);
+      const slot = LANE_LABELS.indexOf(a.choice);
+      const lane = candidates[slot] !== undefined ? candidates[slot] : candidates[0];
+      // probabilities indexed by lane, so the HUD can show them in lane order
+      const probs = [0, 0, 0];
+      candidates.forEach((l, k) => { probs[l] = a.probabilities[LANE_LABELS[k]] || 0; });
 
       Object.assign(entry, {
         status: 'done', lane, probs, confidence: a.confidence, wallMs: wall,
-        // stage two picking a lane stage one called a barrier is the model
-        // contradicting itself, and worth counting separately from a miss
-        contradiction: need[lane] === 'block',
+        contradiction: need[lane] === 'block',      // impossible now, kept as an assertion
+        tookFirst: slot === 0,
+        costlier: need[lane] !== null && candidates.some(l => need[l] === null),
       });
       const st = api.stats;
       st.laneDecisions++;
       st.laneLatencies.push(wall);
       if (forced) st.laneForced++;
       if (entry.contradiction) st.laneContradictions++;
+      if (entry.tookFirst) st.laneTookFirst++;
+      if (entry.costlier) st.laneCostlier++;
       api.trace.push({
         stage: 'lane', run: runIndex, distance: Math.floor(rj.state.distance),
         lanes: need.map(n => n === null ? 'clear' : n),
-        forced, chose: lane, contradiction: entry.contradiction,
+        forced, candidates, chose: lane, contradiction: entry.contradiction,
+        took_first_option: entry.tookFirst, passed_up_a_clear_lane: entry.costlier,
         probabilities: { left: probs[0], middle: probs[1], right: probs[2] },
         confidence: a.confidence, server_ms: body.latency_ms,
         wall_ms: Number(wall.toFixed(1)),
@@ -367,20 +388,31 @@
 
     let target = ruleTarget;
     if (api.config.laneChoice === 'model') {
-      // one stage-two call per wave, once every obstacle in it has a reading
-      const key = Math.min(...wave.group.map(idOf));
       const settled = wave.group.every(o => {
         const d = decisions.get(idOf(o));
         return d && d.status !== 'pending';
       });
-      let lc = laneCalls.get(key);
-      if (!lc && settled && laneInFlight < 2 && !reachedLimit()) {
-        askLane(key, need, need[s.lane] === 'block');
-        lc = laneCalls.get(key);
-      }
-      if (lc && lc.status === 'done') {
-        target = lc.lane;
-        if (api.config.laneShield && need[target] === 'block') target = ruleTarget;
+      // Stay put unless the current lane is a barrier. Moving for its own sake
+      // was the first version's mistake: it gave a biased chooser a chance to
+      // do harm on every single wave.
+      const mustMove = settled && need[s.lane] === 'block';
+      api.laneNeed = !settled ? 'waiting' : mustMove ? 'needed' : 'not needed';
+      if (mustMove) {
+        const candidates = [0, 1, 2].filter(l => need[l] !== 'block');
+        if (candidates.length === 1) {
+          target = candidates[0];               // no choice to make
+          api.stats.laneForcedSingle++;
+        } else if (candidates.length > 1) {
+          const key = Math.min(...wave.group.map(idOf));
+          let lc = laneCalls.get(key);
+          if (!lc && laneInFlight < 2 && !reachedLimit()) {
+            askLane(key, need, candidates, true);
+            lc = laneCalls.get(key);
+          }
+          target = lc && lc.status === 'done' ? lc.lane : ruleTarget;
+        }
+      } else if (settled && need[s.lane] !== 'unknown') {
+        target = s.lane;                        // current lane is fine, hold it
       }
       if (laneCalls.size > 64) {
         const keep = new Map();

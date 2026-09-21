@@ -227,8 +227,11 @@ const main = async () => {
       decisions: result.stats.laneDecisions,
       forced: result.stats.laneForced,
       chose_a_wall: result.stats.laneContradictions,
-      chose_a_wall_rate: result.stats.laneDecisions
-        ? +(result.stats.laneContradictions / result.stats.laneDecisions).toFixed(4) : null,
+      forced_single_candidate: result.stats.laneForcedSingle,
+      took_first_option: result.stats.laneDecisions
+        ? +(result.stats.laneTookFirst / result.stats.laneDecisions).toFixed(4) : null,
+      passed_up_a_clear_lane: result.stats.laneDecisions
+        ? +(result.stats.laneCostlier / result.stats.laneDecisions).toFixed(4) : null,
       latency_p50_ms: result.stats.laneLatencies.length
         ? +pct(result.stats.laneLatencies.slice().sort((a, b) => a - b), 0.5).toFixed(1) : null,
     },
