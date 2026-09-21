@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-21T15:10:04.200Z",
+  "generated": "2026-09-21T15:18:04.276Z",
   "options": {
     "headed": false,
     "endpoint": "http://100.121.51.97:8000",
@@ -13,35 +13,35 @@
     "mockAccuracy": 0.85,
     "mockLatency": 280
   },
-  "decisions": 151,
-  "correct": 151,
+  "decisions": 150,
+  "correct": 150,
   "accuracy": 1,
   "crashes": 0,
-  "best_distance_m": 1351,
+  "best_distance_m": 1289,
   "errors": 0,
   "lane_changes": 21,
   "lane_choice": {
-    "decisions": 18,
+    "decisions": 19,
     "chose_a_barrier": 0,
     "passed_up_a_clear_lane": 0,
-    "latency_p50_ms": 166.6
+    "latency_p50_ms": 169.3
   },
   "latency_ms": {
-    "p50": 187.4,
-    "p95": 291.2,
-    "max": 515
+    "p50": 212.9,
+    "p95": 339.6,
+    "max": 454.9
   },
   "per_truth": {
-    "duck": {
-      "n": 38,
+    "jump": {
+      "n": 49,
       "accuracy": 1
     },
     "block": {
-      "n": 55,
+      "n": 50,
       "accuracy": 1
     },
-    "jump": {
-      "n": 58,
+    "duck": {
+      "n": 51,
       "accuracy": 1
     }
   },

@@ -98,6 +98,9 @@
     running: false,
     laneNeed: 'idle',
     currentNeed: null,
+    // the classification the reindeer is about to act on, as opposed to
+    // whichever one happened to come back most recently
+    activeDecision: null,
     trace: [],
     stats: null,
     onUpdate: null,
@@ -368,7 +371,12 @@
     }
 
     const wave = currentWave();
-    if (!wave) { api.currentNeed = null; rj.setDuck(false); return; }
+    if (!wave) {
+      api.currentNeed = null;
+      api.activeDecision = null;
+      rj.setDuck(false);
+      return;
+    }
 
     const ttc = -wave.z / Math.max(1e-3, s.speed);
 
@@ -429,6 +437,18 @@
 
     // Only commit to a manoeuvre once we are actually standing in the lane it
     // belongs to -- jumping while still sliding clears the wrong obstacle.
+    // Publish the decision the reindeer is actually about to act on. The HUD
+    // used to paint whichever classification finished last, which with four
+    // in flight over a 2.6s horizon is usually an obstacle in another lane or
+    // a later wave -- so the bars and the reindeer disagreed on screen.
+    let active = null;
+    for (const o of wave.group) {
+      if (o.lane !== target) continue;
+      const d = decisions.get(idOf(o));
+      if (d && d.status === 'done') active = d;
+    }
+    api.activeDecision = active;
+
     const inLane = Math.abs(s.x - rj.LANES[target]) < 0.12;
     const req = need[target];
     if (!inLane || req === null || req === 'unknown' || req === 'block') {

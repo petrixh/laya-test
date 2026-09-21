@@ -14,12 +14,12 @@ without standing the service up.
 
 | | |
 |---|---|
-| obstacles classified | 151, accuracy **1.00** (jump 58/58, duck 38/38, block 55/55) |
-| lane choices by the model | 18 |
+| obstacles classified | 150, accuracy **1.00** (jump 49/49, duck 51/51, block 50/50) |
+| lane choices by the model | 19 |
 | of those, chose a barrier | **0** |
 | crashes | **0** |
-| furthest run | **1351m** |
-| latency p50 | 167ms wall, ~30ms of it inference |
+| furthest run | **1289m** |
+| latency p50 | 169ms wall, ~30ms of it inference |
 
 Rows tagged `stage: "lane"` in `trace.json` carry `blocked_scores` — the model's
 per-lane score for each candidate — so every lane change can be checked against the

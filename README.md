@@ -12,7 +12,7 @@ ground truth falls out of the game's own collision geometry.
 
 *Every decision here is the model's. It reads each obstacle as jumpable, duckable or an
 impassable barrier, and when the lane it is standing in is a barrier it picks where to
-go. The harness only handles timing. 151 decisions, no misreadings, no crashes, 1351m.
+go. The harness only handles timing. 150 decisions, no misreadings, no crashes, 1289m.
 [Full recording](demo/run/run.webm).*
 
 ## Quick start
@@ -98,11 +98,11 @@ the rest.
 
 | the run in `demo/` | |
 |---|---|
-| obstacles classified | **151**, accuracy **1.00** — jump 58/58, duck 38/38, block 55/55 |
-| lane choices made by the model | 18 |
+| obstacles classified | **150**, accuracy **1.00** — jump 49/49, duck 51/51, block 50/50 |
+| lane choices made by the model | 19 |
 | of those, chose a barrier | **0** |
 | crashes | **0** |
-| furthest run | **1351m** |
+| furthest run | **1289m** |
 
 **Ranking described alternatives against each other: no better than chance.** This is why
 the lane question is *not* asked as a choice between lanes. Offered a list, it answers by

@@ -282,7 +282,19 @@
       .catch(() => { $('lh-dev').textContent = 'no service'; });
 
     function paintDecision(d) {
-      if (!d || d.status !== 'done') return;
+      if (!d) {
+        // the lane the reindeer is heading for holds nothing this wave
+        $('lh-act').textContent = 'CLEAR';
+        $('lh-act').style.color = 'var(--ink-2)';
+        $('lh-cf').textContent = '';
+        for (const a of ORDER) {
+          $('lh-p-' + a).textContent = '--';
+          $('lh-f-' + a).style.width = '1.5%';
+          $('lh-bar-' + a).classList.remove('win');
+        }
+        return;
+      }
+      if (d.status !== 'done') return;
       $('lh-act').textContent = d.action.toUpperCase();
       $('lh-act').style.color = HEX[d.action] || '#fff';
       $('lh-cf').textContent = 'confidence ' + d.confidence.toFixed(3);
@@ -318,6 +330,11 @@
       } else if (st2 === 'waiting' && tag.textContent !== 'asking…') {
         tag.textContent = 'asking\u2026'; tag.className = 'tag forced';
       }
+      paintDecision(autopilot.activeDecision);
+      // dim the lane panel when its verdict is not the current wave's
+      $('lh-lanesec').style.opacity =
+        autopilot.laneNeed === 'not needed' ? '0.45' : '1';
+
       const rj = window.__rj;
       if (rj) {
         $('lh-dist').innerHTML = Math.floor(rj.state.distance) + '<small> m</small>';
@@ -372,7 +389,9 @@
       }
     }
 
-    autopilot.onUpdate = paintDecision;
+    // Painted from the live active decision each tick, not from a completion
+    // callback: the callback fires for every obstacle classified anywhere in
+    // the 2.6s horizon, which is not the one being acted on.
     autopilot.onLane = paintLane;
     // stop() should stop the panel too, or the canvas keeps redrawing forever
     const wrappedStop = autopilot.stop;
