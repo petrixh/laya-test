@@ -26,6 +26,7 @@ const opts = {
   headed: !!arg('headed', false),
   endpoint: String(arg('endpoint', 'http://127.0.0.1:8000')),
   encoding: String(arg('encoding', 'json')),
+  framing: String(arg('framing', 'guided')),
   decisions: Number(arg('decisions', 40)),
   seconds: Number(arg('seconds', 180)),
   out: String(arg('out', 'runs/latest')),
@@ -170,11 +171,12 @@ const main = async () => {
   await page.addScriptTag({ path: join(ROOT, 'agent/hud.js') });
   await page.evaluate((o) => {
     window.__autopilot.start({
-      endpoint: o.endpoint, encoding: o.encoding, maxDecisions: o.decisions,
+      endpoint: o.endpoint, encoding: o.encoding, framing: o.framing,
+      maxDecisions: o.decisions,
     });
     window.__layaHud.mount(window.__autopilot, o.endpoint);
   }, opts);
-  console.log(`autopilot started (encoding=${opts.encoding}, target ${opts.decisions} decisions)`);
+  console.log(`autopilot started (framing=${opts.framing}, target ${opts.decisions} decisions)`);
 
   const deadline = Date.now() + opts.seconds * 1000;
   let last = -1;

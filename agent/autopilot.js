@@ -19,7 +19,8 @@
 
   const DEFAULTS = {
     endpoint: 'http://127.0.0.1:8000',
-    encoding: 'json',     // 'json' | 'nl'  -- state representation to A/B
+    framing: 'guided',    // 'guided' | 'action'  -- see QUESTION_FOR below
+    encoding: 'json',     // 'json' | 'nl'  -- state shape for the 'action' framing
     decideAt: 2.6,        // seconds-to-impact at which we ask the model
     maxInFlight: 3,       // concurrent classifications (obstacles are independent)
     jumpAt: 0.30,         // seconds-to-impact at which a 'jump' verdict fires
@@ -33,6 +34,33 @@
     jump: 'leap over a ground-level obstacle such as a snowman, a pile of gifts or a log',
     duck: 'crouch under a hanging obstacle such as a garland or a string of baubles',
     run: 'keep running normally, nothing is close enough to need action yet',
+  };
+
+  // The 'guided' framing, chosen by eval/prompt_sweep.py and confirmed by
+  // eval/prompt_confirm.py on 36 scenes: 0.97 overall and 0.94 on objects the
+  // criteria never name, against 0.35 for the 'action' framing below.
+  //
+  // Three things earned that, all static and instance-independent -- the state
+  // still only names the object, and nothing pre-ranks the options:
+  //   - neutral label names. 'jump'/'duck' as label tokens actively hurt
+  //     (marginal accuracy 0.43 against 0.67 for neutral names).
+  //   - criteria that give both the examples and the mechanism (0.69 against
+  //     0.45 for bare criteria).
+  //   - two options, not three. Offering a 'nothing to do yet' option costs
+  //     0.14 accuracy, and the harness already knows when there is no obstacle.
+  const GUIDED = {
+    option_a: 'obstacles resting on the snow, such as a snowman, a pile of gifts or '
+      + 'a log: they block the space near the ground, so leave the ground to clear them',
+    option_b: 'obstacles suspended overhead, such as a garland or a string of baubles: '
+      + 'they block the space above head height, so lower yourself to pass beneath',
+  };
+  const GUIDED_TO_ACTION = { option_a: 'jump', option_b: 'duck' };
+
+  // Plain English for the game's internal type names. Naming the object is not
+  // a hint about where it sits.
+  const NOUN = {
+    snowman: 'snowman', gifts: 'pile of gifts', log: 'log',
+    garland: 'garland', baubles: 'string of baubles',
   };
 
   const QUESTION_KEY = 'action';
@@ -118,6 +146,11 @@
   function describe(o, ttc) {
     const s = rj.state;
     const kind = o.def.kind === 'air' ? 'hanging in the air' : 'sitting on the ground';
+    if (api.config.framing === 'guided') {
+      // Names the object and nothing else. Whether it sits or hangs is exactly
+      // what the model has to work out.
+      return `There is a ${NOUN[o.type] || o.type} on the track ahead of the running reindeer.`;
+    }
     if (api.config.encoding === 'nl') {
       return (
         `The reindeer is running at ${s.speed.toFixed(0)} metres per second and is ` +
@@ -144,12 +177,21 @@
   }
 
   const QUESTIONS = {
-    [QUESTION_KEY]: {
-      type: 'choice',
-      instructions:
-        'A running reindeer must get past the obstacle ahead without touching it. ' +
-        'What should it do?',
-      criteria: ACTIONS,
+    guided: {
+      [QUESTION_KEY]: {
+        type: 'choice',
+        instructions: 'Which manoeuvre clears the obstacle described?',
+        criteria: GUIDED,
+      },
+    },
+    action: {
+      [QUESTION_KEY]: {
+        type: 'choice',
+        instructions:
+          'A running reindeer must get past the obstacle ahead without touching it. ' +
+          'What should it do?',
+        criteria: ACTIONS,
+      },
     },
   };
 
@@ -164,30 +206,38 @@
 
     try {
       const t0 = performance.now();
+      const questions = QUESTIONS[api.config.framing] || QUESTIONS.action;
       const res = await fetch(api.config.endpoint + '/predict', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ state: describe(o, ttc), questions: QUESTIONS }),
+        body: JSON.stringify({ state: describe(o, ttc), questions }),
       });
       if (!res.ok) throw new Error('HTTP ' + res.status + ' ' + (await res.text()).slice(0, 120));
       const body = await res.json();
       const ans = body.answers[QUESTION_KEY];
       const wall = performance.now() - t0;
 
+      // map the neutral option names back onto game actions for the HUD and grading
+      const action = GUIDED_TO_ACTION[ans.choice] || ans.choice;
+      const probs = {};
+      for (const k of Object.keys(ans.probabilities)) {
+        probs[GUIDED_TO_ACTION[k] || k] = ans.probabilities[k];
+      }
+
       Object.assign(entry, {
         status: 'done',
-        action: ans.choice,
-        probs: ans.probabilities,
+        action: action,
+        probs: probs,
         confidence: ans.confidence,
         serverMs: body.latency_ms,
         wallMs: wall,
-        correct: ans.choice === truth,
+        correct: action === truth,
       });
 
       const st = api.stats;
       st.decisions++;
       if (entry.correct) st.correct++;
-      st.byAction[ans.choice] = (st.byAction[ans.choice] || 0) + 1;
+      st.byAction[action] = (st.byAction[action] || 0) + 1;
       st.latencies.push(wall);
 
       api.trace.push({
@@ -198,11 +248,13 @@
         obstacle: o.type,
         kind: o.def.kind,
         ttc_at_ask: Number(ttc.toFixed(3)),
+        framing: api.config.framing,
         truth,
-        pred: ans.choice,
+        pred: action,
+        raw_choice: ans.choice,
         correct: entry.correct,
         confidence: ans.confidence,
-        probabilities: ans.probabilities,
+        probabilities: probs,
         server_ms: body.latency_ms,
         wall_ms: Number(wall.toFixed(1)),
       });

@@ -235,6 +235,82 @@ while still inside a garland it had correctly classified.
 The state encoding is switchable (`--encoding json|nl`) so the JSON-dict and
 natural-language framings can be compared on the same task.
 
+### Result: framing decides everything
+
+The first attempt scored **0.35** against a 0.33 chance baseline and answered
+`duck` to every obstacle. After a prompt sweep the same model, same checkpoint,
+same scenes scores **40/40 with zero crashes over 721m**.
+
+| | first attempt | after triage |
+|---|---|---|
+| accuracy | 0.35 | **1.00** |
+| ground obstacles | 0 / 26 | **29 / 29** |
+| air obstacles | 14 / 14 | **11 / 11** |
+| crashes | 10 | **0** |
+
+Nothing about the task got easier. The state still only names the object --
+`There is a log on the track ahead of the running reindeer.` -- and the model
+still has to work out that a log sits and a garland hangs.
+
+#### What actually moved the needle
+
+`eval/prompt_sweep.py` crosses five axes over 192 variants; `eval/prompt_confirm.py`
+re-tests the leaders on 36 scenes, including eight objects the criteria never
+mention. Marginal effect of each axis on accuracy:
+
+| axis | levels |
+|---|---|
+| criteria | **knowledge 0.76**, both 0.69, bare 0.45, mechanism 0.41 |
+| options | **two 0.65**, three 0.51 |
+| label names | neutral 0.67, motion 0.64, **action 0.43** |
+| state | says_position 0.67, json_facts 0.61, name_only 0.59, geometry 0.44 |
+| instructions | act 0.59, classify 0.57 |
+
+Three findings worth keeping:
+
+**Domain knowledge in the criteria is the biggest single lever** (+0.35 over bare
+criteria). Telling the model that logs sit and garlands hang is fair game: it is
+static text, identical on every call, and the model still has to identify which
+object is present. That is the difference between supplying world knowledge and
+supplying the answer.
+
+**The words `jump` and `duck` were actively hurting.** Neutral label names score
+0.67 against 0.43 for the action verbs. The decision head is reacting to the
+label tokens themselves, not only to the criteria that define them, so an
+evocative label can fight its own description.
+
+**The third option cost 0.14.** Offering "nothing to do yet" alongside jump and
+duck degraded both. The harness already knows when no obstacle is in range, so
+the model never needed to decide that.
+
+State format mattered least, and the JSON dict the first attempt used
+(`json_facts` 0.61) was *not* the culprit -- it beat the prose-with-numbers
+form. Giving raw geometry was worst of all (0.44): the model cannot compare
+`0.00-0.95m` against a 1.75m reindeer. It is a text encoder, not a calculator.
+
+#### Two caveats
+
+**The sweep overfits at five scenes per variant.** Its top pick
+(`action + knowledge + classify + two`, 1.00 on five scenes) fell to **0.78** on
+36. The winner -- `neutral + both + classify + two` -- holds at 0.97 overall and
+**0.94 on the eight held-out objects** (sledge, firewood, snow drift, crate,
+lantern, fairy lights, banner, bunting). That transfer is the evidence this is
+knowledge rather than string matching against the criteria.
+
+**Confidence is useless here, and worse than useless for choosing a prompt.**
+The winning variant runs at 0.057 mean confidence while scoring 1.00, and across
+the confirmed variants confidence is *anti-correlated* with accuracy -- the
+highest-confidence variant (0.333) was the least accurate (0.67). Combined with
+the label-budget finding, that gives three distinct confidence regimes in this
+repo: honest at k<=8, overconfident under option truncation at k=77, and
+uninformative-but-correct here.
+
+Recorded run in `demo/laya-guided/`. The old framing is still available as
+`--framing action` for comparison.
+
+The state encoding is switchable (`--encoding json|nl`) so the JSON-dict and
+natural-language framings can be compared on the same task.
+
 ### Result: Laya cannot play this game
 
 40 decisions on the base checkpoint, CPU:

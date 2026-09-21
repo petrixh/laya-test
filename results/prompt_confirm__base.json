@@ -1,0 +1,192 @@
+{
+  "service": {
+    "checkpoint": "convaiinnovations/laya",
+    "subfolder": null,
+    "backend": "mlx",
+    "backend_requested": "mlx",
+    "runtime": "laya-mlx 0.1.0",
+    "dtype": "float16",
+    "device": "mlx",
+    "device_requested": "auto",
+    "torch": null,
+    "threads": 0,
+    "ready": true,
+    "load_seconds": 0.5666162080597132,
+    "question_types": [
+      "choice",
+      "score",
+      "noul"
+    ]
+  },
+  "scenes": 36,
+  "rows": [
+    {
+      "labels": "neutral",
+      "criteria": "both",
+      "state": "name_only",
+      "instructions": "classify",
+      "options": "two",
+      "leak": "none",
+      "accuracy": 0.972,
+      "mean_confidence": 0.04,
+      "distinct_answers": 2,
+      "picks": [
+        "option_a",
+        "option_a",
+        "option_a",
+        "option_b",
+        "option_b"
+      ],
+      "sweep_accuracy": 1.0,
+      "named_objects": 1.0,
+      "held_out_objects": 0.938
+    },
+    {
+      "labels": "motion",
+      "criteria": "both",
+      "state": "name_only",
+      "instructions": "classify",
+      "options": "two",
+      "leak": "none",
+      "accuracy": 0.889,
+      "mean_confidence": 0.024,
+      "distinct_answers": 2,
+      "picks": [
+        "go_over",
+        "go_over",
+        "go_over",
+        "go_under",
+        "go_under"
+      ],
+      "sweep_accuracy": 1.0,
+      "named_objects": 1.0,
+      "held_out_objects": 0.75
+    },
+    {
+      "labels": "neutral",
+      "criteria": "knowledge",
+      "state": "name_only",
+      "instructions": "act",
+      "options": "two",
+      "leak": "none",
+      "accuracy": 0.833,
+      "mean_confidence": 0.086,
+      "distinct_answers": 2,
+      "picks": [
+        "option_a",
+        "option_a",
+        "option_a",
+        "option_b",
+        "option_b"
+      ],
+      "sweep_accuracy": 1.0,
+      "named_objects": 1.0,
+      "held_out_objects": 0.625
+    },
+    {
+      "labels": "neutral",
+      "criteria": "both",
+      "state": "name_only",
+      "instructions": "act",
+      "options": "two",
+      "leak": "none",
+      "accuracy": 0.833,
+      "mean_confidence": 0.042,
+      "distinct_answers": 2,
+      "picks": [
+        "option_a",
+        "option_a",
+        "option_a",
+        "option_b",
+        "option_b"
+      ],
+      "sweep_accuracy": 1.0,
+      "named_objects": 0.85,
+      "held_out_objects": 0.812
+    },
+    {
+      "labels": "action",
+      "criteria": "knowledge",
+      "state": "name_only",
+      "instructions": "classify",
+      "options": "two",
+      "leak": "none",
+      "accuracy": 0.778,
+      "mean_confidence": 0.263,
+      "distinct_answers": 2,
+      "picks": [
+        "jump",
+        "jump",
+        "jump",
+        "duck",
+        "duck"
+      ],
+      "sweep_accuracy": 1.0,
+      "named_objects": 0.95,
+      "held_out_objects": 0.562
+    },
+    {
+      "labels": "motion",
+      "criteria": "both",
+      "state": "name_only",
+      "instructions": "act",
+      "options": "three",
+      "leak": "none",
+      "accuracy": 0.75,
+      "mean_confidence": 0.039,
+      "distinct_answers": 2,
+      "picks": [
+        "go_over",
+        "go_over",
+        "go_over",
+        "go_under",
+        "go_under"
+      ],
+      "sweep_accuracy": 1.0,
+      "named_objects": 0.9,
+      "held_out_objects": 0.562
+    },
+    {
+      "labels": "motion",
+      "criteria": "both",
+      "state": "name_only",
+      "instructions": "act",
+      "options": "two",
+      "leak": "none",
+      "accuracy": 0.694,
+      "mean_confidence": 0.022,
+      "distinct_answers": 2,
+      "picks": [
+        "go_over",
+        "go_over",
+        "go_over",
+        "go_under",
+        "go_under"
+      ],
+      "sweep_accuracy": 1.0,
+      "named_objects": 0.75,
+      "held_out_objects": 0.625
+    },
+    {
+      "labels": "action",
+      "criteria": "knowledge",
+      "state": "name_only",
+      "instructions": "classify",
+      "options": "three",
+      "leak": "none",
+      "accuracy": 0.667,
+      "mean_confidence": 0.333,
+      "distinct_answers": 2,
+      "picks": [
+        "jump",
+        "jump",
+        "jump",
+        "jump",
+        "duck"
+      ],
+      "sweep_accuracy": 0.8,
+      "named_objects": 0.8,
+      "held_out_objects": 0.5
+    }
+  ]
+}

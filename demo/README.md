@@ -4,10 +4,32 @@ Two recorded runs of the Reindeer Jump autopilot. Both are real captures from
 `agent/play.mjs`; each folder has `run.webm`, a `frame.png` still, and the
 `summary.json` / `trace.json` / `deaths.json` the run produced.
 
-## `laya-cpu/` — the real model playing
+## `laya-guided/` — the same model, after prompt triage
+
+Laya on MLX (M3 Max), 40 decisions with the `guided` framing chosen by
+`eval/prompt_sweep.py` and confirmed by `eval/prompt_confirm.py`.
+
+| | |
+|---|---|
+| accuracy | **1.00** (40/40) |
+| ground obstacles | 29 / 29 |
+| air obstacles | 11 / 11 |
+| crashes | **0** |
+| best distance | **721m** |
+| mean confidence | 0.057 |
+
+No leak: the state is only `There is a log on the track ahead of the running
+reindeer.` The model still decides whether that sits or hangs. What changed is
+static and instance-independent -- neutral label names instead of `jump`/`duck`,
+criteria giving both examples and mechanism, and two options instead of three.
+
+Note the confidence: 0.057 while scoring 1.00. It is right and does not believe
+it, so none of this is gateable on confidence.
+
+## `laya-cpu/` — the same model, first framing
 
 Laya `convaiinnovations/laya` (base checkpoint, fp32, CPU, 4 threads) driving the
-game for 40 decisions.
+game for 40 decisions, before the prompt sweep. Kept as the before-picture.
 
 | | |
 |---|---|
