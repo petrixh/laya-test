@@ -24,6 +24,8 @@ source .venv/bin/activate
 pip install --quiet --upgrade pip
 pip install --quiet -r requirements-mlx.txt
 
+# LAYA_LOG_IO=compact prints one line in and one line out per request
+export LAYA_LOG_IO=${LAYA_LOG_IO:-}
 export LAYA_BACKEND=${LAYA_BACKEND:-mlx}
 export LAYA_DTYPE=${LAYA_DTYPE:-float16}
 # 0.0.0.0 so another machine on the LAN can point its browser at this service

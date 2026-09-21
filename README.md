@@ -542,6 +542,12 @@ pip install -r requirements-mlx.txt              # laya-mlx + fastapi, no torch
 LAYA_BACKEND=mlx python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
+To watch the traffic, set `LAYA_LOG_IO=compact` (or `full` for the whole
+request and response as JSON). It prints one line in and one line out per
+request and costs about 8 microseconds, which is 0.03% of a 30ms inference.
+The only way it can matter is a slow terminal blocking the write, so redirect
+to a file and `tail -f` it if the console is over a laggy SSH link.
+
 Requires macOS 14+ and Python 3.11+. `LAYA_BACKEND` is `auto` by default, which
 picks MLX on Apple silicon when `laya_mlx` imports and torch everywhere else;
 force it with `mlx` or `torch`. `LAYA_SUBFOLDER` works on both backends -- the MLX

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import functools
 import importlib
+import json
 import logging
 import os
 import threading
@@ -24,6 +25,50 @@ from .model import ModelState, state_from_env
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 log = logging.getLogger("laya.api")
+
+# Request/response tracing. Off by default and gated on a plain boolean, so the
+# hot path costs one attribute lookup when it is not in use.
+#   LAYA_LOG_IO=compact   one line in, one line out (good for watching a game)
+#   LAYA_LOG_IO=full      the whole request and response as indented JSON
+IO_MODE = os.environ.get("LAYA_LOG_IO", "").strip().lower()
+IO_LOG = IO_MODE in ("1", "true", "compact", "full")
+IO_FULL = IO_MODE == "full"
+IO_STATE_CHARS = int(os.environ.get("LAYA_LOG_IO_CHARS", "160"))
+iolog = logging.getLogger("laya.io")
+
+
+def _brief(value: Any) -> str:
+    text = value if isinstance(value, str) else json.dumps(value, separators=(",", ":"))
+    text = " ".join(text.split())
+    return text if len(text) <= IO_STATE_CHARS else text[: IO_STATE_CHARS - 1] + "\u2026"
+
+
+def _answer_brief(key: str, ans: dict[str, Any]) -> str:
+    kind = ans.get("type")
+    if kind == "choice":
+        probs = ans.get("probabilities") or {}
+        top = ans.get("choice")
+        return f"{key}={top} p={probs.get(top, 0):.3f} conf={ans.get('confidence', 0):.3f}"
+    if kind == "score":
+        return f"{key}={ans.get('score', 0):.3f}"
+    if kind == "noul":
+        return f"{key}={ans.get('noul', 0):.3f}"
+    return f"{key}={ans.get('choice', ans)}"
+
+
+def trace_io(state: Any, questions: dict[str, Any], result: dict[str, Any],
+             latency_ms: float) -> None:
+    if IO_FULL:
+        iolog.info("--> %s", json.dumps({"state": state, "questions": questions}, indent=2))
+        iolog.info("<-- %s", json.dumps(result, indent=2))
+        return
+    asked = ", ".join(
+        f"{k}:{v.get('type')}" + (f"({len(v.get('criteria') or [])})" if v.get("criteria") else "")
+        for k, v in questions.items())
+    iolog.info("--> %s   [%s]", _brief(state), asked)
+    answers = result.get("answers") or {}
+    iolog.info("<-- %s   %.1fms",
+               " | ".join(_answer_brief(k, v) for k, v in answers.items()), latency_ms)
 
 QTYPES = ("choice", "score", "noul")
 
@@ -160,4 +205,7 @@ async def predict(req: PredictRequest) -> dict[str, Any]:
     except Exception as exc:
         log.exception("inference failed")
         raise HTTPException(500, f"{type(exc).__name__}: {exc}") from exc
+    if IO_LOG:
+        # after the forward pass, so formatting never sits inside the lock
+        trace_io(req.state, questions, result, latency)
     return {**result, "latency_ms": round(latency, 1)}
