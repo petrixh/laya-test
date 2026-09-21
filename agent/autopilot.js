@@ -8,9 +8,10 @@
  *   the harness decides only WHEN to act.
  * The harness reads which lane an obstacle is in, what it is called and how
  * far away it is -- the model takes text, not pixels, so something has to say
- * what is there -- and it never reads the game's own obstacle class. It holds
- * no lane preference of its own: see the stage-two comment below for how the
- * destination is decided and what the harness does and does not contribute.
+ * what is there -- and it never reads the game's own obstacle class. It ranks
+ * no lane above another on its own account; its only say is picking between
+ * lanes the model scored equal, on timing grounds. See the stage-two comment
+ * below.
  *
  * The question is the `split` framing, which scored 0.800 in
  * eval/obstacle_class.py across two sentence phrasings (0.750 on named
@@ -79,8 +80,9 @@
   // 18 -- which the choice framing never did.
   //
   // The harness compares two numbers the model produced. That is arithmetic on
-  // model output, the same as thresholding the barrier question at 0.5; it is
-  // not a preference of the harness's own.
+  // model output, the same as thresholding the barrier question at 0.5, and
+  // not a ranking of its own -- with the one exception of an exact tie, which
+  // the tie-break below handles and counts.
   const LANE_BLOCKED_Q = {
     blocked: { type: 'noul', instructions: 'Is this lane blocked?' },
   };
@@ -290,11 +292,13 @@
       // be a barrier -- and a barrier scores 1.0 while anything else scores
       // less, so it can never be half of a winning tie.
       //
-      // The harness takes the nearer of the tied lanes, which is a timing
-      // choice among options the model has called equivalent: a shorter slide
-      // spends less time straddling two lanes, where a mistimed change is its
-      // own way to die. Counted so the split is visible, not because it is a
-      // decision the model declined to make.
+      // The harness takes the nearer of the tied lanes -- and the left one
+      // when both are equally near, which is every tie from the middle lane,
+      // where the candidates are [0, 2]. A timing choice among options the
+      // model has called equivalent: a shorter slide spends less time
+      // straddling two lanes, where a mistimed change is its own way to die.
+      // Counted so the split is visible, not because it is a decision the
+      // model declined to make.
       let best = 0;
       for (let i = 1; i < scores.length; i++) if (scores[i] < scores[best]) best = i;
       const tied = scores.filter((v) => v === scores[best]).length > 1;
@@ -421,7 +425,9 @@
     for (const o of wave.group) {
       const d = decisions.get(idOf(o));
       // only a completed classification yields an action; pending and errored
-      // both read as unknown, which the lane ranking treats as last resort
+      // 'unknown' means a wave still settling. It never reaches the lane
+      // question, which requires every obstacle to be classified; it only
+      // suppresses action in the guard below.
       need[o.lane] = d && d.status === 'done' ? d.action : 'unknown';
       if (o.lane === s.lane) {
         lastSeen = { id: idOf(o), type: o.type, ttc };

@@ -11,7 +11,7 @@
     "torch": null,
     "threads": 0,
     "ready": true,
-    "load_seconds": 0.6073747499613091,
+    "load_seconds": 0.5405368340434507,
     "question_types": [
       "choice",
       "score",
@@ -86,6 +86,7 @@
       "block": 0.954
     },
     "avoids_the_barrier": "26/27",
-    "prefers_a_clear_lane": "18/18"
+    "prefers_a_clear_lane": "18/18",
+    "identical_prompt_scores_identically": "12/12"
   }
 }

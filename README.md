@@ -1,5 +1,17 @@
 # Reindeer Jump, driven by Laya
 
+> **An afternoon hack, written end to end by an LLM.** Every line here — code,
+> measurements and this README — was produced by Claude Code in one session, with a
+> human steering rather than checking. It is for learning what a small decision model
+> can and cannot do, not for depending on.
+>
+> The numbers are real in that the scripts produce them and the recorded run is a real
+> run, but they come from small samples against one model on one machine, and nothing
+> has been independently verified or peer reviewed. Several figures in the git history
+> were wrong and corrected later. Reproduce anything you intend to rely on — the eval
+> scripts are here for exactly that — and treat the conclusions as observations rather
+> than findings.
+
 [Laya](https://github.com/NandhaKishorM/laya) is a 421M non-autoregressive decision
 model: hand it a state and typed questions, and one forward pass returns calibrated
 probabilities. No tokens are generated, so there is no JSON to repair and no parse step.
@@ -10,10 +22,10 @@ ground truth falls out of the game's own collision geometry.
 
 ![Laya playing Reindeer Jump](demo/reindeer.gif)
 
-*Every decision here is the model's. It reads each obstacle as jumpable, duckable or an
-impassable barrier, and when the lane it is standing in is a barrier it picks where to
-go. The harness only handles timing. 150 decisions, no misreadings, no crashes, 1117m.
-[Full recording](demo/run/run.webm).*
+*Every judgement here is the model's. It reads each obstacle as jumpable, duckable or an
+impassable barrier, and rates the lanes when the one it is standing in is a barrier. The
+harness handles timing, and picks between lanes the model rated equal. 150 decisions, no
+misreadings, no crashes, 1117m. [Full recording](demo/run/run.webm).*
 
 ## Quick start
 
@@ -74,9 +86,10 @@ destination is the model's answer, and the reindeer does not move while that ans
 in flight.
 
 Where the model rates two lanes **equally**, it is because they hold the same thing, and
-either is a correct answer. The harness then takes the nearer one — a timing choice
-among options the model has already called equivalent, since a shorter slide spends less
-time straddling two lanes and a mistimed change is its own way to die. In the recorded
+either is a correct answer. The harness then takes the nearer one, or the left one when both are
+equally near — a timing choice among options the model has already called equivalent,
+since a shorter slide spends less time straddling two lanes and a mistimed change is its
+own way to die. In the recorded
 run that was 3 of 12 lane questions, every one of them `duck`/`duck` or `clear`/`clear`.
 
 Such a tie can never be between two barriers: the question only fires when the current
@@ -183,12 +196,13 @@ out of the set still reachable in the time since the last wave, and refuses to w
 
 That is tested rather than asserted. `make solvable` runs a perfect rule-based player,
 which reads the wave straight from game state and so cannot misclassify anything, for 400
-waves. One such run — the mix varies, the zero does not:
+waves. One such run — the mix varies run to run and tracks the generator's own
+probabilities (40/40/20 walls, 47% with no clear lane); the zero does not vary:
 
 ```
-waves survived : 400      walls per wave : 0:39%  1:40%  2:22%
-distance       : 8402m    passable lanes : 1:22%  2:40%  3:39%
-deaths         : 0        wholly clear   : 0:52%  1:36%  2:12%
+waves survived : 400      walls per wave : 0:42%  1:40%  2:18%
+distance       : 8653m    passable lanes : 1:18%  2:40%  3:42%
+deaths         : 0        wholly clear   : 0:45%  1:41%  2:14%
 ```
 
 Any death there is a generator bug, not a play error.
