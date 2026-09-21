@@ -1,0 +1,274 @@
+/* Live telemetry panel for the Laya autopilot.
+ *
+ * Colours come from the validated dark-mode categorical palette, checked
+ * against this panel's own surface (#0d1630) rather than a generic dark:
+ *   node scripts/validate_palette.js "#3987e5,#d95926,#199e70" \
+ *        --mode dark --surface "#0d1630" --pairs all   -> all checks pass
+ *
+ * The panel is a live readout, not an explorable chart, so there is no hover
+ * layer; every decision is kept in __autopilot.trace, which is the table view
+ * and what the Playwright driver exports.
+ */
+(function () {
+  'use strict';
+
+  const ACTION_SLOT = { jump: 'var(--s1)', duck: 'var(--s2)', run: 'var(--s3)' };
+  const ORDER = ['jump', 'duck', 'run'];
+  const SPARK_N = 60;
+
+  const css = `
+  #laya-hud {
+    --surface: #0d1630;
+    --raised: #142046;
+    --ink: #ffffff;
+    --ink-2: #c3c2b7;
+    --muted: #898781;
+    --rule: #2c3358;
+    --s1: #3987e5;   /* jump  */
+    --s2: #d95926;   /* duck  */
+    --s3: #199e70;   /* run   */
+    --latency: #9085e9;
+    --good: #0ca30c;
+    --critical: #d03b3b;
+
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: 310px; z-index: 50;
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    backdrop-filter: blur(8px);
+    border-left: 1px solid var(--rule);
+    color: var(--ink);
+    font: 12px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  #laya-hud .hd {
+    flex: 0 0 auto; padding: 10px 14px 9px; border-bottom: 1px solid var(--rule);
+    display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+  }
+  #laya-hud .hd b { font-size: 12px; letter-spacing: 2px; }
+  #laya-hud .hd span { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+  #laya-hud .sec { padding: 10px 14px; border-bottom: 1px solid var(--rule); flex: 0 0 auto; }
+  #laya-hud .lbl {
+    font-size: 9.5px; letter-spacing: 1.6px; color: var(--muted);
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+
+  /* hero: the action currently being executed */
+  #laya-hud .hero { display: flex; align-items: baseline; gap: 10px; }
+  #laya-hud .hero .act { font-size: 30px; font-weight: 700; letter-spacing: 1px; line-height: 1; }
+  #laya-hud .hero .cf { font-size: 11px; color: var(--ink-2); }
+
+  /* probability bars - direct-labelled, so identity never rests on colour */
+  #laya-hud .bar { margin-bottom: 8px; }
+  #laya-hud .bar:last-child { margin-bottom: 0; }
+  #laya-hud .bar .top {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--ink-2); margin-bottom: 3px;
+  }
+  #laya-hud .bar .top em { font-style: normal; color: var(--ink); letter-spacing: .5px; }
+  #laya-hud .bar .top i { font-style: normal; font-variant-numeric: tabular-nums; }
+  #laya-hud .bar .trk { height: 8px; background: var(--raised); border-radius: 4px; overflow: hidden; }
+  #laya-hud .bar .fill {
+    height: 100%; border-radius: 4px; width: 0;
+    transition: width .18s ease-out;
+  }
+  #laya-hud .bar.win .top em { font-weight: 700; }
+
+  /* stat tiles */
+  #laya-hud .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+  #laya-hud .tile .v {
+    font-size: 21px; font-weight: 600; line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+  #laya-hud .tile .k { font-size: 9.5px; letter-spacing: 1.2px; color: var(--muted); text-transform: uppercase; }
+  #laya-hud .tile .v small { font-size: 11px; color: var(--muted); font-weight: 400; }
+
+  #laya-hud canvas { display: block; width: 100%; height: 46px; }
+
+  /* decision log - glyph + label, never colour alone */
+  #laya-hud .log {
+    flex: 1 1 auto; min-height: 0; overflow-y: auto;
+    padding: 10px 14px 12px;
+    scrollbar-width: thin; scrollbar-color: var(--rule) transparent;
+  }
+  #laya-hud .row {
+    display: grid; grid-template-columns: 14px 1fr auto auto; gap: 8px;
+    align-items: baseline; padding: 3px 0; font-size: 11px;
+    border-bottom: 1px solid color-mix(in srgb, var(--rule) 50%, transparent);
+  }
+  #laya-hud .row .g { font-weight: 700; }
+  #laya-hud .row .ok { color: var(--good); }
+  #laya-hud .row .no { color: var(--critical); }
+  #laya-hud .row .ob { color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #laya-hud .row .pr { letter-spacing: .5px; }
+  #laya-hud .row .ms { color: var(--muted); font-variant-numeric: tabular-nums; }
+  @media (max-width: 760px) { #laya-hud { display: none; } }
+  `;
+
+  function el(tag, cls, html) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+
+  function build() {
+    const style = el('style'); style.textContent = css;
+    document.head.appendChild(style);
+
+    const root = el('div'); root.id = 'laya-hud';
+    root.appendChild(el('div', 'hd', '<b>LAYA AUTOPILOT</b><span id="lh-dev">connecting</span>'));
+
+    const hero = el('div', 'sec');
+    hero.appendChild(el('div', 'lbl', 'Executing'));
+    hero.appendChild(el('div', 'hero',
+      '<span class="act" id="lh-act">--</span><span class="cf" id="lh-cf"></span>'));
+    root.appendChild(hero);
+
+    const bars = el('div', 'sec');
+    bars.appendChild(el('div', 'lbl', 'Action probability'));
+    for (const a of ORDER) {
+      const b = el('div', 'bar');
+      b.id = 'lh-bar-' + a;
+      b.innerHTML =
+        `<div class="top"><em>${a.toUpperCase()}</em><i id="lh-p-${a}">0.00</i></div>` +
+        `<div class="trk"><div class="fill" id="lh-f-${a}" style="background:${ACTION_SLOT[a]}"></div></div>`;
+      bars.appendChild(b);
+    }
+    root.appendChild(bars);
+
+    const lat = el('div', 'sec');
+    lat.appendChild(el('div', 'lbl', 'Inference latency &middot; ms'));
+    const cv = el('canvas'); cv.id = 'lh-spark'; lat.appendChild(cv);
+    lat.appendChild(el('div', 'tiles',
+      '<div class="tile"><div class="v" id="lh-p50">--</div><div class="k">p50 ms</div></div>' +
+      '<div class="tile"><div class="v" id="lh-p95">--</div><div class="k">p95 ms</div></div>'));
+    root.appendChild(lat);
+
+    const st = el('div', 'sec');
+    st.appendChild(el('div', 'lbl', 'Run'));
+    st.appendChild(el('div', 'tiles',
+      '<div class="tile"><div class="v" id="lh-acc">--</div><div class="k">accuracy</div></div>' +
+      '<div class="tile"><div class="v" id="lh-dec">0</div><div class="k">decisions</div></div>' +
+      '<div class="tile"><div class="v" id="lh-dist">0<small> m</small></div><div class="k">distance</div></div>' +
+      '<div class="tile"><div class="v" id="lh-crash">0</div><div class="k">crashes</div></div>'));
+    root.appendChild(st);
+
+    const log = el('div', 'log');
+    log.appendChild(el('div', 'lbl', 'Decisions'));
+    log.appendChild(el('div', '', '<div id="lh-log"></div>'));
+    root.appendChild(log);
+
+    document.body.appendChild(root);
+    return root;
+  }
+
+  function quantile(sorted, q) {
+    if (!sorted.length) return null;
+    const i = Math.min(sorted.length - 1, Math.floor(q * sorted.length));
+    return sorted[i];
+  }
+
+  function drawSpark(cv, values) {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    const w = cv.clientWidth, h = cv.clientHeight;
+    if (!w || !h) return;
+    cv.width = w * dpr; cv.height = h * dpr;
+    const g = cv.getContext('2d');
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.clearRect(0, 0, w, h);
+    if (values.length < 2) return;
+
+    const pad = 3;
+    const max = Math.max.apply(null, values) * 1.12;
+    const min = 0;                       // latency is a magnitude: baseline at zero
+    const x = i => pad + (i / (values.length - 1)) * (w - pad * 2);
+    const y = v => h - pad - ((v - min) / (max - min || 1)) * (h - pad * 2);
+
+    // recessive baseline
+    g.strokeStyle = '#2c3358'; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(0, h - pad); g.lineTo(w, h - pad); g.stroke();
+
+    // soft area under the line, then the 2px line itself
+    const grad = g.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, 'rgba(144,133,233,.28)');
+    grad.addColorStop(1, 'rgba(144,133,233,0)');
+    g.beginPath();
+    g.moveTo(x(0), y(values[0]));
+    values.forEach((v, i) => g.lineTo(x(i), y(v)));
+    g.lineTo(x(values.length - 1), h - pad); g.lineTo(x(0), h - pad); g.closePath();
+    g.fillStyle = grad; g.fill();
+
+    g.beginPath();
+    g.moveTo(x(0), y(values[0]));
+    values.forEach((v, i) => g.lineTo(x(i), y(v)));
+    g.strokeStyle = '#9085e9'; g.lineWidth = 2;
+    g.lineJoin = 'round'; g.lineCap = 'round';
+    g.stroke();
+
+    // last point gets a marker with a surface ring, per mark specs
+    const lx = x(values.length - 1), ly = y(values[values.length - 1]);
+    g.beginPath(); g.arc(lx, ly, 4.5, 0, Math.PI * 2);
+    g.fillStyle = '#9085e9'; g.fill();
+    g.lineWidth = 2; g.strokeStyle = '#0d1630'; g.stroke();
+  }
+
+  function mount(autopilot, endpoint) {
+    build();
+    const base = endpoint || autopilot.config.endpoint;
+    const $ = id => document.getElementById(id);
+    const spark = $('lh-spark');
+    const logEl = $('lh-log');
+    let lastLogged = 0;
+
+    fetch(base + '/info')
+      .then(r => r.json())
+      .then(i => { $('lh-dev').textContent = (i.subfolder || 'base') + ' · ' + String(i.device).toUpperCase(); })
+      .catch(() => { $('lh-dev').textContent = 'no service'; });
+
+    function paintDecision(d) {
+      if (!d || d.status !== 'done') return;
+      $('lh-act').textContent = d.action.toUpperCase();
+      $('lh-act').style.color = ({ jump: '#3987e5', duck: '#d95926', run: '#199e70' })[d.action] || '#fff';
+      $('lh-cf').textContent = 'confidence ' + d.confidence.toFixed(3);
+      for (const a of ORDER) {
+        const p = (d.probs && d.probs[a]) || 0;
+        $('lh-p-' + a).textContent = p.toFixed(2);
+        $('lh-f-' + a).style.width = Math.max(1.5, p * 100) + '%';
+        $('lh-bar-' + a).classList.toggle('win', a === d.action);
+      }
+    }
+
+    function paintStats() {
+      const st = autopilot.stats;
+      const sorted = st.latencies.slice().sort((a, b) => a - b);
+      $('lh-p50').textContent = sorted.length ? Math.round(quantile(sorted, 0.5)) : '--';
+      $('lh-p95').textContent = sorted.length ? Math.round(quantile(sorted, 0.95)) : '--';
+      $('lh-dec').textContent = st.decisions;
+      $('lh-crash').textContent = st.deaths;
+      $('lh-acc').textContent = st.decisions
+        ? (100 * st.correct / st.decisions).toFixed(1) + '%' : '--';
+      const rj = window.__rj;
+      if (rj) $('lh-dist').innerHTML = Math.floor(rj.state.distance) + '<small> m</small>';
+      drawSpark(spark, st.latencies.slice(-SPARK_N));
+
+      while (lastLogged < autopilot.trace.length) {
+        const t = autopilot.trace[lastLogged++];
+        const row = el('div', 'row');
+        row.innerHTML =
+          `<span class="g ${t.correct ? 'ok' : 'no'}">${t.correct ? '✓' : '✗'}</span>` +
+          `<span class="ob">${t.obstacle}</span>` +
+          `<span class="pr">${t.pred}</span>` +
+          `<span class="ms">${Math.round(t.wall_ms)}</span>`;
+        logEl.prepend(row);
+        while (logEl.children.length > 9) logEl.removeChild(logEl.lastChild);
+      }
+    }
+
+    autopilot.onUpdate = paintDecision;
+    setInterval(paintStats, 120);
+    addEventListener('resize', () => drawSpark(spark, autopilot.stats.latencies.slice(-SPARK_N)));
+  }
+
+  window.__layaHud = { mount };
+})();

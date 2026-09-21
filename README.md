@@ -155,6 +155,71 @@ Practical consequence: keep `choice` questions at 8 labels or fewer and route
 hierarchically (coarse choice, then a fine choice within the winning group) rather than
 presenting one flat label set. Two cheap forward passes beat one truncated one.
 
+## Playing Reindeer Jump
+
+`index.html` already exposes `window.__rj` for automation, so nothing in the game
+needed changing. The autopilot is injected alongside it.
+
+```bash
+make agent-deps          # once: link playwright
+make play-mock           # prove the rig with a fake decision service
+make play                # autopilot plays against the live model, records video
+make play-watch          # open a real browser and watch (needs a display)
+```
+
+Artifacts land in `runs/<name>/`: `run.webm`, `summary.json`, `trace.json`,
+`deaths.json`.
+
+**Where this runs.** The agent lives *in the page* (`agent/autopilot.js`), so the
+only thing it needs is an HTTP route to the service -- which is why the service
+sends CORS headers. To watch it yourself, open the page in a normal browser and
+point it at the container; no driver process is involved. `agent/play.mjs` is
+for the headless case: it serves the page, injects the agent, records video and
+writes the trace, which is what makes it runnable in CI. One agent, two ways in.
+
+**The model decides what, the harness decides when.** Inference costs ~280ms on
+CPU while the collision box is only 65ms wide at top speed, so acting on the
+response the moment it lands cannot work. Instead each obstacle is classified
+once, early -- obstacles are visible 2.8-5.9s out -- and the verdict is cached and
+fired on a timer as the obstacle arrives.
+
+**CPU is fast enough, contrary to the obvious guess.** The game needs
+**0.6-1.5 decisions per second** (obstacle spacing at 16-34 m/s); one CPU forward
+pass takes 278ms, so we have roughly 3.6 per second. The bottleneck was never
+latency, it was reacting instead of looking ahead. Verified: with a perfect
+oracle at 280ms simulated latency the autopilot took 20 decisions with **zero**
+crashes.
+
+**Every run is self-labelling.** Ground truth comes from the game's own collision
+geometry (`def.kind === 'air'` means duck, otherwise jump), so accuracy, latency
+and per-class breakdown are computed with no hand labelling. `deaths.json`
+separates deaths that followed a *correct* verdict -- an execution bug -- from
+deaths that followed a wrong one, which is a model error. That distinction found
+a real bug: the autopilot dropped an obstacle from consideration at `z >= 0`,
+but the game's collision box extends to `z = +1.1`, so it released its duck
+while still inside a garland it had correctly classified.
+
+The state encoding is switchable (`--encoding json|nl`) so the JSON-dict and
+natural-language framings can be compared on the same task.
+
+### The telemetry panel
+
+`agent/hud.js` draws the live side panel: the action being executed, per-action
+probability bars, an inference-latency sparkline with p50/p95, running accuracy,
+distance and crash count, and a rolling decision log. Colours are the validated
+dark-mode categorical palette, checked against the panel's own surface rather
+than a generic dark background:
+
+```
+node scripts/validate_palette.js "#3987e5,#d95926,#199e70" \
+     --mode dark --surface "#0d1630" --pairs all     # all checks pass
+```
+
+Correct/incorrect in the log carries a glyph as well as colour, and every action
+bar is directly labelled, so nothing depends on colour alone. The panel is a live
+readout rather than an explorable chart, so there is no hover layer; `trace.json`
+is the table view.
+
 ## Running on a GPU
 
 `laya.load()` takes `device` directly and `LAYA_DEVICE=auto` already resolves to
@@ -189,6 +254,10 @@ eval/run.py           eval CLI
 eval/report.py        renders results/ as comparison tables
 scripts/smoke.py      in-process load + predict, bypasses HTTP
 scripts/introspect.py prints laya's real signatures and return shape
+index.html            the game (upstream); exposes window.__rj for automation
+agent/autopilot.js    in-page agent: reads game state, asks Laya, acts, self-grades
+agent/hud.js          live telemetry panel
+agent/play.mjs        Playwright driver: serves, injects, records video, writes trace
 ```
 
 `scripts/introspect.py` (`make introspect`) is the diagnostic to re-run after a laya

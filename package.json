@@ -1,0 +1,13 @@
+{
+  "name": "laya-reindeer-agent",
+  "private": true,
+  "type": "module",
+  "description": "Laya autopilot for Reindeer Jump: in-page agent, telemetry HUD, Playwright driver",
+  "scripts": {
+    "play": "node agent/play.mjs",
+    "watch": "node agent/play.mjs --headed --decisions 0 --seconds 600"
+  },
+  "dependencies": {
+    "playwright": "^1.63.0"
+  }
+}

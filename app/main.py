@@ -7,12 +7,14 @@ readiness honestly so callers never race the (slow) first load.
 from __future__ import annotations
 
 import logging
+import os
 import threading
 from contextlib import asynccontextmanager
 from typing import Any, Literal
 
 import anyio
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator
 
@@ -35,6 +37,16 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="laya-service", version="0.1.0", lifespan=lifespan)
+
+# The game autopilot runs inside the browser page and calls /predict directly,
+# so the service has to be reachable cross-origin. This is a local dev service
+# with no auth and no side effects; if that ever changes, narrow this.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=os.environ.get("LAYA_CORS_ORIGINS", "*").split(","),
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
 
 
 class Question(BaseModel):

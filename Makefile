@@ -2,9 +2,11 @@
 COMPOSE := docker compose
 K ?= 4,8,16,32,77
 N ?= 150
+PLAYS ?= 40
 
 .PHONY: help volume build up down logs ready test bench smoke shell clean rebuild \
-        eval eval-labels eval-probes eval-typed report introspect
+        eval eval-labels eval-probes eval-typed report introspect \
+        agent-deps play play-mock play-watch
 
 help:
 	@grep -E '^[a-z-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-10s\033[0m %s\n",$$1,$$2}'
@@ -54,6 +56,18 @@ report: ## Render a comparison table from everything in results/
 
 introspect: ## Print laya's real signatures (run after a version bump)
 	docker run --rm -v laya-models:/models -v "$$PWD/scripts:/srv/scripts:ro" laya:cpu python scripts/introspect.py
+
+agent-deps: ## Link playwright for the game driver
+	npm link playwright
+
+play: up ## Autopilot plays Reindeer Jump against the live model (records video)
+	node agent/play.mjs --decisions $(PLAYS) --out runs/laya
+
+play-mock: ## Same harness, fake decision service -- proves the rig without the model
+	node agent/play.mjs --mock --decisions $(PLAYS) --out runs/mock
+
+play-watch: up ## Open a real browser and watch it play (needs a display)
+	node agent/play.mjs --headed --decisions 0 --seconds 600 --video false
 
 logs: ## Tail service logs
 	$(COMPOSE) logs -f laya
