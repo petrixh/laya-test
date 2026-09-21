@@ -12,7 +12,7 @@ ground truth falls out of the game's own collision geometry.
 
 *Every decision here is the model's. It reads each obstacle as jumpable, duckable or an
 impassable barrier, and when the lane it is standing in is a barrier it picks where to
-go. The harness only handles timing. 150 decisions, no misreadings, no crashes, 1289m.
+go. The harness only handles timing. 150 decisions, no misreadings, no crashes, 1117m.
 [Full recording](demo/run/run.webm).*
 
 ## Quick start
@@ -68,9 +68,18 @@ flowchart TD
 
 Blue is the model, grey is the harness.
 
-**The harness never chooses a lane.** It may notice that a change is needed — the lane
-the reindeer occupies is one the *model* called a barrier — but the destination is always
-the model's answer, and the reindeer does not move while that answer is in flight.
+**The harness chooses a lane only when the model is indifferent.** It may notice that a
+change is needed — the lane the reindeer occupies is one the *model* called a barrier —
+but the destination is the model's answer, and the reindeer does not move while that
+answer is in flight.
+
+The exception is worth stating rather than glossing. The model scores each lane on its
+own and is deterministic, so two candidate lanes holding the *same* thing score
+identically: it has no preference to express and the harness breaks the tie, toward the
+nearer lane. In the recorded run that was **3 of 12** lane questions. Those ties are
+counted in `summary.json` as `ties_broken_by_harness` and flagged per row in the trace,
+because "the model decides" is this repo's central claim and a fifth of the lane
+decisions are the exception to it.
 
 The two lanes it is not standing in are each scored by their own question — *"is this
 lane blocked?"* against a description of that lane alone — and the lower score wins.
@@ -98,11 +107,11 @@ the rest.
 
 | the run in `demo/` | |
 |---|---|
-| obstacles classified | **150**, accuracy **1.00** — jump 49/49, duck 51/51, block 50/50 |
-| lane choices made by the model | 19 |
+| obstacles classified | **150**, accuracy **1.00** — jump 59/59, duck 52/52, block 39/39 |
+| lane questions | 12 — **9 decided by the model**, 3 exact ties broken by the harness |
 | of those, chose a barrier | **0** |
 | crashes | **0** |
-| furthest run | **1289m** |
+| furthest run | **1117m** |
 
 **Ranking described alternatives against each other: no better than chance.** This is why
 the lane question is *not* asked as a choice between lanes. Offered a list, it answers by
@@ -117,10 +126,10 @@ twice:
 | barrier vs duck, clear vs jump, clear vs duck, jump vs duck | 0.00 |
 
 Swap the options and it names the other lane, even when one is a wall and the other is
-empty. An earlier version of this agent asked the lane question that way, and across 12
-questions in a recorded run it took the first-listed option **12 times out of 12** — the
-two offered lanes alternate between `[left, right]` and `[middle, right]` depending on
-where the reindeer stands, so that is a position preference, not a lane preference.
+empty. That table is the committed evidence, in `results/lane_forced.json`. An earlier
+version of this agent did ask the lane question as a choice and took the first-listed
+option on every lane change of a run, but that run is not retained, so treat the
+swapped-order control above as the claim and the anecdote as colour.
 
 **Asking one lane at a time fixes it,** because there is no list to prefer the front of.
 Scored individually, the model's answer to *"is this lane blocked?"* comes out cleanly
@@ -206,8 +215,10 @@ demo/                   one recorded run: video, gif, trace, deaths, summary
 
 - `LAYA_LOG_IO=compact` prints one line in and one line out per request, about 8µs each,
   so you can watch the traffic while it plays.
-- `--mock` stands up a fake decision service with a known accuracy and latency, which
-  exercises the whole rig without the model.
+- To exercise the game and harness with no model at all, `make solvable` drives it with
+  a rule-based player. There is deliberately no mock service: a second implementation of
+  the request protocol drifted out of sync twice without failing, which is worse than
+  not having one.
 - `LAYA_SUBFOLDER` selects `multilingual` or `typed-decisions`; it works on both backends.
 - GPU: build with `TORCH_INDEX=https://download.pytorch.org/whl/cu124` and uncomment the
   device reservation in `compose.yml`. `GET /info` reports the backend actually in use.

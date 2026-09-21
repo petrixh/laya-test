@@ -5,7 +5,8 @@
   "description": "Laya autopilot for Reindeer Jump: in-page agent, telemetry HUD, Playwright driver",
   "scripts": {
     "play": "node agent/play.mjs",
-    "watch": "node agent/play.mjs --headed --decisions 0 --seconds 600"
+    "watch": "node agent/play.mjs --headed --decisions 0 --seconds 600",
+    "solvable": "node agent/check-solvable.mjs --waves 400"
   },
   "dependencies": {
     "playwright": "^1.63.0"

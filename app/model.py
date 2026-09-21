@@ -23,8 +23,8 @@ MLX_REPOS = {
 
 
 def _resolve_backend(requested: str) -> str:
-    """'auto' prefers MLX on Apple silicon, where it is roughly 70x faster than
-    the torch CPU path, and falls back to torch everywhere else."""
+    """'auto' prefers MLX on Apple silicon, where it is roughly 30x faster than
+    the torch CPU path on the game prompt, and falls back to torch elsewhere."""
     if requested != "auto":
         return requested
     if platform.system() == "Darwin" and platform.machine() == "arm64":

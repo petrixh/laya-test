@@ -1,8 +1,11 @@
 /* Drive Reindeer Jump with the Laya autopilot.
  *
- *   node agent/play.mjs --decisions 40                 headless, records video
- *   node agent/play.mjs --headed                       watch it locally
- *   node agent/play.mjs --encoding nl --out runs/nl    A/B the state encoding
+ *   node agent/play.mjs --decisions 40    headless, records video
+ *   node agent/play.mjs --headed          watch it locally
+ *
+ * Needs a running Laya service. To exercise the game and the harness without
+ * one, use agent/check-solvable.mjs, which drives the game with a rule-based
+ * player and no model at all.
  *
  * The page is served over HTTP rather than opened as file:// so the in-page
  * fetch to the Laya service has a real origin for CORS.
@@ -32,93 +35,7 @@ const opts = {
   video: arg('video', true) !== 'false',
   width: Number(arg('width', 960)),
   height: Number(arg('height', 640)),
-  // --mock stands up a fake decision service that answers correctly with a
-  // known probability. It verifies the harness end to end (page, hook, HUD,
-  // grading, trace, video) without needing the model loaded, and because its
-  // accuracy is known it also proves the grading path measures what it claims.
-  mock: arg('mock', false),
-  mockAccuracy: Number(arg('mock-accuracy', 0.85)),
-  mockLatency: Number(arg('mock-latency', 280)),
 };
-
-/** Fake Laya service with a known answer distribution.
- *
- * Speaks the same two-question protocol the autopilot uses: a two-option
- * choice for ground-versus-overhead plus a noul for "is it a barrier". It
- * derives truth from the object named in the state, the same way the game
- * does, so its accuracy is known and the grading path can be checked without
- * the model.
- */
-function serveMock(accuracy, latencyMs) {
-  const DUCKABLE = /garland|baubles/;
-  const BARRIER = /wall|barrier|fence|barricade/;
-  return new Promise((ok) => {
-    const server = createServer((req, res) => {
-      const cors = {
-        'access-control-allow-origin': '*',
-        'access-control-allow-headers': '*',
-        'access-control-allow-methods': 'GET,POST,OPTIONS',
-      };
-      if (req.method === 'OPTIONS') { res.writeHead(204, cors).end(); return; }
-      if (req.url === '/info') {
-        res.writeHead(200, { ...cors, 'content-type': 'application/json' });
-        res.end(JSON.stringify({ checkpoint: 'mock', subfolder: 'mock', device: 'mock',
-                                 ready: true, torch: 'n/a' }));
-        return;
-      }
-      let raw = '';
-      req.on('data', (c) => (raw += c));
-      req.on('end', () => {
-        const body = JSON.parse(raw || '{}');
-        const st = body.state || {};
-        const text = typeof st === 'string' ? st : JSON.stringify(st);
-        const truth = BARRIER.test(text) ? 'block' : DUCKABLE.test(text) ? 'duck' : 'jump';
-        const right = Math.random() < accuracy;
-        // Draw a wrong answer from the classes that are NOT the truth. Drawing
-        // from all three delivered a + (1-a)/3, so a stated 0.30 came out at
-        // 0.55 -- which would read as a five-point error in the grading path
-        // the mock exists to validate.
-        const others = ['jump', 'duck', 'block'].filter((c) => c !== truth);
-        const klass = right ? truth : others[(Math.random() * others.length) | 0];
-
-        const answers = {};
-        // the autopilot thresholds the barrier noul at 0.5, so put the mock's
-        // verdict clearly on one side of it
-        answers.barrier = {
-          type: 'noul',
-          noul: klass === 'block' ? 0.80 + Math.random() * 0.19 : Math.random() * 0.3,
-          confidence: 0.5,
-        };
-        const pGround = klass === 'duck'
-          ? 0.05 + Math.random() * 0.3
-          : 0.65 + Math.random() * 0.3;
-        answers.manoeuvre = {
-          type: 'choice',
-          choice: pGround >= 0.5 ? 'option_a' : 'option_b',
-          probabilities: { option_a: pGround, option_b: 1 - pGround },
-          confidence: Math.abs(pGround - 0.5) * 2,
-        };
-        // a stage-two lane question, if the autopilot asks one
-        if (body.questions && body.questions.lane) {
-          const keys = Object.keys(body.questions.lane.criteria || {});
-          const probs = {};
-          keys.forEach((k, i) => { probs[k] = i === 0 ? 0.7 : 0.3 / (keys.length - 1 || 1); });
-          answers.lane = { type: 'choice', choice: keys[0], probabilities: probs, confidence: 0.4 };
-        }
-
-        // jitter around a real measured latency so the sparkline looks plausible
-        const wait = latencyMs * (0.75 + Math.random() * 0.6);
-        setTimeout(() => {
-          res.writeHead(200, { ...cors, 'content-type': 'application/json' });
-          res.end(JSON.stringify({
-            model: 'mock', answers, usage: { input_tokens: 0 }, latency_ms: wait,
-          }));
-        }, wait);
-      });
-    });
-    server.listen(0, '127.0.0.1', () => ok({ server, port: server.address().port }));
-  });
-}
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -154,15 +71,6 @@ const main = async () => {
   const { server, port } = await serve();
   const outDir = resolve(ROOT, opts.out);
   await mkdir(outDir, { recursive: true });
-
-  let mockServer = null;
-  if (opts.mock) {
-    const m = await serveMock(opts.mockAccuracy, opts.mockLatency);
-    mockServer = m.server;
-    opts.endpoint = `http://127.0.0.1:${m.port}`;
-    console.log(`mock decision service on :${m.port} ` +
-                `(accuracy ${opts.mockAccuracy}, latency ~${opts.mockLatency}ms)`);
-  }
 
   const browser = await chromium.launch({
     headless: !opts.headed,
@@ -251,6 +159,7 @@ const main = async () => {
     lane_choice: {
       decisions: result.stats.laneDecisions,
       chose_a_barrier: result.stats.laneContradictions,
+      ties_broken_by_harness: result.stats.laneTies,
       passed_up_a_clear_lane: result.stats.laneDecisions
         ? +(result.stats.laneCostlier / result.stats.laneDecisions).toFixed(4) : null,
       latency_p50_ms: result.stats.laneLatencies.length
@@ -267,6 +176,7 @@ const main = async () => {
     deaths_with_correct_verdict: result.stats.deathLog.filter((d) => d.correct === true).length,
     deaths_by_verdict: result.stats.deathLog.reduce((a, d) => {
       const k = d.correct === true ? 'correct'
+        : d.verdict === 'error' ? 'service-error'
         : d.verdict === 'pending' ? 'answer-too-late'
         : d.verdict === 'none' ? 'never-asked' : 'wrong';
       a[k] = (a[k] || 0) + 1; return a;
@@ -280,7 +190,6 @@ const main = async () => {
   await context.close();          // flushes the video file
   await browser.close();
   server.close();
-  if (mockServer) mockServer.close();
 
   if (opts.video) {
     for (const f of await readdir(outDir)) {
@@ -290,7 +199,7 @@ const main = async () => {
 
   console.log('\n' + JSON.stringify(summary, null, 2));
   console.log(`\nartifacts in ${outDir}`);
-  process.exit(summary.errors > 0 && summary.decisions === 0 ? 1 : 0);
+  process.exit(summary.decisions === 0 ? 1 : 0);
 };
 
 main().catch((e) => { console.error(e); process.exit(1); });

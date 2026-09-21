@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-21T15:18:04.276Z",
+  "generated": "2026-09-21T16:00:36.317Z",
   "options": {
     "headed": false,
     "endpoint": "http://100.121.51.97:8000",
@@ -8,40 +8,38 @@
     "out": "demo/run",
     "video": true,
     "width": 960,
-    "height": 640,
-    "mock": false,
-    "mockAccuracy": 0.85,
-    "mockLatency": 280
+    "height": 640
   },
   "decisions": 150,
   "correct": 150,
   "accuracy": 1,
   "crashes": 0,
-  "best_distance_m": 1289,
+  "best_distance_m": 1117,
   "errors": 0,
-  "lane_changes": 21,
+  "lane_changes": 15,
   "lane_choice": {
-    "decisions": 19,
+    "decisions": 12,
     "chose_a_barrier": 0,
+    "ties_broken_by_harness": 3,
     "passed_up_a_clear_lane": 0,
-    "latency_p50_ms": 169.3
+    "latency_p50_ms": 192.8
   },
   "latency_ms": {
-    "p50": 212.9,
-    "p95": 339.6,
-    "max": 454.9
+    "p50": 239.4,
+    "p95": 357.1,
+    "max": 564.1
   },
   "per_truth": {
     "jump": {
-      "n": 49,
-      "accuracy": 1
-    },
-    "block": {
-      "n": 50,
+      "n": 59,
       "accuracy": 1
     },
     "duck": {
-      "n": 51,
+      "n": 52,
+      "accuracy": 1
+    },
+    "block": {
+      "n": 39,
       "accuracy": 1
     }
   },

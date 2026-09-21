@@ -154,9 +154,16 @@ def run_per_lane(svc):
             a = svc.predict(f"This lane is {w}.", BLOCKED_Q)["answers"]["blocked"]
             score[(cls, w)] = a["noul"]
 
-    survive = sn = quality = qn = 0
+    survive = sn = quality = qn = ties = tn = 0
     for (c1, w1), (c2, w2) in itertools.combinations(score, 2):
         if c1 == c2:
+            # Two lanes holding the same thing. The model scores each lane on
+            # its own and is deterministic, so these tie exactly and it has no
+            # preference to express -- the harness breaks them. Excluded from
+            # the rates below, and reported separately, because they are about
+            # a fifth of live lane questions.
+            tn += 1
+            ties += score[(c1, w1)] == score[(c2, w2)]
             continue
         pick = (c1, w1) if score[(c1, w1)] < score[(c2, w2)] else (c2, w2)
         if (c1 == "block") != (c2 == "block"):
@@ -169,7 +176,8 @@ def run_per_lane(svc):
                 for c, ws in WORDINGS.items()}
     return {"mean_score_by_class": by_class,
             "avoids_the_barrier": f"{survive}/{sn}",
-            "prefers_a_clear_lane": f"{quality}/{qn}"}
+            "prefers_a_clear_lane": f"{quality}/{qn}",
+            "same_content_pairs_that_tie_exactly": f"{ties}/{tn}"}
 
 
 def main() -> int:
@@ -218,6 +226,8 @@ def main() -> int:
     print(f"  as a rule, lower score wins:")
     print(f"    avoids the barrier    {per_lane['avoids_the_barrier']}")
     print(f"    prefers a clear lane  {per_lane['prefers_a_clear_lane']}")
+    print(f"  same-content pairs that tie exactly, leaving the harness to break them:")
+    print(f"    {per_lane['same_content_pairs_that_tie_exactly']}")
     (RESULTS / "lane_forced.json").write_text(json.dumps(
         {"service": info, "rows": rows, "pairs": pairs, "per_lane": per_lane}, indent=2))
     return 0

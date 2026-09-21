@@ -327,6 +327,8 @@
       const tag = $('lh-lanetag');
       if (st2 === 'not needed' && tag.textContent !== 'not needed') {
         tag.textContent = 'not needed'; tag.className = 'tag';
+      } else if (st2 === 'reading' && tag.textContent !== 'reading scene') {
+        tag.textContent = 'reading scene'; tag.className = 'tag';
       } else if (st2 === 'waiting' && tag.textContent !== 'asking…') {
         tag.textContent = 'asking\u2026'; tag.className = 'tag forced';
       }

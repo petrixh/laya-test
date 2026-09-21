@@ -3,7 +3,7 @@ COMPOSE := docker compose
 PLAYS ?= 120
 
 .PHONY: help volume build up down logs ready test bench smoke shell clean rebuild \
-        introspect agent-deps play play-mock play-watch solvable eval
+        introspect agent-deps play play-watch solvable eval
 
 help:
 	@grep -E '^[a-z-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-10s\033[0m %s\n",$$1,$$2}'
@@ -36,9 +36,6 @@ agent-deps: ## Link playwright for the game driver
 
 play: up ## Autopilot plays Reindeer Jump against the live model (records video)
 	node agent/play.mjs --decisions $(PLAYS) --out runs/laya
-
-play-mock: ## Same harness, fake decision service -- proves the rig without the model
-	node agent/play.mjs --mock --decisions $(PLAYS) --out runs/mock
 
 solvable: ## Prove every wave has a passable, reachable lane (no model needed)
 	node agent/check-solvable.mjs --waves 400

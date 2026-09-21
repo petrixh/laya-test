@@ -66,7 +66,7 @@ const result = await page.evaluate(async (waves) => {
   }
 
   rj.startGame();
-  let lastWave = -1;
+  let lastWave = null;
   await new Promise((done) => {
     const tick = () => {
       const s = rj.state;
@@ -77,9 +77,9 @@ const result = await page.evaluate(async (waves) => {
         rj.startGame(); lastWave = -1;
         requestAnimationFrame(tick); return;
       }
-      log.maxWave = Math.max(log.maxWave, s.wave);
+      log.maxWave = Math.max(log.maxWave, log.waves);
       log.distance = Math.max(log.distance, Math.floor(s.distance));
-      if (s.wave >= waves) { done(); return; }
+      if (log.waves >= waves) { done(); return; }
 
       const w = currentWave();
       if (!w) { rj.setDuck(false); requestAnimationFrame(tick); return; }
@@ -89,9 +89,16 @@ const result = await page.evaluate(async (waves) => {
         log.deaths.push({ wave: s.wave, reason: 'every lane walled', need: w.need });
         done(); return;
       }
-      if (s.wave !== lastWave) {
-        lastWave = s.wave;
+      // Sample the wave actually in front of us, once each.
+      //
+      // Keying on s.wave counted spawns at z = -95, labelling each sample with
+      // a wave several ahead of the one w.need describes. Keying on w.z counts
+      // every frame, since z rises as the wave approaches. A wave *change* is
+      // the nearest wave becoming a further one, i.e. z jumping backwards by
+      // at least the inter-wave gap.
+      if (lastWave === null || w.z < lastWave - 5) {
         log.waves++;
+        lastWave = w.z;
         const open = w.need.filter((n) => n !== 'block').length;
         const clear = w.need.filter((n) => n === null).length;
         const walls = w.need.filter((n) => n === 'block').length;
@@ -99,6 +106,8 @@ const result = await page.evaluate(async (waves) => {
         log.clearLanes[clear] = (log.clearLanes[clear] || 0) + 1;
         log.walls[walls] = (log.walls[walls] || 0) + 1;
         for (const n of w.need) log.kinds[n || 'empty'] = (log.kinds[n || 'empty'] || 0) + 1;
+      } else {
+        lastWave = Math.max(lastWave, w.z);
       }
 
       if (s.lane !== target) rj.moveLane(Math.sign(target - s.lane));

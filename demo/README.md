@@ -14,12 +14,13 @@ without standing the service up.
 
 | | |
 |---|---|
-| obstacles classified | 150, accuracy **1.00** (jump 49/49, duck 51/51, block 50/50) |
-| lane choices by the model | 19 |
+| obstacles classified | 150, accuracy **1.00** (jump 59/59, duck 52/52, block 39/39) |
+| lane questions | 12 — 9 decided by the model, 3 exact ties broken by the harness |
 | of those, chose a barrier | **0** |
 | crashes | **0** |
-| furthest run | **1289m** |
-| latency p50 | 169ms wall, ~30ms of it inference |
+| furthest run | **1117m** |
+| obstacle question, p50 | 239ms wall |
+| lane question, p50 | 193ms wall |
 
 Rows tagged `stage: "lane"` in `trace.json` carry `blocked_scores` — the model's
 per-lane score for each candidate — so every lane change can be checked against the

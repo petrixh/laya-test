@@ -25,6 +25,7 @@
 
   const DEFAULTS = {
     endpoint: 'http://127.0.0.1:8000',
+    timeoutMs: 4000,      // a hung request must not hold an in-flight slot forever
     decideAt: 2.6,        // seconds-to-impact at which an obstacle gets classified
     maxInFlight: 4,       // obstacles are independent questions, so pipeline them
     jumpAt: 0.30,
@@ -89,8 +90,25 @@
     jump: 'something resting on the snow that has to be jumped over',
     duck: 'something hanging overhead that has to be ducked under',
     block: 'a solid barrier that cannot be passed at all',
-    unknown: 'not yet identified',
   };
+  /** fetch with a deadline, so a stalled service cannot wedge the agent */
+  async function post(body) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), api.config.timeoutMs);
+    try {
+      const res = await fetch(api.config.endpoint + '/predict', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: ctrl.signal,
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status + ' ' + (await res.text()).slice(0, 120));
+      return await res.json();
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
   const PLAYER_DEPTH = 0.65;   // the game's collision half-depth
   const WAVE_Z = 3;            // obstacles within this z of each other are one wave
 
@@ -127,7 +145,7 @@
       deaths: 0, bestDistance: 0, lastDistance: 0,
       errors: 0, deathLog: [], laneChanges: 0,
       laneDecisions: 0, laneContradictions: 0,
-      laneCostlier: 0,
+      laneCostlier: 0, laneTies: 0,
       laneLatencies: [],
     };
   }
@@ -182,13 +200,7 @@
     inFlight++;
     try {
       const t0 = performance.now();
-      const res = await fetch(api.config.endpoint + '/predict', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ state: describe(o), questions: QUESTIONS }),
-      });
-      if (!res.ok) throw new Error('HTTP ' + res.status + ' ' + (await res.text()).slice(0, 120));
-      const body = await res.json();
+      const body = await post({ state: describe(o), questions: QUESTIONS });
       const wall = performance.now() - t0;
       const man = body.answers.manoeuvre;
       const pBlock = body.answers.barrier.noul;
@@ -264,18 +276,25 @@
       const t0 = performance.now();
       const scores = await Promise.all(candidates.map(async (l) => {
         const state = `This lane is ${LANE_DESC[need[l] === null ? 'clear' : need[l]]}.`;
-        const res = await fetch(api.config.endpoint + '/predict', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ state, questions: LANE_BLOCKED_Q }),
-        });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return (await res.json()).answers.blocked.noul;
+        return (await post({ state, questions: LANE_BLOCKED_Q })).answers.blocked.noul;
       }));
       const wall = performance.now() - t0;
 
+      // The model scores each lane independently, so two lanes holding the
+      // same thing score identically -- it is indifferent and there is no
+      // model-derived answer to take. The harness then breaks the tie toward
+      // the nearer lane. That IS a harness decision, and it is counted as one.
       let best = 0;
       for (let i = 1; i < scores.length; i++) if (scores[i] < scores[best]) best = i;
+      const tied = scores.filter((v) => v === scores[best]).length > 1;
+      if (tied) {
+        let nearest = best;
+        candidates.forEach((l, i) => {
+          if (scores[i] !== scores[best]) return;
+          if (Math.abs(l - here) < Math.abs(candidates[nearest] - here)) nearest = i;
+        });
+        best = nearest;
+      }
       const lane = candidates[best];
 
       // shown as "how passable", so a longer bar is a better lane
@@ -289,6 +308,7 @@
       const st = api.stats;
       st.laneDecisions++;
       st.laneLatencies.push(wall);
+      if (tied) st.laneTies++;
       if (entry.contradiction) st.laneContradictions++;
       if (need[lane] !== null && candidates.some((l) => need[l] === null)) st.laneCostlier++;
 
@@ -296,15 +316,18 @@
         stage: 'lane', run: runIndex, distance: Math.floor(rj.state.distance),
         lanes: need.map((n) => (n === null ? 'clear' : n)),
         candidates, blocked_scores: scores.map((v) => Number(v.toFixed(4))),
-        chose: lane, contradiction: entry.contradiction,
+        chose: lane, tie_broken_by_harness: tied, contradiction: entry.contradiction,
         wall_ms: Number(wall.toFixed(1)),
       });
       if (api.onLane) api.onLane(entry, need);
     } catch (err) {
-      entry.status = 'error';
-      entry.error = String((err && err.message) || err);
       api.stats.errors++;
-      console.error('[autopilot] lane question failed:', err);
+      // Drop the entry so the next frame asks again. Leaving an errored entry
+      // in place wedged the wave: the retry guard is `if (!lc)`, so it never
+      // re-asked, and the reindeer held position in a lane it had itself
+      // called a barrier until it hit it.
+      laneCalls.delete(key);
+      console.error('[autopilot] lane question failed, will retry:', err);
     } finally {
       laneInFlight--;
     }
@@ -396,9 +419,19 @@
     // what the model says about the wave in front of us, right now, for the HUD
     api.currentNeed = need.slice();
 
+    // Retry anything that errored rather than carrying the failure forward.
+    // An errored classification used to satisfy `settled`, which sent the
+    // description "not yet identified" to the lane question -- and that scores
+    // 0.146 on it, below every real lane content, so the lane nothing was
+    // known about became the *preferred* destination.
+    for (const o of wave.group) {
+      const id = idOf(o);
+      const d = decisions.get(id);
+      if (d && d.status === 'error') decisions.delete(id);
+    }
     const settled = wave.group.every(o => {
       const d = decisions.get(idOf(o));
-      return d && d.status !== 'pending';
+      return d && d.status === 'done';
     });
     // The harness's only say in lane changes: noticing that the lane the model
     // called a barrier is the one we are standing in.
@@ -422,7 +455,7 @@
         api.laneNeed = 'waiting';
       }
     } else {
-      api.laneNeed = settled ? 'not needed' : 'waiting';
+      api.laneNeed = settled ? 'not needed' : 'reading';
     }
 
     if (laneCalls.size > 64) {
