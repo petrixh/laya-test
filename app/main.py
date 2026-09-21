@@ -99,6 +99,12 @@ def info() -> dict[str, Any]:
     return {
         "checkpoint": model.checkpoint,
         "subfolder": model.subfolder,
+        # backend matters for reading results: the MLX path is an independent
+        # FP16 port, so its numbers are not interchangeable with torch fp32.
+        "backend": model.backend,
+        "backend_requested": model.backend_requested,
+        "runtime": model.runtime_version,
+        "dtype": model.dtype if model.backend == "mlx" else "float32",
         "device": model.device,
         "device_requested": model.device_requested,
         "torch": model.torch_version,

@@ -270,6 +270,78 @@ bar is directly labelled, so nothing depends on colour alone. The panel is a liv
 readout rather than an explorable chart, so there is no hover layer; `trace.json`
 is the table view.
 
+## Running on Apple silicon (MLX)
+
+There is an independent MLX port, [`laya-mlx`](https://github.com/mizorewww/laya-mlx),
+with the same `predict()` contract. It reports **13.4ms p50** on an M3 Max for the
+English checkpoint and 7.4ms multilingual, against 940ms on the CPU container
+here. `app/model.py` will use it automatically on Apple silicon.
+
+Docker is not involved: MLX needs Metal, which containers on macOS cannot reach.
+So this runs natively in a venv.
+
+```bash
+./scripts/serve-macos.sh                         # creates .venv, installs, serves on 0.0.0.0:8000
+LAYA_SUBFOLDER=multilingual ./scripts/serve-macos.sh
+```
+
+or by hand:
+
+```bash
+python3.11 -m venv .venv && source .venv/bin/activate
+pip install -r requirements-mlx.txt              # laya-mlx + fastapi, no torch
+LAYA_BACKEND=mlx python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+Requires macOS 14+ and Python 3.11+. `LAYA_BACKEND` is `auto` by default, which
+picks MLX on Apple silicon when `laya_mlx` imports and torch everywhere else;
+force it with `mlx` or `torch`. `LAYA_SUBFOLDER` works on both backends -- the MLX
+port publishes each checkpoint as its own repo, and `MLX_REPOS` in `app/model.py`
+maps them.
+
+**Check which backend answered.** `GET /info` reports `backend`, `runtime` and
+`dtype`. This matters: the MLX port is an independent **FP16** conversion, so its
+answers are not guaranteed bit-identical to the fp32 originals and its numbers
+should not be pooled with the CPU results in this README without re-running.
+The eval harness is the way to check -- point it at the Mac and compare:
+
+```bash
+LAYA_URL=http://<mac>:8000 python -m eval.run labels --k 4,8,16,32,77
+LAYA_URL=http://<mac>:8000 python -m eval.game_probes
+```
+
+At 13ms a question the full Banking77 curve takes about a minute rather than
+the twenty it takes on CPU.
+
+### Pointing the game at any service
+
+The page boots the autopilot itself when `?autopilot=1` is present, so no driver
+process is needed and you can watch it in a real browser:
+
+```bash
+python3 -m http.server 8080          # serve the repo (not file://, the agent scripts need an origin)
+```
+
+then open:
+
+```
+http://localhost:8080/index.html?autopilot=1&laya=http://<mac>:8000
+```
+
+Query parameters: `laya` (service URL, default `http://127.0.0.1:8000`),
+`encoding` (`json` or `nl`), `decisions` (stop after N, `0` for unlimited).
+The service sends permissive CORS headers; narrow them with `LAYA_CORS_ORIGINS`
+if it is ever exposed beyond a LAN.
+
+`node agent/check-page.mjs --endpoint http://<mac>:8000` verifies that path
+end to end -- loader, endpoint wiring, HUD, and a live decision -- without
+recording anything.
+
+**A faster server will not make it play better.** The failure documented above
+is accuracy, not latency: the oracle control already scores 30/30 with zero
+crashes at 975ms. MLX buys a watchable frame rate and much quicker eval sweeps,
+not a working player.
+
 ## Running on a GPU
 
 `laya.load()` takes `device` directly and `LAYA_DEVICE=auto` already resolves to
@@ -304,6 +376,9 @@ eval/run.py           eval CLI
 eval/report.py        renders results/ as comparison tables
 scripts/smoke.py      in-process load + predict, bypasses HTTP
 scripts/introspect.py prints laya's real signatures and return shape
+scripts/serve-macos.sh  native Apple-silicon service (MLX backend, no Docker)
+requirements-mlx.txt  macOS dependency set: laya-mlx + fastapi, no torch
+agent/check-page.mjs  verifies the ?autopilot=1 loader against a live service
 index.html            the game (upstream); exposes window.__rj for automation
 agent/autopilot.js    in-page agent: reads game state, asks Laya, acts, self-grades
 agent/hud.js          live telemetry panel

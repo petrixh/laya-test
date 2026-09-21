@@ -28,9 +28,22 @@ def test_readyz(client):
 def test_info(client):
     info = client.get("/info").json()
     assert info["ready"] is True
-    assert info["device"] in {"cpu", "cuda"}
+    assert info["device"] in {"cpu", "cuda", "mlx"}
     assert info["checkpoint"]
-    assert info["torch"]
+
+
+def test_info_names_the_backend(client):
+    """Results are not comparable across backends -- the MLX port is an
+    independent FP16 conversion -- so /info must always say which one ran."""
+    info = client.get("/info").json()
+    assert info["backend"] in {"torch", "mlx"}
+    assert info["runtime"]
+    if info["backend"] == "torch":
+        assert info["torch"]
+        assert info["dtype"] == "float32"
+        assert info["device"] in {"cpu", "cuda"}
+    else:
+        assert info["device"] == "mlx"
 
 
 # --- layer 2: the answers are reasonable -----------------------------------

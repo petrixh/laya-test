@@ -862,5 +862,44 @@ renderer.setAnimationLoop(() => {
   render();
 });
 </script>
+<!-- Optional Laya autopilot. Dormant unless ?autopilot=1 is in the URL, so the
+     game is untouched for a human player. Point it at any Laya service with
+     ?laya=<url>, e.g. a Mac running the MLX backend on the same network:
+       index.html?autopilot=1&laya=http://192.168.1.20:8000            -->
+<script>
+(function () {
+  var q = new URLSearchParams(location.search);
+  if (!q.has('autopilot')) return;
+  var endpoint = (q.get('laya') || 'http://127.0.0.1:8000').replace(/\/$/, '');
+
+  function add(src) {
+    return new Promise(function (ok, bad) {
+      var s = document.createElement('script');
+      s.src = src; s.onload = ok;
+      s.onerror = function () { bad(new Error('could not load ' + src)); };
+      document.body.appendChild(s);
+    });
+  }
+
+  (function boot() {
+    if (!window.__rj) { setTimeout(boot, 100); return; }   // wait for the game module
+    add('agent/autopilot.js')
+      .then(function () { return add('agent/hud.js'); })
+      .then(function () {
+        window.__autopilot.start({
+          endpoint: endpoint,
+          encoding: q.get('encoding') || 'json',
+          maxDecisions: Number(q.get('decisions') || 0),
+        });
+        window.__layaHud.mount(window.__autopilot, endpoint);
+      })
+      .catch(function (e) {
+        window.__fatal('Autopilot failed to start: ' + e.message +
+          '. Serve this folder over HTTP (python3 -m http.server 8080) rather ' +
+          'than opening the file directly.');
+      });
+  })();
+})();
+</script>
 </body>
 </html>
