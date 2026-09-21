@@ -9,7 +9,50 @@ probability distribution per question. Nothing is generated token by token, so
 there is no JSON to repair and no parse step.
 
 Upstream ships a Python library only — no server, no Dockerfile, no CLI. This repo
-adds the container and the proof that it works.
+adds the container, an eval harness, and a browser game where a wrong answer is
+visible as a reindeer hitting a wall.
+
+[![Laya driving the three-lane game](demo/lane-choice/frame.png)](demo/lane-choice/run.webm)
+
+*Laya playing Reindeer Jump on Apple silicon. Every obstacle is classified by the
+model — jumpable, duckable, or an impassable barrier — and those classifications
+are the only reason the harness knows a lane is blocked. 201 decisions, no misses,
+1798m. [Click for the recording](demo/lane-choice/run.webm), or see
+[**the findings page**](docs/findings.html) for everything we measured.*
+
+## How a decision is made
+
+```mermaid
+flowchart TD
+  O["Obstacle enters the 2.6s horizon<br/>harness reads its name, lane and distance"]
+  O -->|"There is a tall ice wall on the track ahead"| Q1
+
+  subgraph M ["Laya — one forward pass per obstacle"]
+    Q1["choice, 2 options<br/>rests on the snow / hangs overhead"]
+    Q2["noul<br/>is this a solid barrier?"]
+  end
+
+  Q1 --> C
+  Q2 --> C
+  C["jump · duck · block"]
+  C --> L["Harness: which lane<br/>empty beats a manoeuvre, never a barrier"]
+  L --> T["Harness: when<br/>in lane by 0.55s, jump at 0.30s, duck from 0.40s"]
+  T --> A["slide · jump · duck"]
+
+  classDef model fill:#3987e5,stroke:#1c5cab,color:#ffffff;
+  classDef rule fill:#e9edf5,stroke:#9fb0cc,color:#0f1524;
+  class Q1,Q2,C model;
+  class L,T rule;
+```
+
+Blue is the model, grey is the harness. The split is deliberate: **the model decides
+what each obstacle is, the harness decides which lane and when.** The harness never
+reads the game's own obstacle class — `def.kind` appears in `agent/autopilot.js` only
+for grading and logging — so everything it knows about passability came from Laya.
+
+Asking the model to pick the lane as well is built (`--lane-choice model`) and
+[does not work](docs/findings.html): it answers by option position, not by reading
+the scene.
 
 ## Quick start
 
@@ -101,6 +144,10 @@ GPU-shaped work.
   spread-out ordinal distribution, not a broken answer.
 
 ## Evaluation
+
+Everything measured here is written up as a single self-contained page:
+**[docs/findings.html](docs/findings.html)** — open it in a browser, no build step
+and no network needed.
 
 ```bash
 make eval          # probes + label-budget curve against the running checkpoint
