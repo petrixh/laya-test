@@ -1,7 +1,7 @@
 {
   "task": "label_budget",
   "dataset": "mteb/banking77",
-  "n_per_k": 150,
+  "n_per_k": 120,
   "seed": 0,
   "service": {
     "checkpoint": "convaiinnovations/laya",
@@ -11,38 +11,38 @@
     "torch": "2.14.0+cpu",
     "threads": 4,
     "ready": true,
-    "load_seconds": 21.902620617998764,
+    "load_seconds": 19.66356210700019,
     "question_types": [
       "choice",
       "score",
       "noul"
     ]
   },
-  "generated": "2026-09-21T08:35:56.262811+00:00",
+  "generated": "2026-09-21T10:42:31.040922+00:00",
   "results": {
     "4": {
-      "n": 150,
-      "accuracy": 0.9133,
-      "macro_f1": 0.911,
-      "ece_top_prob": 0.0401,
-      "ece_confidence": 0.1874,
-      "brier": 0.1246,
-      "mean_top_prob": 0.8793,
-      "mean_confidence": 0.7259,
-      "latency_p50_ms": 269.2,
-      "mean_input_tokens": 81.5,
+      "n": 120,
+      "accuracy": 0.9083,
+      "macro_f1": 0.9052,
+      "ece_top_prob": 0.0457,
+      "ece_confidence": 0.1925,
+      "brier": 0.1267,
+      "mean_top_prob": 0.8749,
+      "mean_confidence": 0.717,
+      "latency_p50_ms": 261.2,
+      "mean_input_tokens": 81.1,
       "reliability": [
         {
           "bucket": "0.0-0.1",
-          "n": 3,
-          "mean_confidence": 0.0705,
-          "accuracy": 0.6667
+          "n": 1,
+          "mean_confidence": 0.068,
+          "accuracy": 0.0
         },
         {
           "bucket": "0.1-0.2",
-          "n": 12,
-          "mean_confidence": 0.1377,
-          "accuracy": 0.5
+          "n": 11,
+          "mean_confidence": 0.1345,
+          "accuracy": 0.5455
         },
         {
           "bucket": "0.2-0.3",
@@ -53,14 +53,14 @@
         {
           "bucket": "0.3-0.4",
           "n": 9,
-          "mean_confidence": 0.3583,
+          "mean_confidence": 0.3609,
           "accuracy": 0.8889
         },
         {
           "bucket": "0.4-0.5",
-          "n": 4,
-          "mean_confidence": 0.452,
-          "accuracy": 0.5
+          "n": 3,
+          "mean_confidence": 0.4677,
+          "accuracy": 0.6667
         },
         {
           "bucket": "0.5-0.6",
@@ -70,26 +70,26 @@
         },
         {
           "bucket": "0.6-0.7",
-          "n": 11,
-          "mean_confidence": 0.6521,
-          "accuracy": 0.9091
+          "n": 7,
+          "mean_confidence": 0.6499,
+          "accuracy": 0.8571
         },
         {
           "bucket": "0.7-0.8",
-          "n": 10,
-          "mean_confidence": 0.7661,
+          "n": 7,
+          "mean_confidence": 0.7737,
           "accuracy": 1.0
         },
         {
           "bucket": "0.8-0.9",
-          "n": 32,
-          "mean_confidence": 0.8541,
+          "n": 25,
+          "mean_confidence": 0.8576,
           "accuracy": 1.0
         },
         {
           "bucket": "0.9-1.0",
-          "n": 59,
-          "mean_confidence": 0.9468,
+          "n": 47,
+          "mean_confidence": 0.9461,
           "accuracy": 1.0
         }
       ],
@@ -97,16 +97,16 @@
       "random_baseline": 0.25
     },
     "8": {
-      "n": 150,
-      "accuracy": 0.92,
-      "macro_f1": 0.9204,
-      "ece_top_prob": 0.0672,
-      "ece_confidence": 0.0571,
-      "brier": 0.1494,
-      "mean_top_prob": 0.9558,
-      "mean_confidence": 0.9293,
-      "latency_p50_ms": 386.1,
-      "mean_input_tokens": 127.8,
+      "n": 120,
+      "accuracy": 0.925,
+      "macro_f1": 0.9258,
+      "ece_top_prob": 0.0682,
+      "ece_confidence": 0.0583,
+      "brier": 0.144,
+      "mean_top_prob": 0.9545,
+      "mean_confidence": 0.9264,
+      "latency_p50_ms": 364.0,
+      "mean_input_tokens": 127.7,
       "reliability": [
         {
           "bucket": "0.1-0.2",
@@ -116,15 +116,15 @@
         },
         {
           "bucket": "0.2-0.3",
-          "n": 2,
-          "mean_confidence": 0.2609,
+          "n": 1,
+          "mean_confidence": 0.2497,
           "accuracy": 1.0
         },
         {
           "bucket": "0.3-0.4",
-          "n": 5,
-          "mean_confidence": 0.373,
-          "accuracy": 0.4
+          "n": 4,
+          "mean_confidence": 0.3694,
+          "accuracy": 0.5
         },
         {
           "bucket": "0.5-0.6",
@@ -140,37 +140,37 @@
         },
         {
           "bucket": "0.8-0.9",
-          "n": 9,
-          "mean_confidence": 0.8572,
-          "accuracy": 0.7778
+          "n": 8,
+          "mean_confidence": 0.8531,
+          "accuracy": 0.875
         },
         {
           "bucket": "0.9-1.0",
-          "n": 128,
-          "mean_confidence": 0.9885,
-          "accuracy": 0.9609
+          "n": 101,
+          "mean_confidence": 0.9886,
+          "accuracy": 0.9604
         }
       ],
       "k": 8,
       "random_baseline": 0.125
     },
     "16": {
-      "n": 150,
-      "accuracy": 0.7867,
-      "macro_f1": 0.7772,
-      "ece_top_prob": 0.2134,
-      "ece_confidence": 0.2081,
-      "brier": 0.4234,
-      "mean_top_prob": 0.9943,
-      "mean_confidence": 0.9948,
-      "latency_p50_ms": 505.6,
+      "n": 120,
+      "accuracy": 0.7833,
+      "macro_f1": 0.772,
+      "ece_top_prob": 0.2063,
+      "ece_confidence": 0.2084,
+      "brier": 0.4188,
+      "mean_top_prob": 0.9896,
+      "mean_confidence": 0.9918,
+      "latency_p50_ms": 503.4,
       "mean_input_tokens": 185.9,
       "reliability": [
         {
           "bucket": "0.7-0.8",
-          "n": 2,
-          "mean_confidence": 0.7685,
-          "accuracy": 0.5
+          "n": 3,
+          "mean_confidence": 0.7636,
+          "accuracy": 0.3333
         },
         {
           "bucket": "0.8-0.9",
@@ -180,87 +180,13 @@
         },
         {
           "bucket": "0.9-1.0",
-          "n": 146,
-          "mean_confidence": 0.9994,
-          "accuracy": 0.8014
+          "n": 115,
+          "mean_confidence": 0.9996,
+          "accuracy": 0.8087
         }
       ],
       "k": 16,
       "random_baseline": 0.0625
-    },
-    "32": {
-      "n": 150,
-      "accuracy": 0.54,
-      "macro_f1": 0.5183,
-      "ece_top_prob": 0.4449,
-      "ece_confidence": 0.4438,
-      "brier": 0.8933,
-      "mean_top_prob": 0.978,
-      "mean_confidence": 0.9838,
-      "latency_p50_ms": 510.5,
-      "mean_input_tokens": 189.0,
-      "reliability": [
-        {
-          "bucket": "0.6-0.7",
-          "n": 1,
-          "mean_confidence": 0.6827,
-          "accuracy": 0.0
-        },
-        {
-          "bucket": "0.7-0.8",
-          "n": 1,
-          "mean_confidence": 0.7545,
-          "accuracy": 0.0
-        },
-        {
-          "bucket": "0.8-0.9",
-          "n": 9,
-          "mean_confidence": 0.8413,
-          "accuracy": 0.5556
-        },
-        {
-          "bucket": "0.9-1.0",
-          "n": 139,
-          "mean_confidence": 0.9969,
-          "accuracy": 0.5468
-        }
-      ],
-      "k": 32,
-      "random_baseline": 0.0312
-    },
-    "77": {
-      "n": 150,
-      "accuracy": 0.38,
-      "macro_f1": 0.288,
-      "ece_top_prob": 0.6026,
-      "ece_confidence": 0.609,
-      "brier": 1.2186,
-      "mean_top_prob": 0.9826,
-      "mean_confidence": 0.989,
-      "latency_p50_ms": 879.6,
-      "mean_input_tokens": 332.8,
-      "reliability": [
-        {
-          "bucket": "0.6-0.7",
-          "n": 1,
-          "mean_confidence": 0.6046,
-          "accuracy": 0.0
-        },
-        {
-          "bucket": "0.8-0.9",
-          "n": 6,
-          "mean_confidence": 0.8546,
-          "accuracy": 0.3333
-        },
-        {
-          "bucket": "0.9-1.0",
-          "n": 143,
-          "mean_confidence": 0.9973,
-          "accuracy": 0.3846
-        }
-      ],
-      "k": 77,
-      "random_baseline": 0.013
     }
   }
 }

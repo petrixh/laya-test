@@ -138,6 +138,11 @@ each other, but collapse onto a majority label shows up in F1 first.
 Our k=77 result (0.380) lands near the published Banking77 figure (0.425), which is a
 useful sanity check on the harness.
 
+The `laya-typed-decisions` checkpoint is indistinguishable on this task
+(0.908 / 0.925 / 0.783 at k = 4 / 8 / 16, against 0.913 / 0.920 / 0.787 for base,
+n=120), and it behaves identically on the game probes. Nothing here separates the
+two checkpoints.
+
 **Two things to take from this.**
 
 *Accuracy has a cliff between 8 and 16 labels.* Up to k=8 it is ~0.92; by k=32 it is
