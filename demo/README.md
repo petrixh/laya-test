@@ -1,3 +1,6 @@
+> **Note:** these recordings are from the single-lane game on `main`. The
+> `three-lanes` branch changes the game, so they are a record of the old one.
+
 # Demo runs
 
 Two recorded runs of the Reindeer Jump autopilot. Both are real captures from
