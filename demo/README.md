@@ -14,15 +14,13 @@ without standing the service up.
 
 | | |
 |---|---|
-| obstacles classified | 131, accuracy **1.00** (jump 44/44, duck 39/39, block 48/48) |
-| lane choices by the model | 12 |
-| took the first of the two lanes offered | **12 / 12** |
-| of those, the first lane was a barrier | 3 |
-| crashes | **3** — the same three |
-| furthest run | 488m |
-| latency p50 | 168ms wall, ~30ms of it inference |
+| obstacles classified | 151, accuracy **1.00** (jump 58/58, duck 38/38, block 55/55) |
+| lane choices by the model | 18 |
+| of those, chose a barrier | **0** |
+| crashes | **0** |
+| furthest run | **1351m** |
+| latency p50 | 167ms wall, ~30ms of it inference |
 
-Every crash traces to the lane question; reading obstacles did not fail once. The
-offered pair alternates between `[left, right]` and `[middle, right]` depending on where
-the reindeer is standing, so always taking the first is a position preference rather
-than a lane preference. `trace.json` rows tagged `stage: "lane"` show each one.
+Rows tagged `stage: "lane"` in `trace.json` carry `blocked_scores` — the model's
+per-lane score for each candidate — so every lane change can be checked against the
+numbers it was made from.

@@ -251,8 +251,6 @@ const main = async () => {
     lane_choice: {
       decisions: result.stats.laneDecisions,
       chose_a_barrier: result.stats.laneContradictions,
-      took_first_option: result.stats.laneDecisions
-        ? +(result.stats.laneTookFirst / result.stats.laneDecisions).toFixed(4) : null,
       passed_up_a_clear_lane: result.stats.laneDecisions
         ? +(result.stats.laneCostlier / result.stats.laneDecisions).toFixed(4) : null,
       latency_p50_ms: result.stats.laneLatencies.length

@@ -11,8 +11,9 @@ ground truth falls out of the game's own collision geometry.
 ![Laya playing Reindeer Jump](demo/reindeer.gif)
 
 *Every decision here is the model's. It reads each obstacle as jumpable, duckable or an
-impassable barrier, and when the lane it is standing in is a barrier it chooses where to
-go. The harness only handles timing. [Full recording](demo/run/run.webm).*
+impassable barrier, and when the lane it is standing in is a barrier it picks where to
+go. The harness only handles timing. 151 decisions, no misreadings, no crashes, 1351m.
+[Full recording](demo/run/run.webm).*
 
 ## Quick start
 
@@ -55,7 +56,7 @@ flowchart TD
   C["jump · duck · block"]
   C --> G{"is the lane I am in<br/>a barrier?"}
   G -->|no| T
-  G -->|yes| L["Laya — which of the other two lanes?<br/>described from its own readings, unfiltered"]
+  G -->|yes| L["Laya — one yes/no per candidate lane<br/>'is this lane blocked?' · lower score wins"]
   L --> T["Harness: when<br/>jump at 0.30s, duck from 0.40s, hold until the answer lands"]
   T --> A["slide · jump · duck"]
 
@@ -71,11 +72,17 @@ Blue is the model, grey is the harness.
 the reindeer occupies is one the *model* called a barrier — but the destination is always
 the model's answer, and the reindeer does not move while that answer is in flight.
 
-The two lanes it is not standing in are offered. Leaving out the current one is not the
-harness narrowing the choice: that lane having been read as a barrier is the entire
-reason the question is being asked, so offering "stay here" as a destination would be
-incoherent. The two that remain are **not** filtered by what the model said about them —
-either may be a barrier too, and picking one is the model's mistake to make.
+The two lanes it is not standing in are each scored by their own question — *"is this
+lane blocked?"* against a description of that lane alone — and the lower score wins.
+Leaving out the current lane is not the harness narrowing the choice: that lane having
+been read as a barrier is the entire reason the question is being asked. The two that
+remain are **not** filtered by what the model said about them; either may be a barrier
+too, and picking one would be the model's mistake to make.
+
+Comparing two numbers the model produced is arithmetic on its output, the same as
+thresholding the barrier question at 0.5. It is not a preference the harness holds — the
+*ordering* (a barrier is worse than a manoeuvre, which is worse than a clear lane) comes
+entirely from the model and appears nowhere in the harness.
 
 The harness also never reads the game's own obstacle class: `def.kind` appears in
 `agent/autopilot.js` only for grading and logging. Everything it knows about passability
@@ -91,17 +98,17 @@ the rest.
 
 | the run in `demo/` | |
 |---|---|
-| obstacles classified | **131**, accuracy **1.00** — jump 44/44, duck 39/39, block 48/48 |
-| lane choices made by the model | 12 |
-| it took the first of the two lanes offered | **12 / 12** |
-| of those, the first lane was itself a barrier | 3 |
-| crashes | **3** — the same three |
-| furthest run | 488m |
+| obstacles classified | **151**, accuracy **1.00** — jump 58/58, duck 38/38, block 55/55 |
+| lane choices made by the model | 18 |
+| of those, chose a barrier | **0** |
+| crashes | **0** |
+| furthest run | **1351m** |
 
-**Choosing between described alternatives: no better than chance.** Offered three lanes
-whose contents are spelled out in the state, it answers by option *position*. The clean
-test needs no baseline — ask the same two-option question with the options swapped, and a
-model that is reading the state names the same lane twice:
+**Ranking described alternatives against each other: no better than chance.** This is why
+the lane question is *not* asked as a choice between lanes. Offered a list, it answers by
+option *position*. The clean test needs no baseline — ask the same two-option question
+with the options swapped, and a model that is reading the state names the same lane
+twice:
 
 | pair, presented both ways | order-consistent |
 |---|---|
@@ -110,18 +117,30 @@ model that is reading the state names the same lane twice:
 | barrier vs duck, clear vs jump, clear vs duck, jump vs duck | 0.00 |
 
 Swap the options and it names the other lane, even when one is a wall and the other is
-empty. `python -m eval.lane_forced` reproduces it.
+empty. An earlier version of this agent asked the lane question that way, and across 12
+questions in a recorded run it took the first-listed option **12 times out of 12** — the
+two offered lanes alternate between `[left, right]` and `[middle, right]` depending on
+where the reindeer stands, so that is a position preference, not a lane preference.
 
-The recording makes this unusually legible. The two lanes offered alternate between
-`[left, right]` and `[middle, right]` depending on where the reindeer is standing, and
-it picked the first-listed one **every single time** — twelve for twelve. Three of those
-first-listed lanes happened to be barriers, and those are exactly the three crashes.
-Reading obstacles did not fail once.
+**Asking one lane at a time fixes it,** because there is no list to prefer the front of.
+Scored individually, the model's answer to *"is this lane blocked?"* comes out cleanly
+ordered:
 
-It would be easy to hide this. Filtering the two offered lanes down to ones the model has
-already called safe takes the crash count to zero, because survival is then inherited
-from the classifier upstream and the chooser cannot do harm either way. That is not done
-here: a component with no signal should not be dressed up as one that works.
+| lane contents | mean score |
+|---|---|
+| clear | **0.192** |
+| needs a jump | 0.825 |
+| needs a duck | 0.830 |
+| barrier | **0.954** |
+
+As a decision rule over pairs, across three different wordings of each content: it
+**avoids the barrier in 26 of 27**, and prefers a clear lane to one needing a manoeuvre
+**18 of 18** — which the choice framing never managed. `python -m eval.lane_forced`
+reproduces both halves.
+
+The general shape: **this model answers a question about one described thing, and cannot
+rank several against each other.** That is how the obstacle classifier is built, it is
+now how the lane question is built, and neither missed once in the recorded run.
 
 ## Three classes, two questions
 

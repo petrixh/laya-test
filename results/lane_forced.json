@@ -1,0 +1,91 @@
+{
+  "service": {
+    "checkpoint": "convaiinnovations/laya",
+    "subfolder": null,
+    "backend": "mlx",
+    "backend_requested": "mlx",
+    "runtime": "laya-mlx 0.1.0",
+    "dtype": "float16",
+    "device": "mlx",
+    "device_requested": "auto",
+    "torch": null,
+    "threads": 0,
+    "ready": true,
+    "load_seconds": 0.6073747499613091,
+    "question_types": [
+      "choice",
+      "score",
+      "noul"
+    ]
+  },
+  "rows": {
+    "fixed order": {
+      "picks_clear": 0.483,
+      "picks_first_option": 1.0,
+      "mean_confidence": 0.574
+    },
+    "shuffled order": {
+      "picks_clear": 0.617,
+      "picks_first_option": 1.0,
+      "mean_confidence": 0.513
+    },
+    "BASELINE always first option": {
+      "picks_clear": 0.483,
+      "picks_first_option": 1.0,
+      "mean_confidence": 0.0
+    },
+    "BASELINE coin flip": {
+      "picks_clear": 0.517,
+      "picks_first_option": null,
+      "mean_confidence": 0.0
+    }
+  },
+  "pairs": [
+    {
+      "pair": "block vs clear",
+      "order_consistent": 0.1,
+      "picks_better": 0.45,
+      "mean_confidence": 0.369
+    },
+    {
+      "pair": "block vs jump",
+      "order_consistent": 0.2,
+      "picks_better": 0.6,
+      "mean_confidence": 0.288
+    },
+    {
+      "pair": "block vs duck",
+      "order_consistent": 0.0,
+      "picks_better": 0.5,
+      "mean_confidence": 0.521
+    },
+    {
+      "pair": "clear vs jump",
+      "order_consistent": 0.0,
+      "picks_better": 0.5,
+      "mean_confidence": 0.441
+    },
+    {
+      "pair": "clear vs duck",
+      "order_consistent": 0.0,
+      "picks_better": 0.5,
+      "mean_confidence": 0.587
+    },
+    {
+      "pair": "jump vs duck",
+      "order_consistent": 0.0,
+      "picks_better": null,
+      "mean_confidence": 0.424
+    }
+  ],
+  "per_lane": {
+    "mean_score_by_class": {
+      "clear": 0.192,
+      "jump": 0.825,
+      "duck": 0.83,
+      "block": 0.954
+    },
+    "avoids_the_barrier": "26/27",
+    "prefers_a_clear_lane": "18/18"
+  }
+}

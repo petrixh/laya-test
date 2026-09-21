@@ -60,16 +60,28 @@
 
   // Stage two: which lane to move to.
   //
-  // The harness may notice that a move is needed -- the model called the lane
-  // the reindeer is standing in a barrier -- but it does not choose where to
-  // go and does not move on a guess while the answer is in flight. The two
-  // lanes it is not standing in are offered, unfiltered: either may itself be
-  // a barrier, and if the model picks one the reindeer hits it.
+  // Asked as one yes/no per candidate lane, each about that lane alone, and
+  // the lane with the lower score wins.
   //
-  // Framing is the best of 20 in eval/lane_choice.py: neutral labels, bare
-  // criteria, plain instruction, and the current lane left unstated. Putting
-  // the preference into the instruction actively hurt (0.700 against 0.875).
-  const LANE_LABELS = ['option_a', 'option_b', 'option_c'];
+  // It was previously a single choice question listing the candidate lanes as
+  // options, which does not work: across 12 lane questions in a recorded run
+  // the model took the first-listed option 12 times out of 12, and asking the
+  // same pair with the options swapped flips the answer (order-consistency
+  // 0.00-0.20 in eval/lane_forced.py). It answers by option position.
+  //
+  // One question about one described thing is the shape this model is good at
+  // -- it is how the obstacle classifier above works, and that has not missed.
+  // There is no option list here, so there is no position to be biased by.
+  // Measured over three wordings of each lane content: avoids the barrier in
+  // 26 of 27 pairs, and prefers a clear lane to one needing a manoeuvre 18 of
+  // 18 -- which the choice framing never did.
+  //
+  // The harness compares two numbers the model produced. That is arithmetic on
+  // model output, the same as thresholding the barrier question at 0.5; it is
+  // not a preference of the harness's own.
+  const LANE_BLOCKED_Q = {
+    blocked: { type: 'noul', instructions: 'Is this lane blocked?' },
+  };
   const LANE_WORDS = ['left', 'middle', 'right'];
   const LANE_DESC = {
     clear: 'clear, with nothing in it',
@@ -78,15 +90,6 @@
     block: 'a solid barrier that cannot be passed at all',
     unknown: 'not yet identified',
   };
-  const laneQuestion = (candidates) => ({
-    lane: {
-      type: 'choice',
-      instructions: 'Which lane should the reindeer take?',
-      criteria: Object.fromEntries(
-        candidates.map((l, k) => [LANE_LABELS[k], `the ${LANE_WORDS[l]} lane`])),
-    },
-  });
-
   const PLAYER_DEPTH = 0.65;   // the game's collision half-depth
   const WAVE_Z = 3;            // obstacles within this z of each other are one wave
 
@@ -120,7 +123,7 @@
       deaths: 0, bestDistance: 0, lastDistance: 0,
       errors: 0, deathLog: [], laneChanges: 0,
       laneDecisions: 0, laneContradictions: 0,
-      laneTookFirst: 0, laneCostlier: 0,
+      laneCostlier: 0,
       laneLatencies: [],
     };
   }
@@ -239,62 +242,57 @@
     }
   }
 
-  /** Ask the model which lane to move to. */
+  /** Ask the model which lane to move to.
+   *
+   * One request per candidate lane, each describing only that lane, so the
+   * model never sees a list of options to prefer the front of.
+   */
   async function askLane(key, need, here) {
     // Every lane except the one we are standing in. Excluding it is not the
-    // harness narrowing the model's choice: that lane having been read as a
-    // barrier is the whole reason the question is being asked, so offering
-    // "stay here" as a destination would be incoherent.
-    //
-    // The remaining lanes are NOT filtered by what the model said about them.
-    // One of them may be a barrier too, and choosing it is the model's
-    // mistake to make -- which is the thing being measured.
+    // harness narrowing the choice: that lane having been read as a barrier is
+    // the whole reason the question is being asked. The rest are not filtered
+    // by what the model said about them.
     const candidates = [0, 1, 2].filter(l => l !== here);
-    const entry = { status: 'pending', forced: true, candidates };
+    const entry = { status: 'pending', candidates };
     laneCalls.set(key, entry);
     laneInFlight++;
     try {
-      const sentence = candidates.map(i =>
-        `The ${LANE_WORDS[i]} lane is ${LANE_DESC[need[i] === null ? 'clear' : need[i]]}.`
-      ).join(' ');
       const t0 = performance.now();
-      const res = await fetch(api.config.endpoint + '/predict', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ state: sentence, questions: laneQuestion(candidates) }),
-      });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const body = await res.json();
-      const a = body.answers.lane;
+      const scores = await Promise.all(candidates.map(async (l) => {
+        const state = `This lane is ${LANE_DESC[need[l] === null ? 'clear' : need[l]]}.`;
+        const res = await fetch(api.config.endpoint + '/predict', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ state, questions: LANE_BLOCKED_Q }),
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return (await res.json()).answers.blocked.noul;
+      }));
       const wall = performance.now() - t0;
-      const slot = LANE_LABELS.indexOf(a.choice);
-      if (slot < 0 || slot >= candidates.length) {
-        throw new Error('unexpected lane label ' + a.choice);
-      }
-      const lane = candidates[slot];
-      // probabilities indexed by lane, so the HUD can show them in lane order
+
+      let best = 0;
+      for (let i = 1; i < scores.length; i++) if (scores[i] < scores[best]) best = i;
+      const lane = candidates[best];
+
+      // shown as "how passable", so a longer bar is a better lane
       const probs = [0, 0, 0];
-      candidates.forEach((l, k) => { probs[l] = a.probabilities[LANE_LABELS[k]] || 0; });
+      candidates.forEach((l, i) => { probs[l] = 1 - scores[i]; });
 
       Object.assign(entry, {
-        status: 'done', lane, probs, confidence: a.confidence, wallMs: wall,
-        contradiction: need[lane] === 'block',      // impossible now, kept as an assertion
-        tookFirst: slot === 0,
-        costlier: need[lane] !== null && candidates.some(l => need[l] === null),
+        status: 'done', lane, probs, confidence: 1 - scores[best], wallMs: wall,
+        contradiction: need[lane] === 'block',
       });
       const st = api.stats;
       st.laneDecisions++;
       st.laneLatencies.push(wall);
       if (entry.contradiction) st.laneContradictions++;
-      if (entry.tookFirst) st.laneTookFirst++;
-      if (entry.costlier) st.laneCostlier++;
+      if (need[lane] !== null && candidates.some((l) => need[l] === null)) st.laneCostlier++;
+
       api.trace.push({
         stage: 'lane', run: runIndex, distance: Math.floor(rj.state.distance),
-        lanes: need.map(n => n === null ? 'clear' : n),
-        candidates, chose: lane, contradiction: entry.contradiction,
-        took_first_option: entry.tookFirst, passed_up_a_clear_lane: entry.costlier,
-        probabilities: { left: probs[0], middle: probs[1], right: probs[2] },
-        confidence: a.confidence, server_ms: body.latency_ms,
+        lanes: need.map((n) => (n === null ? 'clear' : n)),
+        candidates, blocked_scores: scores.map((v) => Number(v.toFixed(4))),
+        chose: lane, contradiction: entry.contradiction,
         wall_ms: Number(wall.toFixed(1)),
       });
       if (api.onLane) api.onLane(entry, need);
@@ -302,9 +300,6 @@
       entry.status = 'error';
       entry.error = String((err && err.message) || err);
       api.stats.errors++;
-      // Loud on purpose: a ReferenceError in this handler once counted itself
-      // as a service failure, so every lane question "failed" and the reindeer
-      // never moved, with nothing in the summary saying why.
       console.error('[autopilot] lane question failed:', err);
     } finally {
       laneInFlight--;

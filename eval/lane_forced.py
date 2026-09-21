@@ -122,6 +122,54 @@ def run_pairs(svc, rng, reps=10):
     return out
 
 
+BLOCKED_Q = {"blocked": {"type": "noul", "instructions": "Is this lane blocked?"}}
+
+# three wordings per class, so the ranking cannot be an artefact of one string
+WORDINGS = {
+    None: ["clear, with nothing in it", "empty", "open, with a clear path through"],
+    "jump": ["something resting on the snow that has to be jumped over",
+             "a log lying across it", "a snowman standing in it"],
+    "duck": ["something hanging overhead that has to be ducked under",
+             "a garland strung across it above head height",
+             "a string of baubles hanging over it"],
+    "block": ["a solid barrier that cannot be passed at all",
+              "a tall ice wall filling it from the snow to above head height",
+              "completely walled off"],
+}
+
+
+def run_per_lane(svc):
+    """The framing the autopilot uses: one yes/no per lane, lower score wins.
+
+    No option list, so nothing to prefer the front of. Reported as a decision
+    rule over pairs, which is how it is actually used.
+    """
+    import itertools
+
+    score = {}
+    for cls, words in WORDINGS.items():
+        for w in words:
+            a = svc.predict(f"This lane is {w}.", BLOCKED_Q)["answers"]["blocked"]
+            score[(cls, w)] = a["noul"]
+
+    survive = sn = quality = qn = 0
+    for (c1, w1), (c2, w2) in itertools.combinations(score, 2):
+        if c1 == c2:
+            continue
+        pick = (c1, w1) if score[(c1, w1)] < score[(c2, w2)] else (c2, w2)
+        if (c1 == "block") != (c2 == "block"):
+            sn += 1
+            survive += pick[0] != "block"
+        if None in (c1, c2) and "block" not in (c1, c2):
+            qn += 1
+            quality += pick[0] is None
+    by_class = {str(c or "clear"): round(sum(score[(c, w)] for w in ws) / len(ws), 3)
+                for c, ws in WORDINGS.items()}
+    return {"mean_score_by_class": by_class,
+            "avoids_the_barrier": f"{survive}/{sn}",
+            "prefers_a_clear_lane": f"{quality}/{qn}"}
+
+
 def main() -> int:
     rng = random.Random(23)
     scenes = [make_scene(rng) for _ in range(60)]
@@ -131,6 +179,7 @@ def main() -> int:
         fixed = run(svc, scenes, False, random.Random(1))
         shuf = run(svc, scenes, True, random.Random(2))
         pairs = run_pairs(svc, random.Random(31))
+        per_lane = run_per_lane(svc)
 
     # baselines on the same scenes
     r = random.Random(4)
@@ -159,8 +208,16 @@ def main() -> int:
               f"{r['mean_confidence']:>7.3f}")
     print("\nconsistent = named the same lane with the options swapped. 0 means it is\n"
           "answering by position; 1 means it is reading the scene.")
+
+    print("\n=== the framing the autopilot uses instead: one yes/no per lane ===")
+    print("  mean 'is this lane blocked?' by content:")
+    for k, v in per_lane["mean_score_by_class"].items():
+        print(f"    {k:<6} {v:.3f}")
+    print(f"  as a rule, lower score wins:")
+    print(f"    avoids the barrier    {per_lane['avoids_the_barrier']}")
+    print(f"    prefers a clear lane  {per_lane['prefers_a_clear_lane']}")
     (RESULTS / "lane_forced.json").write_text(json.dumps(
-        {"service": info, "rows": rows, "pairs": pairs}, indent=2))
+        {"service": info, "rows": rows, "pairs": pairs, "per_lane": per_lane}, indent=2))
     return 0
 
 
