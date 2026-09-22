@@ -52,7 +52,7 @@ Lift over chance, which is the fairer way to read a curve whose baseline is movi
 
 ### The same documents, a longer menu
 
-The curve above cannot separate two things, because a document is only scored at k when its own gold label is on the menu: as k grows, the document set grows with it. This holds the documents fixed -- the 20 whose gold label is `billing` or `technical`, so they are scorable at every rung -- and grows only the number of wrong answers on offer. Any fall here is option count alone.
+The curve above cannot separate two things, because a document is only scored at k when its own gold label is on the menu: as k grows, the document set grows with it. This holds the documents fixed -- the 20 whose gold label is `billing` or `technical`, so they are scorable at every rung -- and grows only the number of wrong answers on offer. Any fall here is option count alone -- with one caveat. These labels are the first in the nested order, so the gold option always sits at the front of the menu and the distractors are added behind it: this measures wrong answers added after the right one, not menu length in general. Menu position itself is measured in the presentation section below.
 
 | framing | k=2 | k=3 | k=4 | k=6 | k=8 | k=12 | k=16 |
 |---|---|---|---|---|---|---|---|
@@ -134,7 +134,7 @@ The control that needs no baseline: ask the same question with the options rearr
 
 ## Calibration: what it says it knows
 
-`confidence` here is laya's own, and it is normalised Shannon entropy, `1 - H(p)/log(k)`. The `log(k)` denominator matters for reading this table: as the menu grows, the same amount of real uncertainty maps to a *higher* reported confidence. ECE is the gap between confidence and realised accuracy; 0 is honest.
+`confidence` here is laya's own, normalised Shannon entropy `1 - H(p)/log(k)` over the returned distribution. Read the `choice` rows with the checkpoint's calibration table in mind: `rl_agent_config.json` divides the logits by a temperature chosen by option count, 1.0 for six to ten options but 0.10 for eleven or more, so every `choice` answer at k>=11 is sharpened tenfold before it reaches this table. That, not the `log(k)` denominator, is the step between k=8 and k=12. ECE is the gap between confidence and realised accuracy; 0 is honest.
 
 | framing | k | accuracy | mean confidence | ECE | Brier |
 |---|---|---|---|---|---|

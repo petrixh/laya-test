@@ -182,7 +182,11 @@ def render(d: dict) -> str:
           f"{len(fs['documents'])} whose gold label is `"
           + "` or `".join(fs["labels"]) + "`, so they are scorable at every rung -- "
           "and grows only the number of wrong answers on offer. Any fall here is "
-          "option count alone.\n")
+          "option count alone -- with one caveat. These labels are the first in the "
+          "nested order, so the gold option always sits at the front of the menu and "
+          "the distractors are added behind it: this measures wrong answers added "
+          "after the right one, not menu length in general. Menu position itself is "
+          "measured in the presentation section below.\n")
         rows = []
         for f, per_k in fs["by_framing"].items():
             rows.append([f"`{f}`"] + [fmt(per_k[k]["accuracy"]) if k in per_k else "  --  "
@@ -232,10 +236,13 @@ def render(d: dict) -> str:
 
     # ---- calibration
     A("## Calibration: what it says it knows\n")
-    A("`confidence` here is laya's own, and it is normalised Shannon entropy, "
-      "`1 - H(p)/log(k)`. The `log(k)` denominator matters for reading this table: as the "
-      "menu grows, the same amount of real uncertainty maps to a *higher* reported "
-      "confidence. ECE is the gap between confidence and realised accuracy; 0 is honest.\n")
+    A("`confidence` here is laya's own, normalised Shannon entropy `1 - H(p)/log(k)` over "
+      "the returned distribution. Read the `choice` rows with the checkpoint's calibration "
+      "table in mind: `rl_agent_config.json` divides the logits by a temperature chosen by "
+      "option count, 1.0 for six to ten options but 0.10 for eleven or more, so every "
+      "`choice` answer at k>=11 is sharpened tenfold before it reaches this table. That, "
+      "not the `log(k)` denominator, is the step between k=8 and k=12. ECE is the gap "
+      "between confidence and realised accuracy; 0 is honest.\n")
     rows = []
     for f in framings:
         if single[f].get(rungs[0], {}).get("mean_confidence") is None:

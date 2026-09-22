@@ -1,0 +1,5590 @@
+{
+  "generated": "2026-09-22T13:28:57.513803+00:00",
+  "service": {
+    "checkpoint": "convaiinnovations/laya",
+    "subfolder": null,
+    "backend": "torch",
+    "backend_requested": "auto",
+    "runtime": "torch 2.14.0+cpu",
+    "dtype": "float32",
+    "device": "cpu",
+    "device_requested": "auto",
+    "torch": "2.14.0+cpu",
+    "threads": 4,
+    "ready": true,
+    "load_seconds": 20.354002408999804,
+    "question_types": [
+      "choice",
+      "score",
+      "noul"
+    ]
+  },
+  "corpus": {
+    "n": 160,
+    "multi_label": 34,
+    "per_label": {
+      "account_admin": 10,
+      "billing": 10,
+      "compliance": 10,
+      "data_privacy": 10,
+      "facilities": 10,
+      "hr": 10,
+      "legal": 10,
+      "logistics": 10,
+      "partnerships": 10,
+      "press": 10,
+      "procurement": 10,
+      "product_feedback": 10,
+      "sales": 10,
+      "security": 10,
+      "technical": 10,
+      "training": 10
+    },
+    "per_tier": {
+      "explicit": 40,
+      "realistic": 40,
+      "implicit": 40,
+      "adversarial": 40
+    },
+    "per_type": {
+      "email": 138,
+      "chat": 9,
+      "ticket": 5,
+      "incident_report": 2,
+      "form": 2,
+      "notice": 1,
+      "contract_clause": 1,
+      "disclosure": 1,
+      "application": 1
+    },
+    "body_chars": {
+      "min": 84,
+      "mean": 384,
+      "max": 950
+    }
+  },
+  "config": {
+    "rungs": [
+      2,
+      3,
+      4,
+      6,
+      8,
+      12,
+      16
+    ],
+    "framings": [
+      "choice",
+      "choice_bare",
+      "noul_per_label",
+      "noul_described",
+      "two_stage"
+    ],
+    "orders": 3,
+    "thresholds": [
+      0.3,
+      0.5,
+      0.7
+    ],
+    "smoke": false
+  },
+  "single_label": {
+    "choice": {
+      "2": {
+        "n": 20,
+        "accuracy": 0.85,
+        "macro_f1": 0.8496,
+        "ece_top_prob": 0.0679,
+        "ece_confidence": 0.4036,
+        "brier": 0.2386,
+        "mean_top_prob": 0.8727,
+        "mean_confidence": 0.4932,
+        "latency_p50_ms": 407.9,
+        "reliability": [
+          {
+            "bucket": "0.1-0.2",
+            "n": 3,
+            "mean_confidence": 0.1511,
+            "accuracy": 0.6667
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 1,
+            "mean_confidence": 0.2227,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 5,
+            "mean_confidence": 0.3816,
+            "accuracy": 0.8
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 1,
+            "mean_confidence": 0.4679,
+            "accuracy": 0.0
+          },
+          {
+            "bucket": "0.5-0.6",
+            "n": 2,
+            "mean_confidence": 0.5231,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.6-0.7",
+            "n": 3,
+            "mean_confidence": 0.6633,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 4,
+            "mean_confidence": 0.7171,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.9-1.0",
+            "n": 1,
+            "mean_confidence": 0.9076,
+            "accuracy": 1.0
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "billing",
+            "pred": "technical",
+            "n": 1
+          }
+        ],
+        "k": 2,
+        "chance": 0.5,
+        "lift_over_chance": 1.7,
+        "mean_passes": 1.0,
+        "wall_seconds": 26.6
+      },
+      "3": {
+        "n": 30,
+        "accuracy": 0.7667,
+        "macro_f1": 0.7667,
+        "ece_top_prob": 0.248,
+        "ece_confidence": 0.3775,
+        "brier": 0.3491,
+        "mean_top_prob": 0.7265,
+        "mean_confidence": 0.3891,
+        "latency_p50_ms": 458.3,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 5,
+            "mean_confidence": 0.0288,
+            "accuracy": 0.6
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 6,
+            "mean_confidence": 0.1427,
+            "accuracy": 0.8333
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 4,
+            "mean_confidence": 0.3418,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 4,
+            "mean_confidence": 0.4264,
+            "accuracy": 0.75
+          },
+          {
+            "bucket": "0.5-0.6",
+            "n": 2,
+            "mean_confidence": 0.5491,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.6-0.7",
+            "n": 5,
+            "mean_confidence": 0.6683,
+            "accuracy": 0.8
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 3,
+            "mean_confidence": 0.747,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.9-1.0",
+            "n": 1,
+            "mean_confidence": 0.9207,
+            "accuracy": 1.0
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "sales",
+            "pred": "billing",
+            "n": 3
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "billing",
+            "pred": "technical",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "technical",
+            "n": 1
+          }
+        ],
+        "k": 3,
+        "chance": 0.3333,
+        "lift_over_chance": 2.3,
+        "mean_passes": 1.0,
+        "wall_seconds": 46.8
+      },
+      "4": {
+        "n": 40,
+        "accuracy": 0.675,
+        "macro_f1": 0.6742,
+        "ece_top_prob": 0.1594,
+        "ece_confidence": 0.3732,
+        "brier": 0.4456,
+        "mean_top_prob": 0.6381,
+        "mean_confidence": 0.327,
+        "latency_p50_ms": 588.7,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 9,
+            "mean_confidence": 0.0484,
+            "accuracy": 0.6667
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 6,
+            "mean_confidence": 0.1346,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 5,
+            "mean_confidence": 0.2457,
+            "accuracy": 0.8
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 5,
+            "mean_confidence": 0.3558,
+            "accuracy": 0.4
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 5,
+            "mean_confidence": 0.4448,
+            "accuracy": 0.6
+          },
+          {
+            "bucket": "0.5-0.6",
+            "n": 4,
+            "mean_confidence": 0.5529,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.6-0.7",
+            "n": 3,
+            "mean_confidence": 0.6617,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 2,
+            "mean_confidence": 0.7521,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.9-1.0",
+            "n": 1,
+            "mean_confidence": 0.9044,
+            "accuracy": 1.0
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "sales",
+            "pred": "legal",
+            "n": 3
+          },
+          {
+            "gold": "billing",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "legal",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "technical",
+            "pred": "legal",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "billing",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "technical",
+            "n": 1
+          },
+          {
+            "gold": "legal",
+            "pred": "billing",
+            "n": 1
+          }
+        ],
+        "k": 4,
+        "chance": 0.25,
+        "lift_over_chance": 2.7,
+        "mean_passes": 1.0,
+        "wall_seconds": 77.8
+      },
+      "6": {
+        "n": 60,
+        "accuracy": 0.6833,
+        "macro_f1": 0.6852,
+        "ece_top_prob": 0.2201,
+        "ece_confidence": 0.3159,
+        "brier": 0.5198,
+        "mean_top_prob": 0.6772,
+        "mean_confidence": 0.4942,
+        "latency_p50_ms": 714.9,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 5,
+            "mean_confidence": 0.0758,
+            "accuracy": 0.8
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 6,
+            "mean_confidence": 0.1529,
+            "accuracy": 0.6667
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 7,
+            "mean_confidence": 0.2407,
+            "accuracy": 0.7143
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 10,
+            "mean_confidence": 0.3556,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 5,
+            "mean_confidence": 0.4333,
+            "accuracy": 0.8
+          },
+          {
+            "bucket": "0.5-0.6",
+            "n": 3,
+            "mean_confidence": 0.552,
+            "accuracy": 0.6667
+          },
+          {
+            "bucket": "0.6-0.7",
+            "n": 4,
+            "mean_confidence": 0.6219,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 6,
+            "mean_confidence": 0.7511,
+            "accuracy": 0.6667
+          },
+          {
+            "bucket": "0.8-0.9",
+            "n": 10,
+            "mean_confidence": 0.8404,
+            "accuracy": 0.7
+          },
+          {
+            "bucket": "0.9-1.0",
+            "n": 4,
+            "mean_confidence": 0.9736,
+            "accuracy": 0.5
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "sales",
+            "pred": "legal",
+            "n": 3
+          },
+          {
+            "gold": "security",
+            "pred": "technical",
+            "n": 3
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "security",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "billing",
+            "pred": "technical",
+            "n": 1
+          },
+          {
+            "gold": "technical",
+            "pred": "legal",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "billing",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "technical",
+            "n": 1
+          },
+          {
+            "gold": "legal",
+            "pred": "technical",
+            "n": 1
+          },
+          {
+            "gold": "legal",
+            "pred": "billing",
+            "n": 1
+          },
+          {
+            "gold": "legal",
+            "pred": "security",
+            "n": 1
+          },
+          {
+            "gold": "hr",
+            "pred": "security",
+            "n": 1
+          }
+        ],
+        "k": 6,
+        "chance": 0.1667,
+        "lift_over_chance": 4.1,
+        "mean_passes": 1.0,
+        "wall_seconds": 132.0
+      },
+      "8": {
+        "n": 80,
+        "accuracy": 0.6,
+        "macro_f1": 0.5781,
+        "ece_top_prob": 0.2057,
+        "ece_confidence": 0.2461,
+        "brier": 0.608,
+        "mean_top_prob": 0.6215,
+        "mean_confidence": 0.4633,
+        "latency_p50_ms": 774.8,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 5,
+            "mean_confidence": 0.061,
+            "accuracy": 0.4
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 11,
+            "mean_confidence": 0.1563,
+            "accuracy": 0.4545
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 12,
+            "mean_confidence": 0.241,
+            "accuracy": 0.6667
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 9,
+            "mean_confidence": 0.3333,
+            "accuracy": 0.4444
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 11,
+            "mean_confidence": 0.4435,
+            "accuracy": 0.8182
+          },
+          {
+            "bucket": "0.5-0.6",
+            "n": 7,
+            "mean_confidence": 0.5386,
+            "accuracy": 0.4286
+          },
+          {
+            "bucket": "0.6-0.7",
+            "n": 5,
+            "mean_confidence": 0.6357,
+            "accuracy": 0.6
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 6,
+            "mean_confidence": 0.766,
+            "accuracy": 0.6667
+          },
+          {
+            "bucket": "0.8-0.9",
+            "n": 8,
+            "mean_confidence": 0.8619,
+            "accuracy": 0.875
+          },
+          {
+            "bucket": "0.9-1.0",
+            "n": 6,
+            "mean_confidence": 0.9721,
+            "accuracy": 0.5
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "sales",
+            "pred": "legal",
+            "n": 3
+          },
+          {
+            "gold": "security",
+            "pred": "technical",
+            "n": 3
+          },
+          {
+            "gold": "product_feedback",
+            "pred": "technical",
+            "n": 3
+          },
+          {
+            "gold": "account_admin",
+            "pred": "hr",
+            "n": 3
+          },
+          {
+            "gold": "sales",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "sales",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "security",
+            "pred": "account_admin",
+            "n": 2
+          },
+          {
+            "gold": "hr",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 1
+          },
+          {
+            "gold": "technical",
+            "pred": "legal",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "product_feedback",
+            "n": 1
+          },
+          {
+            "gold": "legal",
+            "pred": "product_feedback",
+            "n": 1
+          }
+        ],
+        "k": 8,
+        "chance": 0.125,
+        "lift_over_chance": 4.8,
+        "mean_passes": 1.0,
+        "wall_seconds": 196.3
+      },
+      "12": {
+        "n": 120,
+        "accuracy": 0.5167,
+        "macro_f1": 0.5068,
+        "ece_top_prob": 0.4541,
+        "ece_confidence": 0.4513,
+        "brier": 0.9043,
+        "mean_top_prob": 0.9707,
+        "mean_confidence": 0.968,
+        "latency_p50_ms": 768.6,
+        "reliability": [
+          {
+            "bucket": "0.6-0.7",
+            "n": 1,
+            "mean_confidence": 0.6697,
+            "accuracy": 0.0
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 8,
+            "mean_confidence": 0.742,
+            "accuracy": 0.125
+          },
+          {
+            "bucket": "0.8-0.9",
+            "n": 6,
+            "mean_confidence": 0.8771,
+            "accuracy": 0.3333
+          },
+          {
+            "bucket": "0.9-1.0",
+            "n": 105,
+            "mean_confidence": 0.9933,
+            "accuracy": 0.5619
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "partnerships",
+            "pred": "sales",
+            "n": 4
+          },
+          {
+            "gold": "sales",
+            "pred": "legal",
+            "n": 3
+          },
+          {
+            "gold": "security",
+            "pred": "account_admin",
+            "n": 3
+          },
+          {
+            "gold": "product_feedback",
+            "pred": "technical",
+            "n": 3
+          },
+          {
+            "gold": "account_admin",
+            "pred": "hr",
+            "n": 3
+          },
+          {
+            "gold": "logistics",
+            "pred": "technical",
+            "n": 3
+          },
+          {
+            "gold": "facilities",
+            "pred": "technical",
+            "n": 3
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "account_admin",
+            "pred": "product_feedback",
+            "n": 2
+          },
+          {
+            "gold": "logistics",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "partnerships",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "billing",
+            "pred": "account_admin",
+            "n": 1
+          }
+        ],
+        "k": 12,
+        "chance": 0.0833,
+        "lift_over_chance": 6.2,
+        "mean_passes": 1.0,
+        "wall_seconds": 295.5
+      },
+      "16": {
+        "n": 160,
+        "accuracy": 0.5437,
+        "macro_f1": 0.5454,
+        "ece_top_prob": 0.4157,
+        "ece_confidence": 0.4226,
+        "brier": 0.8571,
+        "mean_top_prob": 0.9594,
+        "mean_confidence": 0.9664,
+        "latency_p50_ms": 793.5,
+        "reliability": [
+          {
+            "bucket": "0.5-0.6",
+            "n": 2,
+            "mean_confidence": 0.5953,
+            "accuracy": 0.0
+          },
+          {
+            "bucket": "0.6-0.7",
+            "n": 1,
+            "mean_confidence": 0.6777,
+            "accuracy": 0.0
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 10,
+            "mean_confidence": 0.7554,
+            "accuracy": 0.4
+          },
+          {
+            "bucket": "0.8-0.9",
+            "n": 5,
+            "mean_confidence": 0.8588,
+            "accuracy": 0.6
+          },
+          {
+            "bucket": "0.9-1.0",
+            "n": 142,
+            "mean_confidence": 0.9923,
+            "accuracy": 0.5634
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "training",
+            "pred": "product_feedback",
+            "n": 4
+          },
+          {
+            "gold": "sales",
+            "pred": "legal",
+            "n": 3
+          },
+          {
+            "gold": "security",
+            "pred": "account_admin",
+            "n": 3
+          },
+          {
+            "gold": "product_feedback",
+            "pred": "technical",
+            "n": 3
+          },
+          {
+            "gold": "logistics",
+            "pred": "technical",
+            "n": 3
+          },
+          {
+            "gold": "partnerships",
+            "pred": "product_feedback",
+            "n": 3
+          },
+          {
+            "gold": "partnerships",
+            "pred": "sales",
+            "n": 3
+          },
+          {
+            "gold": "procurement",
+            "pred": "sales",
+            "n": 3
+          },
+          {
+            "gold": "data_privacy",
+            "pred": "product_feedback",
+            "n": 3
+          },
+          {
+            "gold": "account_admin",
+            "pred": "hr",
+            "n": 2
+          },
+          {
+            "gold": "account_admin",
+            "pred": "product_feedback",
+            "n": 2
+          },
+          {
+            "gold": "logistics",
+            "pred": "billing",
+            "n": 2
+          }
+        ],
+        "k": 16,
+        "chance": 0.0625,
+        "lift_over_chance": 8.7,
+        "mean_passes": 1.0,
+        "wall_seconds": 407.9
+      }
+    },
+    "choice_bare": {
+      "2": {
+        "n": 20,
+        "accuracy": 0.85,
+        "macro_f1": 0.8496,
+        "ece_top_prob": 0.1724,
+        "ece_confidence": 0.3812,
+        "brier": 0.2845,
+        "mean_top_prob": 0.8411,
+        "mean_confidence": 0.4688,
+        "latency_p50_ms": 345.1,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 3,
+            "mean_confidence": 0.0112,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 2,
+            "mean_confidence": 0.1515,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 2,
+            "mean_confidence": 0.3563,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 4,
+            "mean_confidence": 0.4673,
+            "accuracy": 0.75
+          },
+          {
+            "bucket": "0.5-0.6",
+            "n": 1,
+            "mean_confidence": 0.5738,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.6-0.7",
+            "n": 2,
+            "mean_confidence": 0.6363,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 5,
+            "mean_confidence": 0.7429,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.8-0.9",
+            "n": 1,
+            "mean_confidence": 0.8973,
+            "accuracy": 1.0
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "billing",
+            "pred": "technical",
+            "n": 1
+          }
+        ],
+        "k": 2,
+        "chance": 0.5,
+        "lift_over_chance": 1.7,
+        "mean_passes": 1.0,
+        "wall_seconds": 7.6
+      },
+      "3": {
+        "n": 30,
+        "accuracy": 0.7,
+        "macro_f1": 0.698,
+        "ece_top_prob": 0.154,
+        "ece_confidence": 0.3739,
+        "brier": 0.4242,
+        "mean_top_prob": 0.7236,
+        "mean_confidence": 0.3993,
+        "latency_p50_ms": 358.8,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 5,
+            "mean_confidence": 0.0532,
+            "accuracy": 0.4
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 3,
+            "mean_confidence": 0.1356,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 6,
+            "mean_confidence": 0.2363,
+            "accuracy": 0.8333
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 5,
+            "mean_confidence": 0.3266,
+            "accuracy": 0.4
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 1,
+            "mean_confidence": 0.4882,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.5-0.6",
+            "n": 1,
+            "mean_confidence": 0.5971,
+            "accuracy": 0.0
+          },
+          {
+            "bucket": "0.6-0.7",
+            "n": 2,
+            "mean_confidence": 0.6624,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 2,
+            "mean_confidence": 0.7369,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.8-0.9",
+            "n": 3,
+            "mean_confidence": 0.8335,
+            "accuracy": 0.6667
+          },
+          {
+            "bucket": "0.9-1.0",
+            "n": 2,
+            "mean_confidence": 0.9349,
+            "accuracy": 1.0
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "sales",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "sales",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "billing",
+            "pred": "sales",
+            "n": 1
+          },
+          {
+            "gold": "billing",
+            "pred": "technical",
+            "n": 1
+          },
+          {
+            "gold": "technical",
+            "pred": "sales",
+            "n": 1
+          }
+        ],
+        "k": 3,
+        "chance": 0.3333,
+        "lift_over_chance": 2.1,
+        "mean_passes": 1.0,
+        "wall_seconds": 12.7
+      },
+      "4": {
+        "n": 40,
+        "accuracy": 0.675,
+        "macro_f1": 0.675,
+        "ece_top_prob": 0.1564,
+        "ece_confidence": 0.2911,
+        "brier": 0.4663,
+        "mean_top_prob": 0.7142,
+        "mean_confidence": 0.4273,
+        "latency_p50_ms": 342.4,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 2,
+            "mean_confidence": 0.0636,
+            "accuracy": 0.0
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 7,
+            "mean_confidence": 0.1336,
+            "accuracy": 0.5714
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 6,
+            "mean_confidence": 0.2352,
+            "accuracy": 0.6667
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 7,
+            "mean_confidence": 0.3485,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 1,
+            "mean_confidence": 0.4045,
+            "accuracy": 0.0
+          },
+          {
+            "bucket": "0.5-0.6",
+            "n": 5,
+            "mean_confidence": 0.551,
+            "accuracy": 0.6
+          },
+          {
+            "bucket": "0.6-0.7",
+            "n": 2,
+            "mean_confidence": 0.6676,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 8,
+            "mean_confidence": 0.7342,
+            "accuracy": 0.75
+          },
+          {
+            "bucket": "0.8-0.9",
+            "n": 1,
+            "mean_confidence": 0.8881,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.9-1.0",
+            "n": 1,
+            "mean_confidence": 0.9216,
+            "accuracy": 1.0
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "sales",
+            "pred": "billing",
+            "n": 3
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "billing",
+            "pred": "sales",
+            "n": 1
+          },
+          {
+            "gold": "billing",
+            "pred": "technical",
+            "n": 1
+          },
+          {
+            "gold": "technical",
+            "pred": "sales",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "legal",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "technical",
+            "n": 1
+          },
+          {
+            "gold": "legal",
+            "pred": "sales",
+            "n": 1
+          },
+          {
+            "gold": "legal",
+            "pred": "billing",
+            "n": 1
+          },
+          {
+            "gold": "legal",
+            "pred": "technical",
+            "n": 1
+          }
+        ],
+        "k": 4,
+        "chance": 0.25,
+        "lift_over_chance": 2.7,
+        "mean_passes": 1.0,
+        "wall_seconds": 15.8
+      },
+      "6": {
+        "n": 60,
+        "accuracy": 0.65,
+        "macro_f1": 0.6499,
+        "ece_top_prob": 0.251,
+        "ece_confidence": 0.2328,
+        "brier": 0.5734,
+        "mean_top_prob": 0.8107,
+        "mean_confidence": 0.6733,
+        "latency_p50_ms": 360.3,
+        "reliability": [
+          {
+            "bucket": "0.1-0.2",
+            "n": 1,
+            "mean_confidence": 0.129,
+            "accuracy": 0.0
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 5,
+            "mean_confidence": 0.2412,
+            "accuracy": 0.6
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 7,
+            "mean_confidence": 0.3484,
+            "accuracy": 0.4286
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 2,
+            "mean_confidence": 0.4133,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.5-0.6",
+            "n": 6,
+            "mean_confidence": 0.5448,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.6-0.7",
+            "n": 9,
+            "mean_confidence": 0.6538,
+            "accuracy": 0.8889
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 7,
+            "mean_confidence": 0.7652,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.8-0.9",
+            "n": 7,
+            "mean_confidence": 0.8545,
+            "accuracy": 0.5714
+          },
+          {
+            "bucket": "0.9-1.0",
+            "n": 16,
+            "mean_confidence": 0.9565,
+            "accuracy": 0.625
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "sales",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "hr",
+            "pred": "security",
+            "n": 2
+          },
+          {
+            "gold": "hr",
+            "pred": "legal",
+            "n": 2
+          },
+          {
+            "gold": "billing",
+            "pred": "sales",
+            "n": 1
+          },
+          {
+            "gold": "billing",
+            "pred": "security",
+            "n": 1
+          },
+          {
+            "gold": "technical",
+            "pred": "sales",
+            "n": 1
+          },
+          {
+            "gold": "technical",
+            "pred": "security",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "legal",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "technical",
+            "n": 1
+          },
+          {
+            "gold": "legal",
+            "pred": "sales",
+            "n": 1
+          },
+          {
+            "gold": "legal",
+            "pred": "billing",
+            "n": 1
+          }
+        ],
+        "k": 6,
+        "chance": 0.1667,
+        "lift_over_chance": 3.9,
+        "mean_passes": 1.0,
+        "wall_seconds": 24.4
+      },
+      "8": {
+        "n": 80,
+        "accuracy": 0.5375,
+        "macro_f1": 0.5394,
+        "ece_top_prob": 0.2136,
+        "ece_confidence": 0.2098,
+        "brier": 0.7236,
+        "mean_top_prob": 0.7415,
+        "mean_confidence": 0.612,
+        "latency_p50_ms": 390.0,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 1,
+            "mean_confidence": 0.0995,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 4,
+            "mean_confidence": 0.1459,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 12,
+            "mean_confidence": 0.2673,
+            "accuracy": 0.25
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 6,
+            "mean_confidence": 0.3658,
+            "accuracy": 0.6667
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 4,
+            "mean_confidence": 0.4761,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.5-0.6",
+            "n": 7,
+            "mean_confidence": 0.559,
+            "accuracy": 0.5714
+          },
+          {
+            "bucket": "0.6-0.7",
+            "n": 12,
+            "mean_confidence": 0.6576,
+            "accuracy": 0.75
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 12,
+            "mean_confidence": 0.7507,
+            "accuracy": 0.75
+          },
+          {
+            "bucket": "0.8-0.9",
+            "n": 8,
+            "mean_confidence": 0.8369,
+            "accuracy": 0.375
+          },
+          {
+            "bucket": "0.9-1.0",
+            "n": 14,
+            "mean_confidence": 0.9617,
+            "accuracy": 0.4286
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "account_admin",
+            "pred": "security",
+            "n": 4
+          },
+          {
+            "gold": "billing",
+            "pred": "security",
+            "n": 2
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "sales",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "sales",
+            "pred": "legal",
+            "n": 2
+          },
+          {
+            "gold": "security",
+            "pred": "account_admin",
+            "n": 2
+          },
+          {
+            "gold": "hr",
+            "pred": "security",
+            "n": 2
+          },
+          {
+            "gold": "product_feedback",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "account_admin",
+            "pred": "hr",
+            "n": 2
+          },
+          {
+            "gold": "billing",
+            "pred": "account_admin",
+            "n": 1
+          },
+          {
+            "gold": "technical",
+            "pred": "account_admin",
+            "n": 1
+          },
+          {
+            "gold": "technical",
+            "pred": "security",
+            "n": 1
+          }
+        ],
+        "k": 8,
+        "chance": 0.125,
+        "lift_over_chance": 4.3,
+        "mean_passes": 1.0,
+        "wall_seconds": 34.7
+      },
+      "12": {
+        "n": 120,
+        "accuracy": 0.5833,
+        "macro_f1": 0.5909,
+        "ece_top_prob": 0.3955,
+        "ece_confidence": 0.4014,
+        "brier": 0.8011,
+        "mean_top_prob": 0.9788,
+        "mean_confidence": 0.9773,
+        "latency_p50_ms": 403.6,
+        "reliability": [
+          {
+            "bucket": "0.5-0.6",
+            "n": 1,
+            "mean_confidence": 0.5526,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.6-0.7",
+            "n": 1,
+            "mean_confidence": 0.6739,
+            "accuracy": 0.0
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 4,
+            "mean_confidence": 0.7456,
+            "accuracy": 0.25
+          },
+          {
+            "bucket": "0.8-0.9",
+            "n": 3,
+            "mean_confidence": 0.8429,
+            "accuracy": 0.0
+          },
+          {
+            "bucket": "0.9-1.0",
+            "n": 111,
+            "mean_confidence": 0.9958,
+            "accuracy": 0.6126
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "account_admin",
+            "pred": "security",
+            "n": 4
+          },
+          {
+            "gold": "account_admin",
+            "pred": "hr",
+            "n": 3
+          },
+          {
+            "gold": "billing",
+            "pred": "security",
+            "n": 2
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "sales",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "sales",
+            "pred": "product_feedback",
+            "n": 2
+          },
+          {
+            "gold": "product_feedback",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "logistics",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "press",
+            "pred": "security",
+            "n": 2
+          },
+          {
+            "gold": "billing",
+            "pred": "sales",
+            "n": 1
+          },
+          {
+            "gold": "technical",
+            "pred": "account_admin",
+            "n": 1
+          },
+          {
+            "gold": "technical",
+            "pred": "security",
+            "n": 1
+          }
+        ],
+        "k": 12,
+        "chance": 0.0833,
+        "lift_over_chance": 7.0,
+        "mean_passes": 1.0,
+        "wall_seconds": 54.2
+      },
+      "16": {
+        "n": 160,
+        "accuracy": 0.55,
+        "macro_f1": 0.5576,
+        "ece_top_prob": 0.4315,
+        "ece_confidence": 0.4297,
+        "brier": 0.8787,
+        "mean_top_prob": 0.9704,
+        "mean_confidence": 0.9752,
+        "latency_p50_ms": 438.4,
+        "reliability": [
+          {
+            "bucket": "0.6-0.7",
+            "n": 4,
+            "mean_confidence": 0.6545,
+            "accuracy": 0.0
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 6,
+            "mean_confidence": 0.774,
+            "accuracy": 0.8333
+          },
+          {
+            "bucket": "0.8-0.9",
+            "n": 4,
+            "mean_confidence": 0.8465,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.9-1.0",
+            "n": 146,
+            "mean_confidence": 0.9958,
+            "accuracy": 0.5548
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "account_admin",
+            "pred": "hr",
+            "n": 3
+          },
+          {
+            "gold": "account_admin",
+            "pred": "security",
+            "n": 3
+          },
+          {
+            "gold": "compliance",
+            "pred": "security",
+            "n": 3
+          },
+          {
+            "gold": "training",
+            "pred": "product_feedback",
+            "n": 3
+          },
+          {
+            "gold": "data_privacy",
+            "pred": "security",
+            "n": 3
+          },
+          {
+            "gold": "technical",
+            "pred": "security",
+            "n": 2
+          },
+          {
+            "gold": "sales",
+            "pred": "procurement",
+            "n": 2
+          },
+          {
+            "gold": "sales",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "sales",
+            "pred": "product_feedback",
+            "n": 2
+          },
+          {
+            "gold": "hr",
+            "pred": "security",
+            "n": 2
+          },
+          {
+            "gold": "logistics",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "partnerships",
+            "pred": "procurement",
+            "n": 2
+          }
+        ],
+        "k": 16,
+        "chance": 0.0625,
+        "lift_over_chance": 8.8,
+        "mean_passes": 1.0,
+        "wall_seconds": 78.3
+      }
+    },
+    "noul_per_label": {
+      "2": {
+        "n": 20,
+        "accuracy": 0.9,
+        "macro_f1": 0.899,
+        "ece_top_prob": 0.0835,
+        "ece_confidence": 0.3875,
+        "brier": 0.1348,
+        "mean_top_prob": 0.8356,
+        "mean_confidence": 0.5125,
+        "latency_p50_ms": 725.8,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 5,
+            "mean_confidence": 0.0227,
+            "accuracy": 0.6
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 1,
+            "mean_confidence": 0.1958,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 2,
+            "mean_confidence": 0.3299,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 1,
+            "mean_confidence": 0.4016,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.5-0.6",
+            "n": 2,
+            "mean_confidence": 0.5447,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.6-0.7",
+            "n": 3,
+            "mean_confidence": 0.6584,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.9-1.0",
+            "n": 6,
+            "mean_confidence": 0.9692,
+            "accuracy": 1.0
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 2
+          }
+        ],
+        "k": 2,
+        "chance": 0.5,
+        "lift_over_chance": 1.8,
+        "mean_passes": 1.0,
+        "wall_seconds": 49.1
+      },
+      "3": {
+        "n": 30,
+        "accuracy": 0.8,
+        "macro_f1": 0.8013,
+        "ece_top_prob": 0.1627,
+        "ece_confidence": 0.3157,
+        "brier": 0.2503,
+        "mean_top_prob": 0.7589,
+        "mean_confidence": 0.4843,
+        "latency_p50_ms": 1065.2,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 3,
+            "mean_confidence": 0.0476,
+            "accuracy": 0.6667
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 2,
+            "mean_confidence": 0.138,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 3,
+            "mean_confidence": 0.2622,
+            "accuracy": 0.6667
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 5,
+            "mean_confidence": 0.3638,
+            "accuracy": 0.6
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 2,
+            "mean_confidence": 0.4387,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.5-0.6",
+            "n": 6,
+            "mean_confidence": 0.5711,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.6-0.7",
+            "n": 3,
+            "mean_confidence": 0.6481,
+            "accuracy": 0.6667
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 1,
+            "mean_confidence": 0.7017,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.8-0.9",
+            "n": 2,
+            "mean_confidence": 0.827,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.9-1.0",
+            "n": 3,
+            "mean_confidence": 0.9665,
+            "accuracy": 1.0
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "billing",
+            "pred": "sales",
+            "n": 2
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "sales",
+            "pred": "billing",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "technical",
+            "n": 1
+          }
+        ],
+        "k": 3,
+        "chance": 0.3333,
+        "lift_over_chance": 2.4,
+        "mean_passes": 1.0,
+        "wall_seconds": 107.3
+      },
+      "4": {
+        "n": 40,
+        "accuracy": 0.775,
+        "macro_f1": 0.7656,
+        "ece_top_prob": 0.1594,
+        "ece_confidence": 0.3522,
+        "brier": 0.3042,
+        "mean_top_prob": 0.6715,
+        "mean_confidence": 0.4228,
+        "latency_p50_ms": 1455.8,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 5,
+            "mean_confidence": 0.058,
+            "accuracy": 0.8
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 4,
+            "mean_confidence": 0.1483,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 4,
+            "mean_confidence": 0.2469,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 7,
+            "mean_confidence": 0.3421,
+            "accuracy": 0.5714
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 7,
+            "mean_confidence": 0.4741,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.5-0.6",
+            "n": 4,
+            "mean_confidence": 0.5461,
+            "accuracy": 0.75
+          },
+          {
+            "bucket": "0.6-0.7",
+            "n": 4,
+            "mean_confidence": 0.6573,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 1,
+            "mean_confidence": 0.7628,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.8-0.9",
+            "n": 1,
+            "mean_confidence": 0.8405,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.9-1.0",
+            "n": 3,
+            "mean_confidence": 0.9699,
+            "accuracy": 1.0
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "sales",
+            "pred": "legal",
+            "n": 3
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "billing",
+            "pred": "legal",
+            "n": 1
+          },
+          {
+            "gold": "billing",
+            "pred": "sales",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "billing",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "technical",
+            "n": 1
+          }
+        ],
+        "k": 4,
+        "chance": 0.25,
+        "lift_over_chance": 3.1,
+        "mean_passes": 1.0,
+        "wall_seconds": 198.5
+      },
+      "6": {
+        "n": 60,
+        "accuracy": 0.7,
+        "macro_f1": 0.687,
+        "ece_top_prob": 0.1796,
+        "ece_confidence": 0.3121,
+        "brier": 0.439,
+        "mean_top_prob": 0.5856,
+        "mean_confidence": 0.4029,
+        "latency_p50_ms": 2131.3,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 4,
+            "mean_confidence": 0.0631,
+            "accuracy": 0.75
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 7,
+            "mean_confidence": 0.1601,
+            "accuracy": 0.5714
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 9,
+            "mean_confidence": 0.2496,
+            "accuracy": 0.3333
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 10,
+            "mean_confidence": 0.3686,
+            "accuracy": 0.9
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 11,
+            "mean_confidence": 0.447,
+            "accuracy": 0.6364
+          },
+          {
+            "bucket": "0.5-0.6",
+            "n": 9,
+            "mean_confidence": 0.5315,
+            "accuracy": 0.8889
+          },
+          {
+            "bucket": "0.6-0.7",
+            "n": 4,
+            "mean_confidence": 0.6124,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 3,
+            "mean_confidence": 0.7253,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.8-0.9",
+            "n": 3,
+            "mean_confidence": 0.8475,
+            "accuracy": 1.0
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "security",
+            "pred": "technical",
+            "n": 6
+          },
+          {
+            "gold": "sales",
+            "pred": "legal",
+            "n": 3
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "billing",
+            "pred": "legal",
+            "n": 1
+          },
+          {
+            "gold": "billing",
+            "pred": "sales",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "billing",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "technical",
+            "n": 1
+          },
+          {
+            "gold": "legal",
+            "pred": "security",
+            "n": 1
+          },
+          {
+            "gold": "security",
+            "pred": "billing",
+            "n": 1
+          },
+          {
+            "gold": "hr",
+            "pred": "security",
+            "n": 1
+          }
+        ],
+        "k": 6,
+        "chance": 0.1667,
+        "lift_over_chance": 4.2,
+        "mean_passes": 1.0,
+        "wall_seconds": 447.3
+      },
+      "8": {
+        "n": 80,
+        "accuracy": 0.5875,
+        "macro_f1": 0.5662,
+        "ece_top_prob": 0.0966,
+        "ece_confidence": 0.2502,
+        "brier": 0.5715,
+        "mean_top_prob": 0.4909,
+        "mean_confidence": 0.3555,
+        "latency_p50_ms": 2975.1,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 8,
+            "mean_confidence": 0.0624,
+            "accuracy": 0.25
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 12,
+            "mean_confidence": 0.1506,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 12,
+            "mean_confidence": 0.2377,
+            "accuracy": 0.4167
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 14,
+            "mean_confidence": 0.3443,
+            "accuracy": 0.6429
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 16,
+            "mean_confidence": 0.4408,
+            "accuracy": 0.8125
+          },
+          {
+            "bucket": "0.5-0.6",
+            "n": 8,
+            "mean_confidence": 0.5286,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.6-0.7",
+            "n": 6,
+            "mean_confidence": 0.6495,
+            "accuracy": 0.8333
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 2,
+            "mean_confidence": 0.7482,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.8-0.9",
+            "n": 1,
+            "mean_confidence": 0.8822,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.9-1.0",
+            "n": 1,
+            "mean_confidence": 0.9014,
+            "accuracy": 1.0
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "security",
+            "pred": "technical",
+            "n": 4
+          },
+          {
+            "gold": "product_feedback",
+            "pred": "technical",
+            "n": 4
+          },
+          {
+            "gold": "sales",
+            "pred": "legal",
+            "n": 3
+          },
+          {
+            "gold": "account_admin",
+            "pred": "product_feedback",
+            "n": 3
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "security",
+            "pred": "account_admin",
+            "n": 2
+          },
+          {
+            "gold": "account_admin",
+            "pred": "hr",
+            "n": 2
+          },
+          {
+            "gold": "account_admin",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "billing",
+            "pred": "legal",
+            "n": 1
+          },
+          {
+            "gold": "billing",
+            "pred": "sales",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "billing",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "technical",
+            "n": 1
+          }
+        ],
+        "k": 8,
+        "chance": 0.125,
+        "lift_over_chance": 4.7,
+        "mean_passes": 1.0,
+        "wall_seconds": 770.9
+      },
+      "12": {
+        "n": 120,
+        "accuracy": 0.5667,
+        "macro_f1": 0.561,
+        "ece_top_prob": 0.1774,
+        "ece_confidence": 0.2449,
+        "brier": 0.6017,
+        "mean_top_prob": 0.408,
+        "mean_confidence": 0.3251,
+        "latency_p50_ms": 3940.8,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 9,
+            "mean_confidence": 0.069,
+            "accuracy": 0.1111
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 22,
+            "mean_confidence": 0.1539,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 23,
+            "mean_confidence": 0.2528,
+            "accuracy": 0.4783
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 27,
+            "mean_confidence": 0.3451,
+            "accuracy": 0.7037
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 22,
+            "mean_confidence": 0.4369,
+            "accuracy": 0.6818
+          },
+          {
+            "bucket": "0.5-0.6",
+            "n": 9,
+            "mean_confidence": 0.5435,
+            "accuracy": 0.5556
+          },
+          {
+            "bucket": "0.6-0.7",
+            "n": 5,
+            "mean_confidence": 0.6409,
+            "accuracy": 0.6
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 3,
+            "mean_confidence": 0.7228,
+            "accuracy": 1.0
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "security",
+            "pred": "technical",
+            "n": 4
+          },
+          {
+            "gold": "sales",
+            "pred": "legal",
+            "n": 3
+          },
+          {
+            "gold": "product_feedback",
+            "pred": "technical",
+            "n": 3
+          },
+          {
+            "gold": "account_admin",
+            "pred": "product_feedback",
+            "n": 3
+          },
+          {
+            "gold": "technical",
+            "pred": "partnerships",
+            "n": 2
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "sales",
+            "pred": "partnerships",
+            "n": 2
+          },
+          {
+            "gold": "security",
+            "pred": "account_admin",
+            "n": 2
+          },
+          {
+            "gold": "product_feedback",
+            "pred": "partnerships",
+            "n": 2
+          },
+          {
+            "gold": "account_admin",
+            "pred": "hr",
+            "n": 2
+          },
+          {
+            "gold": "account_admin",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "logistics",
+            "pred": "billing",
+            "n": 2
+          }
+        ],
+        "k": 12,
+        "chance": 0.0833,
+        "lift_over_chance": 6.8,
+        "mean_passes": 1.0,
+        "wall_seconds": 1650.5
+      },
+      "16": {
+        "n": 160,
+        "accuracy": 0.5125,
+        "macro_f1": 0.5098,
+        "ece_top_prob": 0.1499,
+        "ece_confidence": 0.2012,
+        "brier": 0.6598,
+        "mean_top_prob": 0.3626,
+        "mean_confidence": 0.3134,
+        "latency_p50_ms": 5643.1,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 12,
+            "mean_confidence": 0.0651,
+            "accuracy": 0.1667
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 40,
+            "mean_confidence": 0.1473,
+            "accuracy": 0.425
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 26,
+            "mean_confidence": 0.2507,
+            "accuracy": 0.5769
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 35,
+            "mean_confidence": 0.3413,
+            "accuracy": 0.5143
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 23,
+            "mean_confidence": 0.4462,
+            "accuracy": 0.5217
+          },
+          {
+            "bucket": "0.5-0.6",
+            "n": 13,
+            "mean_confidence": 0.5485,
+            "accuracy": 0.7692
+          },
+          {
+            "bucket": "0.6-0.7",
+            "n": 5,
+            "mean_confidence": 0.6349,
+            "accuracy": 0.6
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 6,
+            "mean_confidence": 0.7408,
+            "accuracy": 0.8333
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "sales",
+            "pred": "legal",
+            "n": 3
+          },
+          {
+            "gold": "security",
+            "pred": "technical",
+            "n": 3
+          },
+          {
+            "gold": "product_feedback",
+            "pred": "technical",
+            "n": 3
+          },
+          {
+            "gold": "compliance",
+            "pred": "legal",
+            "n": 3
+          },
+          {
+            "gold": "procurement",
+            "pred": "sales",
+            "n": 3
+          },
+          {
+            "gold": "technical",
+            "pred": "partnerships",
+            "n": 2
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "sales",
+            "pred": "partnerships",
+            "n": 2
+          },
+          {
+            "gold": "security",
+            "pred": "account_admin",
+            "n": 2
+          },
+          {
+            "gold": "hr",
+            "pred": "training",
+            "n": 2
+          },
+          {
+            "gold": "product_feedback",
+            "pred": "partnerships",
+            "n": 2
+          },
+          {
+            "gold": "account_admin",
+            "pred": "product_feedback",
+            "n": 2
+          }
+        ],
+        "k": 16,
+        "chance": 0.0625,
+        "lift_over_chance": 8.2,
+        "mean_passes": 1.0,
+        "wall_seconds": 3053.7
+      }
+    },
+    "noul_described": {
+      "2": {
+        "n": 20,
+        "accuracy": 0.8,
+        "macro_f1": 0.798,
+        "ece_top_prob": 0.1505,
+        "ece_confidence": 0.5675,
+        "brier": 0.2248,
+        "mean_top_prob": 0.7175,
+        "mean_confidence": 0.2325,
+        "latency_p50_ms": 876.4,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 8,
+            "mean_confidence": 0.0141,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 2,
+            "mean_confidence": 0.1362,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 2,
+            "mean_confidence": 0.2308,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 2,
+            "mean_confidence": 0.334,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 4,
+            "mean_confidence": 0.4577,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.5-0.6",
+            "n": 1,
+            "mean_confidence": 0.5563,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.7-0.8",
+            "n": 1,
+            "mean_confidence": 0.7482,
+            "accuracy": 1.0
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 3
+          },
+          {
+            "gold": "billing",
+            "pred": "technical",
+            "n": 1
+          }
+        ],
+        "k": 2,
+        "chance": 0.5,
+        "lift_over_chance": 1.6,
+        "mean_passes": 1.0,
+        "wall_seconds": 19.1
+      },
+      "3": {
+        "n": 30,
+        "accuracy": 0.8,
+        "macro_f1": 0.8028,
+        "ece_top_prob": 0.2144,
+        "ece_confidence": 0.6057,
+        "brier": 0.3455,
+        "mean_top_prob": 0.5856,
+        "mean_confidence": 0.1943,
+        "latency_p50_ms": 1260.2,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 8,
+            "mean_confidence": 0.0391,
+            "accuracy": 0.75
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 10,
+            "mean_confidence": 0.1601,
+            "accuracy": 0.8
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 7,
+            "mean_confidence": 0.2422,
+            "accuracy": 0.7143
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 1,
+            "mean_confidence": 0.3706,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 3,
+            "mean_confidence": 0.4385,
+            "accuracy": 1.0
+          },
+          {
+            "bucket": "0.5-0.6",
+            "n": 1,
+            "mean_confidence": 0.534,
+            "accuracy": 1.0
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 3
+          },
+          {
+            "gold": "billing",
+            "pred": "technical",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "technical",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "billing",
+            "n": 1
+          }
+        ],
+        "k": 3,
+        "chance": 0.3333,
+        "lift_over_chance": 2.4,
+        "mean_passes": 1.0,
+        "wall_seconds": 42.5
+      },
+      "4": {
+        "n": 40,
+        "accuracy": 0.725,
+        "macro_f1": 0.7092,
+        "ece_top_prob": 0.2496,
+        "ece_confidence": 0.5531,
+        "brier": 0.4396,
+        "mean_top_prob": 0.49,
+        "mean_confidence": 0.1719,
+        "latency_p50_ms": 1822.6,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 11,
+            "mean_confidence": 0.0415,
+            "accuracy": 0.6364
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 17,
+            "mean_confidence": 0.1523,
+            "accuracy": 0.7059
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 6,
+            "mean_confidence": 0.244,
+            "accuracy": 0.8333
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 4,
+            "mean_confidence": 0.3529,
+            "accuracy": 0.75
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 2,
+            "mean_confidence": 0.4773,
+            "accuracy": 1.0
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "sales",
+            "pred": "legal",
+            "n": 4
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 3
+          },
+          {
+            "gold": "billing",
+            "pred": "technical",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "technical",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "billing",
+            "n": 1
+          },
+          {
+            "gold": "legal",
+            "pred": "technical",
+            "n": 1
+          }
+        ],
+        "k": 4,
+        "chance": 0.25,
+        "lift_over_chance": 2.9,
+        "mean_passes": 1.0,
+        "wall_seconds": 80.2
+      },
+      "6": {
+        "n": 60,
+        "accuracy": 0.55,
+        "macro_f1": 0.5361,
+        "ece_top_prob": 0.2067,
+        "ece_confidence": 0.4234,
+        "brier": 0.5908,
+        "mean_top_prob": 0.3661,
+        "mean_confidence": 0.1266,
+        "latency_p50_ms": 2687.9,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 25,
+            "mean_confidence": 0.0436,
+            "accuracy": 0.32
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 24,
+            "mean_confidence": 0.1487,
+            "accuracy": 0.6667
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 8,
+            "mean_confidence": 0.2278,
+            "accuracy": 0.875
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 2,
+            "mean_confidence": 0.3407,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.4-0.5",
+            "n": 1,
+            "mean_confidence": 0.4312,
+            "accuracy": 1.0
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "security",
+            "pred": "technical",
+            "n": 7
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 3
+          },
+          {
+            "gold": "sales",
+            "pred": "legal",
+            "n": 3
+          },
+          {
+            "gold": "legal",
+            "pred": "hr",
+            "n": 2
+          },
+          {
+            "gold": "hr",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "hr",
+            "pred": "legal",
+            "n": 2
+          },
+          {
+            "gold": "billing",
+            "pred": "technical",
+            "n": 1
+          },
+          {
+            "gold": "technical",
+            "pred": "security",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "security",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "technical",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "billing",
+            "n": 1
+          },
+          {
+            "gold": "legal",
+            "pred": "security",
+            "n": 1
+          }
+        ],
+        "k": 6,
+        "chance": 0.1667,
+        "lift_over_chance": 3.3,
+        "mean_passes": 1.0,
+        "wall_seconds": 178.4
+      },
+      "8": {
+        "n": 80,
+        "accuracy": 0.4375,
+        "macro_f1": 0.4253,
+        "ece_top_prob": 0.1557,
+        "ece_confidence": 0.3323,
+        "brier": 0.7173,
+        "mean_top_prob": 0.2946,
+        "mean_confidence": 0.1052,
+        "latency_p50_ms": 3480.1,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 47,
+            "mean_confidence": 0.0527,
+            "accuracy": 0.2553
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 24,
+            "mean_confidence": 0.1449,
+            "accuracy": 0.7083
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 6,
+            "mean_confidence": 0.237,
+            "accuracy": 0.5
+          },
+          {
+            "bucket": "0.3-0.4",
+            "n": 3,
+            "mean_confidence": 0.3462,
+            "accuracy": 1.0
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "product_feedback",
+            "pred": "technical",
+            "n": 4
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 3
+          },
+          {
+            "gold": "sales",
+            "pred": "legal",
+            "n": 3
+          },
+          {
+            "gold": "security",
+            "pred": "technical",
+            "n": 3
+          },
+          {
+            "gold": "security",
+            "pred": "account_admin",
+            "n": 3
+          },
+          {
+            "gold": "hr",
+            "pred": "product_feedback",
+            "n": 3
+          },
+          {
+            "gold": "billing",
+            "pred": "product_feedback",
+            "n": 2
+          },
+          {
+            "gold": "account_admin",
+            "pred": "product_feedback",
+            "n": 2
+          },
+          {
+            "gold": "account_admin",
+            "pred": "hr",
+            "n": 2
+          },
+          {
+            "gold": "account_admin",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "account_admin",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "billing",
+            "pred": "technical",
+            "n": 1
+          }
+        ],
+        "k": 8,
+        "chance": 0.125,
+        "lift_over_chance": 3.5,
+        "mean_passes": 1.0,
+        "wall_seconds": 314.3
+      },
+      "12": {
+        "n": 120,
+        "accuracy": 0.3833,
+        "macro_f1": 0.3601,
+        "ece_top_prob": 0.1447,
+        "ece_confidence": 0.2856,
+        "brier": 0.7863,
+        "mean_top_prob": 0.2387,
+        "mean_confidence": 0.0977,
+        "latency_p50_ms": 5429.0,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 67,
+            "mean_confidence": 0.0544,
+            "accuracy": 0.2985
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 43,
+            "mean_confidence": 0.1334,
+            "accuracy": 0.4186
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 10,
+            "mean_confidence": 0.2345,
+            "accuracy": 0.8
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "logistics",
+            "pred": "billing",
+            "n": 6
+          },
+          {
+            "gold": "product_feedback",
+            "pred": "technical",
+            "n": 4
+          },
+          {
+            "gold": "partnerships",
+            "pred": "product_feedback",
+            "n": 4
+          },
+          {
+            "gold": "sales",
+            "pred": "legal",
+            "n": 3
+          },
+          {
+            "gold": "hr",
+            "pred": "facilities",
+            "n": 3
+          },
+          {
+            "gold": "account_admin",
+            "pred": "facilities",
+            "n": 3
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "security",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "security",
+            "pred": "account_admin",
+            "n": 2
+          },
+          {
+            "gold": "hr",
+            "pred": "product_feedback",
+            "n": 2
+          },
+          {
+            "gold": "account_admin",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "account_admin",
+            "pred": "billing",
+            "n": 2
+          }
+        ],
+        "k": 12,
+        "chance": 0.0833,
+        "lift_over_chance": 4.6,
+        "mean_passes": 1.0,
+        "wall_seconds": 722.1
+      },
+      "16": {
+        "n": 160,
+        "accuracy": 0.35,
+        "macro_f1": 0.3185,
+        "ece_top_prob": 0.1601,
+        "ece_confidence": 0.262,
+        "brier": 0.8335,
+        "mean_top_prob": 0.1922,
+        "mean_confidence": 0.088,
+        "latency_p50_ms": 7287.4,
+        "reliability": [
+          {
+            "bucket": "0.0-0.1",
+            "n": 106,
+            "mean_confidence": 0.0591,
+            "accuracy": 0.2264
+          },
+          {
+            "bucket": "0.1-0.2",
+            "n": 49,
+            "mean_confidence": 0.1365,
+            "accuracy": 0.551
+          },
+          {
+            "bucket": "0.2-0.3",
+            "n": 5,
+            "mean_confidence": 0.2238,
+            "accuracy": 1.0
+          }
+        ],
+        "confusion": [
+          {
+            "gold": "logistics",
+            "pred": "billing",
+            "n": 6
+          },
+          {
+            "gold": "security",
+            "pred": "data_privacy",
+            "n": 4
+          },
+          {
+            "gold": "sales",
+            "pred": "legal",
+            "n": 3
+          },
+          {
+            "gold": "hr",
+            "pred": "facilities",
+            "n": 3
+          },
+          {
+            "gold": "procurement",
+            "pred": "legal",
+            "n": 3
+          },
+          {
+            "gold": "procurement",
+            "pred": "billing",
+            "n": 3
+          },
+          {
+            "gold": "training",
+            "pred": "product_feedback",
+            "n": 3
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 2
+          },
+          {
+            "gold": "sales",
+            "pred": "training",
+            "n": 2
+          },
+          {
+            "gold": "product_feedback",
+            "pred": "training",
+            "n": 2
+          },
+          {
+            "gold": "product_feedback",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "account_admin",
+            "pred": "facilities",
+            "n": 2
+          }
+        ],
+        "k": 16,
+        "chance": 0.0625,
+        "lift_over_chance": 5.6,
+        "mean_passes": 1.0,
+        "wall_seconds": 1284.6
+      }
+    },
+    "two_stage": {
+      "2": {
+        "n": 20,
+        "accuracy": 0.75,
+        "macro_f1": 0.7442,
+        "mean_top_prob": 1.0,
+        "mean_confidence": null,
+        "latency_p50_ms": 408.3,
+        "confusion": [
+          {
+            "gold": "billing",
+            "pred": "technical",
+            "n": 4
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 1
+          }
+        ],
+        "k": 2,
+        "chance": 0.5,
+        "lift_over_chance": 1.5,
+        "mean_passes": 1.0,
+        "wall_seconds": 8.9
+      },
+      "3": {
+        "n": 30,
+        "accuracy": 0.6667,
+        "macro_f1": 0.6667,
+        "mean_top_prob": 1.0,
+        "mean_confidence": null,
+        "latency_p50_ms": 670.7,
+        "confusion": [
+          {
+            "gold": "billing",
+            "pred": "technical",
+            "n": 4
+          },
+          {
+            "gold": "sales",
+            "pred": "technical",
+            "n": 4
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "billing",
+            "n": 1
+          }
+        ],
+        "k": 3,
+        "chance": 0.3333,
+        "lift_over_chance": 2.0,
+        "mean_passes": 1.43,
+        "wall_seconds": 19.6
+      },
+      "4": {
+        "n": 40,
+        "accuracy": 0.6,
+        "macro_f1": 0.5368,
+        "mean_top_prob": 1.0,
+        "mean_confidence": null,
+        "latency_p50_ms": 680.9,
+        "confusion": [
+          {
+            "gold": "sales",
+            "pred": "technical",
+            "n": 4
+          },
+          {
+            "gold": "legal",
+            "pred": "billing",
+            "n": 4
+          },
+          {
+            "gold": "legal",
+            "pred": "sales",
+            "n": 3
+          },
+          {
+            "gold": "billing",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "legal",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "sales",
+            "pred": "billing",
+            "n": 1
+          }
+        ],
+        "k": 4,
+        "chance": 0.25,
+        "lift_over_chance": 2.4,
+        "mean_passes": 1.52,
+        "wall_seconds": 28.8
+      },
+      "6": {
+        "n": 60,
+        "accuracy": 0.4333,
+        "macro_f1": 0.3865,
+        "mean_top_prob": 1.0,
+        "mean_confidence": null,
+        "latency_p50_ms": 702.9,
+        "confusion": [
+          {
+            "gold": "security",
+            "pred": "technical",
+            "n": 8
+          },
+          {
+            "gold": "sales",
+            "pred": "technical",
+            "n": 4
+          },
+          {
+            "gold": "legal",
+            "pred": "billing",
+            "n": 4
+          },
+          {
+            "gold": "billing",
+            "pred": "technical",
+            "n": 3
+          },
+          {
+            "gold": "legal",
+            "pred": "sales",
+            "n": 3
+          },
+          {
+            "gold": "sales",
+            "pred": "hr",
+            "n": 2
+          },
+          {
+            "gold": "legal",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "hr",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "hr",
+            "pred": "sales",
+            "n": 2
+          },
+          {
+            "gold": "technical",
+            "pred": "billing",
+            "n": 1
+          },
+          {
+            "gold": "sales",
+            "pred": "billing",
+            "n": 1
+          },
+          {
+            "gold": "security",
+            "pred": "billing",
+            "n": 1
+          }
+        ],
+        "k": 6,
+        "chance": 0.1667,
+        "lift_over_chance": 2.6,
+        "mean_passes": 1.42,
+        "wall_seconds": 44.1
+      },
+      "8": {
+        "n": 80,
+        "accuracy": 0.4375,
+        "macro_f1": 0.39,
+        "mean_top_prob": 1.0,
+        "mean_confidence": null,
+        "latency_p50_ms": 938.6,
+        "confusion": [
+          {
+            "gold": "security",
+            "pred": "technical",
+            "n": 5
+          },
+          {
+            "gold": "legal",
+            "pred": "billing",
+            "n": 4
+          },
+          {
+            "gold": "account_admin",
+            "pred": "hr",
+            "n": 4
+          },
+          {
+            "gold": "billing",
+            "pred": "technical",
+            "n": 3
+          },
+          {
+            "gold": "legal",
+            "pred": "sales",
+            "n": 3
+          },
+          {
+            "gold": "security",
+            "pred": "account_admin",
+            "n": 3
+          },
+          {
+            "gold": "sales",
+            "pred": "hr",
+            "n": 2
+          },
+          {
+            "gold": "sales",
+            "pred": "product_feedback",
+            "n": 2
+          },
+          {
+            "gold": "sales",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "hr",
+            "pred": "sales",
+            "n": 2
+          },
+          {
+            "gold": "product_feedback",
+            "pred": "technical",
+            "n": 2
+          },
+          {
+            "gold": "account_admin",
+            "pred": "billing",
+            "n": 2
+          }
+        ],
+        "k": 8,
+        "chance": 0.125,
+        "lift_over_chance": 3.5,
+        "mean_passes": 1.86,
+        "wall_seconds": 79.2
+      },
+      "12": {
+        "n": 120,
+        "accuracy": 0.35,
+        "macro_f1": 0.2971,
+        "mean_top_prob": 1.0,
+        "mean_confidence": null,
+        "latency_p50_ms": 970.2,
+        "confusion": [
+          {
+            "gold": "logistics",
+            "pred": "billing",
+            "n": 6
+          },
+          {
+            "gold": "legal",
+            "pred": "billing",
+            "n": 5
+          },
+          {
+            "gold": "security",
+            "pred": "technical",
+            "n": 5
+          },
+          {
+            "gold": "partnerships",
+            "pred": "product_feedback",
+            "n": 4
+          },
+          {
+            "gold": "billing",
+            "pred": "technical",
+            "n": 3
+          },
+          {
+            "gold": "security",
+            "pred": "account_admin",
+            "n": 3
+          },
+          {
+            "gold": "account_admin",
+            "pred": "hr",
+            "n": 3
+          },
+          {
+            "gold": "logistics",
+            "pred": "technical",
+            "n": 3
+          },
+          {
+            "gold": "partnerships",
+            "pred": "technical",
+            "n": 3
+          },
+          {
+            "gold": "press",
+            "pred": "technical",
+            "n": 3
+          },
+          {
+            "gold": "press",
+            "pred": "billing",
+            "n": 3
+          },
+          {
+            "gold": "sales",
+            "pred": "hr",
+            "n": 2
+          }
+        ],
+        "k": 12,
+        "chance": 0.0833,
+        "lift_over_chance": 4.2,
+        "mean_passes": 2.0,
+        "wall_seconds": 127.2
+      },
+      "16": {
+        "n": 160,
+        "accuracy": 0.3063,
+        "macro_f1": 0.2692,
+        "mean_top_prob": 1.0,
+        "mean_confidence": null,
+        "latency_p50_ms": 1002.4,
+        "confusion": [
+          {
+            "gold": "logistics",
+            "pred": "billing",
+            "n": 6
+          },
+          {
+            "gold": "legal",
+            "pred": "billing",
+            "n": 5
+          },
+          {
+            "gold": "security",
+            "pred": "technical",
+            "n": 5
+          },
+          {
+            "gold": "partnerships",
+            "pred": "product_feedback",
+            "n": 4
+          },
+          {
+            "gold": "compliance",
+            "pred": "technical",
+            "n": 4
+          },
+          {
+            "gold": "training",
+            "pred": "product_feedback",
+            "n": 4
+          },
+          {
+            "gold": "billing",
+            "pred": "technical",
+            "n": 3
+          },
+          {
+            "gold": "sales",
+            "pred": "product_feedback",
+            "n": 3
+          },
+          {
+            "gold": "security",
+            "pred": "account_admin",
+            "n": 3
+          },
+          {
+            "gold": "product_feedback",
+            "pred": "technical",
+            "n": 3
+          },
+          {
+            "gold": "account_admin",
+            "pred": "hr",
+            "n": 3
+          },
+          {
+            "gold": "logistics",
+            "pred": "technical",
+            "n": 3
+          }
+        ],
+        "k": 16,
+        "chance": 0.0625,
+        "lift_over_chance": 4.9,
+        "mean_passes": 2.0,
+        "wall_seconds": 176.6
+      }
+    }
+  },
+  "by_tier": {
+    "choice": {
+      "2": {
+        "explicit": {
+          "n": 6,
+          "accuracy": 1.0
+        },
+        "realistic": {
+          "n": 5,
+          "accuracy": 1.0
+        },
+        "implicit": {
+          "n": 4,
+          "accuracy": 0.75
+        },
+        "adversarial": {
+          "n": 5,
+          "accuracy": 0.6
+        }
+      },
+      "3": {
+        "explicit": {
+          "n": 8,
+          "accuracy": 0.875
+        },
+        "realistic": {
+          "n": 7,
+          "accuracy": 1.0
+        },
+        "implicit": {
+          "n": 7,
+          "accuracy": 0.7143
+        },
+        "adversarial": {
+          "n": 8,
+          "accuracy": 0.5
+        }
+      },
+      "4": {
+        "explicit": {
+          "n": 10,
+          "accuracy": 1.0
+        },
+        "realistic": {
+          "n": 10,
+          "accuracy": 0.9
+        },
+        "implicit": {
+          "n": 10,
+          "accuracy": 0.6
+        },
+        "adversarial": {
+          "n": 10,
+          "accuracy": 0.2
+        }
+      },
+      "6": {
+        "explicit": {
+          "n": 16,
+          "accuracy": 0.875
+        },
+        "realistic": {
+          "n": 15,
+          "accuracy": 0.8667
+        },
+        "implicit": {
+          "n": 14,
+          "accuracy": 0.5714
+        },
+        "adversarial": {
+          "n": 15,
+          "accuracy": 0.4
+        }
+      },
+      "8": {
+        "explicit": {
+          "n": 20,
+          "accuracy": 0.75
+        },
+        "realistic": {
+          "n": 20,
+          "accuracy": 0.8
+        },
+        "implicit": {
+          "n": 20,
+          "accuracy": 0.5
+        },
+        "adversarial": {
+          "n": 20,
+          "accuracy": 0.35
+        }
+      },
+      "12": {
+        "explicit": {
+          "n": 30,
+          "accuracy": 0.6667
+        },
+        "realistic": {
+          "n": 30,
+          "accuracy": 0.6333
+        },
+        "implicit": {
+          "n": 30,
+          "accuracy": 0.4667
+        },
+        "adversarial": {
+          "n": 30,
+          "accuracy": 0.3
+        }
+      },
+      "16": {
+        "explicit": {
+          "n": 40,
+          "accuracy": 0.75
+        },
+        "realistic": {
+          "n": 40,
+          "accuracy": 0.65
+        },
+        "implicit": {
+          "n": 40,
+          "accuracy": 0.475
+        },
+        "adversarial": {
+          "n": 40,
+          "accuracy": 0.3
+        }
+      }
+    },
+    "choice_bare": {
+      "2": {
+        "explicit": {
+          "n": 6,
+          "accuracy": 1.0
+        },
+        "realistic": {
+          "n": 5,
+          "accuracy": 1.0
+        },
+        "implicit": {
+          "n": 4,
+          "accuracy": 0.75
+        },
+        "adversarial": {
+          "n": 5,
+          "accuracy": 0.6
+        }
+      },
+      "3": {
+        "explicit": {
+          "n": 8,
+          "accuracy": 0.75
+        },
+        "realistic": {
+          "n": 7,
+          "accuracy": 1.0
+        },
+        "implicit": {
+          "n": 7,
+          "accuracy": 0.5714
+        },
+        "adversarial": {
+          "n": 8,
+          "accuracy": 0.5
+        }
+      },
+      "4": {
+        "explicit": {
+          "n": 10,
+          "accuracy": 0.8
+        },
+        "realistic": {
+          "n": 10,
+          "accuracy": 0.9
+        },
+        "implicit": {
+          "n": 10,
+          "accuracy": 0.6
+        },
+        "adversarial": {
+          "n": 10,
+          "accuracy": 0.4
+        }
+      },
+      "6": {
+        "explicit": {
+          "n": 16,
+          "accuracy": 0.75
+        },
+        "realistic": {
+          "n": 15,
+          "accuracy": 0.8
+        },
+        "implicit": {
+          "n": 14,
+          "accuracy": 0.6429
+        },
+        "adversarial": {
+          "n": 15,
+          "accuracy": 0.4
+        }
+      },
+      "8": {
+        "explicit": {
+          "n": 20,
+          "accuracy": 0.75
+        },
+        "realistic": {
+          "n": 20,
+          "accuracy": 0.7
+        },
+        "implicit": {
+          "n": 20,
+          "accuracy": 0.4
+        },
+        "adversarial": {
+          "n": 20,
+          "accuracy": 0.3
+        }
+      },
+      "12": {
+        "explicit": {
+          "n": 30,
+          "accuracy": 0.7667
+        },
+        "realistic": {
+          "n": 30,
+          "accuracy": 0.7
+        },
+        "implicit": {
+          "n": 30,
+          "accuracy": 0.4333
+        },
+        "adversarial": {
+          "n": 30,
+          "accuracy": 0.4333
+        }
+      },
+      "16": {
+        "explicit": {
+          "n": 40,
+          "accuracy": 0.7
+        },
+        "realistic": {
+          "n": 40,
+          "accuracy": 0.65
+        },
+        "implicit": {
+          "n": 40,
+          "accuracy": 0.525
+        },
+        "adversarial": {
+          "n": 40,
+          "accuracy": 0.325
+        }
+      }
+    },
+    "noul_per_label": {
+      "2": {
+        "explicit": {
+          "n": 6,
+          "accuracy": 1.0
+        },
+        "realistic": {
+          "n": 5,
+          "accuracy": 1.0
+        },
+        "implicit": {
+          "n": 4,
+          "accuracy": 0.75
+        },
+        "adversarial": {
+          "n": 5,
+          "accuracy": 0.8
+        }
+      },
+      "3": {
+        "explicit": {
+          "n": 8,
+          "accuracy": 0.875
+        },
+        "realistic": {
+          "n": 7,
+          "accuracy": 0.8571
+        },
+        "implicit": {
+          "n": 7,
+          "accuracy": 0.8571
+        },
+        "adversarial": {
+          "n": 8,
+          "accuracy": 0.625
+        }
+      },
+      "4": {
+        "explicit": {
+          "n": 10,
+          "accuracy": 0.9
+        },
+        "realistic": {
+          "n": 10,
+          "accuracy": 0.7
+        },
+        "implicit": {
+          "n": 10,
+          "accuracy": 0.8
+        },
+        "adversarial": {
+          "n": 10,
+          "accuracy": 0.7
+        }
+      },
+      "6": {
+        "explicit": {
+          "n": 16,
+          "accuracy": 0.875
+        },
+        "realistic": {
+          "n": 15,
+          "accuracy": 0.6667
+        },
+        "implicit": {
+          "n": 14,
+          "accuracy": 0.7143
+        },
+        "adversarial": {
+          "n": 15,
+          "accuracy": 0.5333
+        }
+      },
+      "8": {
+        "explicit": {
+          "n": 20,
+          "accuracy": 0.85
+        },
+        "realistic": {
+          "n": 20,
+          "accuracy": 0.6
+        },
+        "implicit": {
+          "n": 20,
+          "accuracy": 0.55
+        },
+        "adversarial": {
+          "n": 20,
+          "accuracy": 0.35
+        }
+      },
+      "12": {
+        "explicit": {
+          "n": 30,
+          "accuracy": 0.7333
+        },
+        "realistic": {
+          "n": 30,
+          "accuracy": 0.6333
+        },
+        "implicit": {
+          "n": 30,
+          "accuracy": 0.5
+        },
+        "adversarial": {
+          "n": 30,
+          "accuracy": 0.4
+        }
+      },
+      "16": {
+        "explicit": {
+          "n": 40,
+          "accuracy": 0.75
+        },
+        "realistic": {
+          "n": 40,
+          "accuracy": 0.55
+        },
+        "implicit": {
+          "n": 40,
+          "accuracy": 0.5
+        },
+        "adversarial": {
+          "n": 40,
+          "accuracy": 0.25
+        }
+      }
+    },
+    "noul_described": {
+      "2": {
+        "explicit": {
+          "n": 6,
+          "accuracy": 1.0
+        },
+        "realistic": {
+          "n": 5,
+          "accuracy": 1.0
+        },
+        "implicit": {
+          "n": 4,
+          "accuracy": 0.5
+        },
+        "adversarial": {
+          "n": 5,
+          "accuracy": 0.6
+        }
+      },
+      "3": {
+        "explicit": {
+          "n": 8,
+          "accuracy": 1.0
+        },
+        "realistic": {
+          "n": 7,
+          "accuracy": 1.0
+        },
+        "implicit": {
+          "n": 7,
+          "accuracy": 0.5714
+        },
+        "adversarial": {
+          "n": 8,
+          "accuracy": 0.625
+        }
+      },
+      "4": {
+        "explicit": {
+          "n": 10,
+          "accuracy": 0.9
+        },
+        "realistic": {
+          "n": 10,
+          "accuracy": 0.8
+        },
+        "implicit": {
+          "n": 10,
+          "accuracy": 0.6
+        },
+        "adversarial": {
+          "n": 10,
+          "accuracy": 0.6
+        }
+      },
+      "6": {
+        "explicit": {
+          "n": 16,
+          "accuracy": 0.5625
+        },
+        "realistic": {
+          "n": 15,
+          "accuracy": 0.8
+        },
+        "implicit": {
+          "n": 14,
+          "accuracy": 0.4286
+        },
+        "adversarial": {
+          "n": 15,
+          "accuracy": 0.4
+        }
+      },
+      "8": {
+        "explicit": {
+          "n": 20,
+          "accuracy": 0.45
+        },
+        "realistic": {
+          "n": 20,
+          "accuracy": 0.6
+        },
+        "implicit": {
+          "n": 20,
+          "accuracy": 0.4
+        },
+        "adversarial": {
+          "n": 20,
+          "accuracy": 0.3
+        }
+      },
+      "12": {
+        "explicit": {
+          "n": 30,
+          "accuracy": 0.4333
+        },
+        "realistic": {
+          "n": 30,
+          "accuracy": 0.5667
+        },
+        "implicit": {
+          "n": 30,
+          "accuracy": 0.2667
+        },
+        "adversarial": {
+          "n": 30,
+          "accuracy": 0.2667
+        }
+      },
+      "16": {
+        "explicit": {
+          "n": 40,
+          "accuracy": 0.425
+        },
+        "realistic": {
+          "n": 40,
+          "accuracy": 0.425
+        },
+        "implicit": {
+          "n": 40,
+          "accuracy": 0.3
+        },
+        "adversarial": {
+          "n": 40,
+          "accuracy": 0.25
+        }
+      }
+    },
+    "two_stage": {
+      "2": {
+        "explicit": {
+          "n": 6,
+          "accuracy": 1.0
+        },
+        "realistic": {
+          "n": 5,
+          "accuracy": 0.8
+        },
+        "implicit": {
+          "n": 4,
+          "accuracy": 0.75
+        },
+        "adversarial": {
+          "n": 5,
+          "accuracy": 0.4
+        }
+      },
+      "3": {
+        "explicit": {
+          "n": 8,
+          "accuracy": 1.0
+        },
+        "realistic": {
+          "n": 7,
+          "accuracy": 0.7143
+        },
+        "implicit": {
+          "n": 7,
+          "accuracy": 0.5714
+        },
+        "adversarial": {
+          "n": 8,
+          "accuracy": 0.375
+        }
+      },
+      "4": {
+        "explicit": {
+          "n": 10,
+          "accuracy": 0.8
+        },
+        "realistic": {
+          "n": 10,
+          "accuracy": 0.7
+        },
+        "implicit": {
+          "n": 10,
+          "accuracy": 0.5
+        },
+        "adversarial": {
+          "n": 10,
+          "accuracy": 0.4
+        }
+      },
+      "6": {
+        "explicit": {
+          "n": 16,
+          "accuracy": 0.5
+        },
+        "realistic": {
+          "n": 15,
+          "accuracy": 0.6
+        },
+        "implicit": {
+          "n": 14,
+          "accuracy": 0.2857
+        },
+        "adversarial": {
+          "n": 15,
+          "accuracy": 0.3333
+        }
+      },
+      "8": {
+        "explicit": {
+          "n": 20,
+          "accuracy": 0.55
+        },
+        "realistic": {
+          "n": 20,
+          "accuracy": 0.55
+        },
+        "implicit": {
+          "n": 20,
+          "accuracy": 0.3
+        },
+        "adversarial": {
+          "n": 20,
+          "accuracy": 0.35
+        }
+      },
+      "12": {
+        "explicit": {
+          "n": 30,
+          "accuracy": 0.4
+        },
+        "realistic": {
+          "n": 30,
+          "accuracy": 0.4667
+        },
+        "implicit": {
+          "n": 30,
+          "accuracy": 0.3
+        },
+        "adversarial": {
+          "n": 30,
+          "accuracy": 0.2333
+        }
+      },
+      "16": {
+        "explicit": {
+          "n": 40,
+          "accuracy": 0.375
+        },
+        "realistic": {
+          "n": 40,
+          "accuracy": 0.425
+        },
+        "implicit": {
+          "n": 40,
+          "accuracy": 0.25
+        },
+        "adversarial": {
+          "n": 40,
+          "accuracy": 0.175
+        }
+      }
+    }
+  },
+  "presentation": {
+    "choice": {
+      "2": {
+        "orders": 3,
+        "order_consistency": 1.0,
+        "position_bias": {
+          "k": 2,
+          "n": 60,
+          "uniform": 0.5,
+          "share_by_position": [
+            0.55,
+            0.45
+          ],
+          "max_excess": 0.05
+        }
+      },
+      "3": {
+        "orders": 3,
+        "order_consistency": 0.8333,
+        "position_bias": {
+          "k": 3,
+          "n": 90,
+          "uniform": 0.3333,
+          "share_by_position": [
+            0.4,
+            0.3778,
+            0.2222
+          ],
+          "max_excess": 0.0667
+        }
+      },
+      "4": {
+        "orders": 3,
+        "order_consistency": 0.95,
+        "position_bias": {
+          "k": 4,
+          "n": 120,
+          "uniform": 0.25,
+          "share_by_position": [
+            0.3,
+            0.3167,
+            0.125,
+            0.2583
+          ],
+          "max_excess": 0.0667
+        }
+      },
+      "6": {
+        "orders": 3,
+        "order_consistency": 0.75,
+        "position_bias": {
+          "k": 6,
+          "n": 180,
+          "uniform": 0.1667,
+          "share_by_position": [
+            0.3444,
+            0.1667,
+            0.1556,
+            0.15,
+            0.0889,
+            0.0944
+          ],
+          "max_excess": 0.1777
+        }
+      },
+      "8": {
+        "orders": 3,
+        "order_consistency": 0.7625,
+        "position_bias": {
+          "k": 8,
+          "n": 240,
+          "uniform": 0.125,
+          "share_by_position": [
+            0.1333,
+            0.15,
+            0.1458,
+            0.125,
+            0.1,
+            0.1125,
+            0.1292,
+            0.1042
+          ],
+          "max_excess": 0.025
+        }
+      },
+      "12": {
+        "orders": 3,
+        "order_consistency": 0.7417,
+        "position_bias": {
+          "k": 12,
+          "n": 360,
+          "uniform": 0.0833,
+          "share_by_position": [
+            0.1611,
+            0.1361,
+            0.1,
+            0.0972,
+            0.05,
+            0.1056,
+            0.0583,
+            0.0639,
+            0.0278,
+            0.0806,
+            0.0722,
+            0.0472
+          ],
+          "max_excess": 0.0778
+        }
+      },
+      "16": {
+        "orders": 3,
+        "order_consistency": 0.6375,
+        "position_bias": {
+          "k": 16,
+          "n": 480,
+          "uniform": 0.0625,
+          "share_by_position": [
+            0.1875,
+            0.1104,
+            0.1042,
+            0.0688,
+            0.05,
+            0.0333,
+            0.0688,
+            0.0646,
+            0.0333,
+            0.0167,
+            0.0625,
+            0.0375,
+            0.0458,
+            0.0292,
+            0.0458,
+            0.0417
+          ],
+          "max_excess": 0.125
+        }
+      }
+    },
+    "choice_bare": {},
+    "noul_per_label": {
+      "2": {
+        "orders": 3,
+        "order_consistency": 1.0,
+        "position_bias": {
+          "k": 2,
+          "n": 60,
+          "uniform": 0.5,
+          "share_by_position": [
+            0.6,
+            0.4
+          ],
+          "max_excess": 0.1
+        }
+      },
+      "3": {
+        "orders": 3,
+        "order_consistency": 1.0,
+        "position_bias": {
+          "k": 3,
+          "n": 90,
+          "uniform": 0.3333,
+          "share_by_position": [
+            0.3333,
+            0.3444,
+            0.3222
+          ],
+          "max_excess": 0.0111
+        }
+      },
+      "4": {
+        "orders": 3,
+        "order_consistency": 1.0,
+        "position_bias": {
+          "k": 4,
+          "n": 120,
+          "uniform": 0.25,
+          "share_by_position": [
+            0.325,
+            0.2583,
+            0.15,
+            0.2667
+          ],
+          "max_excess": 0.075
+        }
+      },
+      "6": {
+        "orders": 3,
+        "order_consistency": 1.0,
+        "position_bias": {
+          "k": 6,
+          "n": 180,
+          "uniform": 0.1667,
+          "share_by_position": [
+            0.2333,
+            0.1778,
+            0.1778,
+            0.1722,
+            0.1111,
+            0.1278
+          ],
+          "max_excess": 0.0666
+        }
+      },
+      "8": {
+        "orders": 3,
+        "order_consistency": 1.0,
+        "position_bias": {
+          "k": 8,
+          "n": 240,
+          "uniform": 0.125,
+          "share_by_position": [
+            0.1042,
+            0.175,
+            0.0958,
+            0.1542,
+            0.1417,
+            0.1167,
+            0.1083,
+            0.1042
+          ],
+          "max_excess": 0.05
+        }
+      },
+      "12": {
+        "orders": 3,
+        "order_consistency": 1.0,
+        "position_bias": {
+          "k": 12,
+          "n": 360,
+          "uniform": 0.0833,
+          "share_by_position": [
+            0.0889,
+            0.125,
+            0.075,
+            0.0944,
+            0.0833,
+            0.0944,
+            0.0528,
+            0.0611,
+            0.05,
+            0.0972,
+            0.1,
+            0.0778
+          ],
+          "max_excess": 0.0417
+        }
+      },
+      "16": {
+        "orders": 3,
+        "order_consistency": 1.0,
+        "position_bias": {
+          "k": 16,
+          "n": 480,
+          "uniform": 0.0625,
+          "share_by_position": [
+            0.0583,
+            0.075,
+            0.0667,
+            0.0708,
+            0.0375,
+            0.0479,
+            0.0667,
+            0.0833,
+            0.0437,
+            0.075,
+            0.0563,
+            0.0604,
+            0.0688,
+            0.0583,
+            0.0688,
+            0.0625
+          ],
+          "max_excess": 0.0208
+        }
+      }
+    },
+    "noul_described": {},
+    "two_stage": {}
+  },
+  "multilabel": {
+    "noul_per_label": {
+      "k": 16,
+      "by_threshold": {
+        "0.3": {
+          "n": 160,
+          "micro_precision": 0.4672,
+          "micro_recall": 0.6598,
+          "micro_f1": 0.547,
+          "macro_f1": 0.5647,
+          "exact_set_match": 0.3375,
+          "at_least_one_correct": 0.7312,
+          "mean_predicted_labels": 1.712,
+          "mean_gold_labels": 1.212,
+          "per_label": {
+            "account_admin": {
+              "support": 13,
+              "precision": 0.5556,
+              "recall": 0.3846,
+              "f1": 0.4545
+            },
+            "billing": {
+              "support": 14,
+              "precision": 0.6316,
+              "recall": 0.8571,
+              "f1": 0.7273
+            },
+            "compliance": {
+              "support": 12,
+              "precision": 0.6667,
+              "recall": 0.6667,
+              "f1": 0.6667
+            },
+            "data_privacy": {
+              "support": 11,
+              "precision": 0.75,
+              "recall": 0.5455,
+              "f1": 0.6316
+            },
+            "facilities": {
+              "support": 11,
+              "precision": 0.7692,
+              "recall": 0.9091,
+              "f1": 0.8333
+            },
+            "hr": {
+              "support": 11,
+              "precision": 0.4,
+              "recall": 0.5455,
+              "f1": 0.4615
+            },
+            "legal": {
+              "support": 16,
+              "precision": 0.3784,
+              "recall": 0.875,
+              "f1": 0.5283
+            },
+            "logistics": {
+              "support": 10,
+              "precision": 1.0,
+              "recall": 0.8,
+              "f1": 0.8889
+            },
+            "partnerships": {
+              "support": 10,
+              "precision": 0.25,
+              "recall": 0.6,
+              "f1": 0.3529
+            },
+            "press": {
+              "support": 10,
+              "precision": 0.6923,
+              "recall": 0.9,
+              "f1": 0.7826
+            },
+            "procurement": {
+              "support": 11,
+              "precision": 0.3333,
+              "recall": 0.4545,
+              "f1": 0.3846
+            },
+            "product_feedback": {
+              "support": 12,
+              "precision": 0.2667,
+              "recall": 0.3333,
+              "f1": 0.2963
+            },
+            "sales": {
+              "support": 14,
+              "precision": 0.44,
+              "recall": 0.7857,
+              "f1": 0.5641
+            },
+            "security": {
+              "support": 16,
+              "precision": 0.6667,
+              "recall": 0.375,
+              "f1": 0.48
+            },
+            "technical": {
+              "support": 13,
+              "precision": 0.3077,
+              "recall": 0.9231,
+              "f1": 0.4615
+            },
+            "training": {
+              "support": 10,
+              "precision": 0.4615,
+              "recall": 0.6,
+              "f1": 0.5217
+            }
+          }
+        },
+        "0.5": {
+          "n": 160,
+          "micro_precision": 0.5652,
+          "micro_recall": 0.6031,
+          "micro_f1": 0.5835,
+          "macro_f1": 0.5879,
+          "exact_set_match": 0.4313,
+          "at_least_one_correct": 0.7,
+          "mean_predicted_labels": 1.294,
+          "mean_gold_labels": 1.212,
+          "per_label": {
+            "account_admin": {
+              "support": 13,
+              "precision": 0.8333,
+              "recall": 0.3846,
+              "f1": 0.5263
+            },
+            "billing": {
+              "support": 14,
+              "precision": 0.6471,
+              "recall": 0.7857,
+              "f1": 0.7097
+            },
+            "compliance": {
+              "support": 12,
+              "precision": 0.7,
+              "recall": 0.5833,
+              "f1": 0.6364
+            },
+            "data_privacy": {
+              "support": 11,
+              "precision": 0.7143,
+              "recall": 0.4545,
+              "f1": 0.5556
+            },
+            "facilities": {
+              "support": 11,
+              "precision": 0.8333,
+              "recall": 0.9091,
+              "f1": 0.8696
+            },
+            "hr": {
+              "support": 11,
+              "precision": 0.5455,
+              "recall": 0.5455,
+              "f1": 0.5455
+            },
+            "legal": {
+              "support": 16,
+              "precision": 0.5,
+              "recall": 0.75,
+              "f1": 0.6
+            },
+            "logistics": {
+              "support": 10,
+              "precision": 1.0,
+              "recall": 0.7,
+              "f1": 0.8235
+            },
+            "partnerships": {
+              "support": 10,
+              "precision": 0.3,
+              "recall": 0.6,
+              "f1": 0.4
+            },
+            "press": {
+              "support": 10,
+              "precision": 0.8,
+              "recall": 0.8,
+              "f1": 0.8
+            },
+            "procurement": {
+              "support": 11,
+              "precision": 0.5,
+              "recall": 0.4545,
+              "f1": 0.4762
+            },
+            "product_feedback": {
+              "support": 12,
+              "precision": 0.2727,
+              "recall": 0.25,
+              "f1": 0.2609
+            },
+            "sales": {
+              "support": 14,
+              "precision": 0.4444,
+              "recall": 0.5714,
+              "f1": 0.5
+            },
+            "security": {
+              "support": 16,
+              "precision": 0.75,
+              "recall": 0.375,
+              "f1": 0.5
+            },
+            "technical": {
+              "support": 13,
+              "precision": 0.48,
+              "recall": 0.9231,
+              "f1": 0.6316
+            },
+            "training": {
+              "support": 10,
+              "precision": 0.5455,
+              "recall": 0.6,
+              "f1": 0.5714
+            }
+          }
+        },
+        "0.7": {
+          "n": 160,
+          "micro_precision": 0.5964,
+          "micro_recall": 0.5103,
+          "micro_f1": 0.55,
+          "macro_f1": 0.5418,
+          "exact_set_match": 0.4625,
+          "at_least_one_correct": 0.6188,
+          "mean_predicted_labels": 1.038,
+          "mean_gold_labels": 1.212,
+          "per_label": {
+            "account_admin": {
+              "support": 13,
+              "precision": 0.75,
+              "recall": 0.2308,
+              "f1": 0.3529
+            },
+            "billing": {
+              "support": 14,
+              "precision": 0.6667,
+              "recall": 0.7143,
+              "f1": 0.6897
+            },
+            "compliance": {
+              "support": 12,
+              "precision": 0.7143,
+              "recall": 0.4167,
+              "f1": 0.5263
+            },
+            "data_privacy": {
+              "support": 11,
+              "precision": 0.8333,
+              "recall": 0.4545,
+              "f1": 0.5882
+            },
+            "facilities": {
+              "support": 11,
+              "precision": 0.8,
+              "recall": 0.7273,
+              "f1": 0.7619
+            },
+            "hr": {
+              "support": 11,
+              "precision": 0.5455,
+              "recall": 0.5455,
+              "f1": 0.5455
+            },
+            "legal": {
+              "support": 16,
+              "precision": 0.6,
+              "recall": 0.75,
+              "f1": 0.6667
+            },
+            "logistics": {
+              "support": 10,
+              "precision": 1.0,
+              "recall": 0.6,
+              "f1": 0.75
+            },
+            "partnerships": {
+              "support": 10,
+              "precision": 0.3333,
+              "recall": 0.5,
+              "f1": 0.4
+            },
+            "press": {
+              "support": 10,
+              "precision": 0.8889,
+              "recall": 0.8,
+              "f1": 0.8421
+            },
+            "procurement": {
+              "support": 11,
+              "precision": 0.4,
+              "recall": 0.1818,
+              "f1": 0.25
+            },
+            "product_feedback": {
+              "support": 12,
+              "precision": 0.375,
+              "recall": 0.25,
+              "f1": 0.3
+            },
+            "sales": {
+              "support": 14,
+              "precision": 0.4615,
+              "recall": 0.4286,
+              "f1": 0.4444
+            },
+            "security": {
+              "support": 16,
+              "precision": 0.6667,
+              "recall": 0.25,
+              "f1": 0.3636
+            },
+            "technical": {
+              "support": 13,
+              "precision": 0.4762,
+              "recall": 0.7692,
+              "f1": 0.5882
+            },
+            "training": {
+              "support": 10,
+              "precision": 0.6,
+              "recall": 0.6,
+              "f1": 0.6
+            }
+          }
+        },
+        "argmax_only": {
+          "n": 160,
+          "micro_precision": 0.6062,
+          "micro_recall": 0.5,
+          "micro_f1": 0.548,
+          "macro_f1": 0.5413,
+          "exact_set_match": 0.475,
+          "at_least_one_correct": 0.6062,
+          "mean_predicted_labels": 1.0,
+          "mean_gold_labels": 1.212,
+          "per_label": {
+            "account_admin": {
+              "support": 13,
+              "precision": 0.75,
+              "recall": 0.2308,
+              "f1": 0.3529
+            },
+            "billing": {
+              "support": 14,
+              "precision": 0.7143,
+              "recall": 0.7143,
+              "f1": 0.7143
+            },
+            "compliance": {
+              "support": 12,
+              "precision": 0.7143,
+              "recall": 0.4167,
+              "f1": 0.5263
+            },
+            "data_privacy": {
+              "support": 11,
+              "precision": 0.8333,
+              "recall": 0.4545,
+              "f1": 0.5882
+            },
+            "facilities": {
+              "support": 11,
+              "precision": 0.8,
+              "recall": 0.7273,
+              "f1": 0.7619
+            },
+            "hr": {
+              "support": 11,
+              "precision": 0.5455,
+              "recall": 0.5455,
+              "f1": 0.5455
+            },
+            "legal": {
+              "support": 16,
+              "precision": 0.6667,
+              "recall": 0.75,
+              "f1": 0.7059
+            },
+            "logistics": {
+              "support": 10,
+              "precision": 1.0,
+              "recall": 0.6,
+              "f1": 0.75
+            },
+            "partnerships": {
+              "support": 10,
+              "precision": 0.3333,
+              "recall": 0.5,
+              "f1": 0.4
+            },
+            "press": {
+              "support": 10,
+              "precision": 0.8889,
+              "recall": 0.8,
+              "f1": 0.8421
+            },
+            "procurement": {
+              "support": 11,
+              "precision": 0.4,
+              "recall": 0.1818,
+              "f1": 0.25
+            },
+            "product_feedback": {
+              "support": 12,
+              "precision": 0.375,
+              "recall": 0.25,
+              "f1": 0.3
+            },
+            "sales": {
+              "support": 14,
+              "precision": 0.4615,
+              "recall": 0.4286,
+              "f1": 0.4444
+            },
+            "security": {
+              "support": 16,
+              "precision": 0.6667,
+              "recall": 0.25,
+              "f1": 0.3636
+            },
+            "technical": {
+              "support": 13,
+              "precision": 0.4444,
+              "recall": 0.6154,
+              "f1": 0.5161
+            },
+            "training": {
+              "support": 10,
+              "precision": 0.6,
+              "recall": 0.6,
+              "f1": 0.6
+            }
+          }
+        }
+      }
+    },
+    "noul_described": {
+      "k": 16,
+      "by_threshold": {
+        "0.3": {
+          "n": 160,
+          "micro_precision": 0.2218,
+          "micro_recall": 0.6082,
+          "micro_f1": 0.3251,
+          "macro_f1": 0.3474,
+          "exact_set_match": 0.1313,
+          "at_least_one_correct": 0.6438,
+          "mean_predicted_labels": 3.325,
+          "mean_gold_labels": 1.212,
+          "per_label": {
+            "account_admin": {
+              "support": 13,
+              "precision": 0.3333,
+              "recall": 0.3846,
+              "f1": 0.3571
+            },
+            "billing": {
+              "support": 14,
+              "precision": 0.2727,
+              "recall": 0.8571,
+              "f1": 0.4138
+            },
+            "compliance": {
+              "support": 12,
+              "precision": 0.2424,
+              "recall": 0.6667,
+              "f1": 0.3556
+            },
+            "data_privacy": {
+              "support": 11,
+              "precision": 0.186,
+              "recall": 0.7273,
+              "f1": 0.2963
+            },
+            "facilities": {
+              "support": 11,
+              "precision": 0.1212,
+              "recall": 0.7273,
+              "f1": 0.2078
+            },
+            "hr": {
+              "support": 11,
+              "precision": 0.2083,
+              "recall": 0.4545,
+              "f1": 0.2857
+            },
+            "legal": {
+              "support": 16,
+              "precision": 0.4118,
+              "recall": 0.875,
+              "f1": 0.56
+            },
+            "logistics": {
+              "support": 10,
+              "precision": 0.5556,
+              "recall": 0.5,
+              "f1": 0.5263
+            },
+            "partnerships": {
+              "support": 10,
+              "precision": 0.125,
+              "recall": 0.4,
+              "f1": 0.1905
+            },
+            "press": {
+              "support": 10,
+              "precision": 0.5294,
+              "recall": 0.9,
+              "f1": 0.6667
+            },
+            "procurement": {
+              "support": 11,
+              "precision": 0.2105,
+              "recall": 0.3636,
+              "f1": 0.2667
+            },
+            "product_feedback": {
+              "support": 12,
+              "precision": 0.0545,
+              "recall": 0.25,
+              "f1": 0.0896
+            },
+            "sales": {
+              "support": 14,
+              "precision": 0.2647,
+              "recall": 0.6429,
+              "f1": 0.375
+            },
+            "security": {
+              "support": 16,
+              "precision": 0.2353,
+              "recall": 0.5,
+              "f1": 0.32
+            },
+            "technical": {
+              "support": 13,
+              "precision": 0.275,
+              "recall": 0.8462,
+              "f1": 0.4151
+            },
+            "training": {
+              "support": 10,
+              "precision": 0.1515,
+              "recall": 0.5,
+              "f1": 0.2326
+            }
+          }
+        },
+        "0.5": {
+          "n": 160,
+          "micro_precision": 0.3091,
+          "micro_recall": 0.5052,
+          "micro_f1": 0.3836,
+          "macro_f1": 0.3781,
+          "exact_set_match": 0.2062,
+          "at_least_one_correct": 0.5625,
+          "mean_predicted_labels": 1.981,
+          "mean_gold_labels": 1.212,
+          "per_label": {
+            "account_admin": {
+              "support": 13,
+              "precision": 0.5,
+              "recall": 0.3077,
+              "f1": 0.381
+            },
+            "billing": {
+              "support": 14,
+              "precision": 0.3438,
+              "recall": 0.7857,
+              "f1": 0.4783
+            },
+            "compliance": {
+              "support": 12,
+              "precision": 0.3333,
+              "recall": 0.5,
+              "f1": 0.4
+            },
+            "data_privacy": {
+              "support": 11,
+              "precision": 0.2333,
+              "recall": 0.6364,
+              "f1": 0.3415
+            },
+            "facilities": {
+              "support": 11,
+              "precision": 0.1667,
+              "recall": 0.5455,
+              "f1": 0.2553
+            },
+            "hr": {
+              "support": 11,
+              "precision": 0.3571,
+              "recall": 0.4545,
+              "f1": 0.4
+            },
+            "legal": {
+              "support": 16,
+              "precision": 0.5417,
+              "recall": 0.8125,
+              "f1": 0.65
+            },
+            "logistics": {
+              "support": 10,
+              "precision": 0.6667,
+              "recall": 0.2,
+              "f1": 0.3077
+            },
+            "partnerships": {
+              "support": 10,
+              "precision": 0.1333,
+              "recall": 0.2,
+              "f1": 0.16
+            },
+            "press": {
+              "support": 10,
+              "precision": 0.6429,
+              "recall": 0.9,
+              "f1": 0.75
+            },
+            "procurement": {
+              "support": 11,
+              "precision": 0.0909,
+              "recall": 0.0909,
+              "f1": 0.0909
+            },
+            "product_feedback": {
+              "support": 12,
+              "precision": 0.1111,
+              "recall": 0.25,
+              "f1": 0.1538
+            },
+            "sales": {
+              "support": 14,
+              "precision": 0.4667,
+              "recall": 0.5,
+              "f1": 0.4828
+            },
+            "security": {
+              "support": 16,
+              "precision": 0.4444,
+              "recall": 0.5,
+              "f1": 0.4706
+            },
+            "technical": {
+              "support": 13,
+              "precision": 0.3704,
+              "recall": 0.7692,
+              "f1": 0.5
+            },
+            "training": {
+              "support": 10,
+              "precision": 0.16,
+              "recall": 0.4,
+              "f1": 0.2286
+            }
+          }
+        },
+        "0.7": {
+          "n": 160,
+          "micro_precision": 0.3761,
+          "micro_recall": 0.4381,
+          "micro_f1": 0.4048,
+          "macro_f1": 0.3743,
+          "exact_set_match": 0.2687,
+          "at_least_one_correct": 0.5,
+          "mean_predicted_labels": 1.413,
+          "mean_gold_labels": 1.212,
+          "per_label": {
+            "account_admin": {
+              "support": 13,
+              "precision": 0.75,
+              "recall": 0.2308,
+              "f1": 0.3529
+            },
+            "billing": {
+              "support": 14,
+              "precision": 0.4074,
+              "recall": 0.7857,
+              "f1": 0.5366
+            },
+            "compliance": {
+              "support": 12,
+              "precision": 0.3529,
+              "recall": 0.5,
+              "f1": 0.4138
+            },
+            "data_privacy": {
+              "support": 11,
+              "precision": 0.3182,
+              "recall": 0.6364,
+              "f1": 0.4242
+            },
+            "facilities": {
+              "support": 11,
+              "precision": 0.2778,
+              "recall": 0.4545,
+              "f1": 0.3448
+            },
+            "hr": {
+              "support": 11,
+              "precision": 0.4444,
+              "recall": 0.3636,
+              "f1": 0.4
+            },
+            "legal": {
+              "support": 16,
+              "precision": 0.55,
+              "recall": 0.6875,
+              "f1": 0.6111
+            },
+            "logistics": {
+              "support": 10,
+              "precision": 1.0,
+              "recall": 0.1,
+              "f1": 0.1818
+            },
+            "partnerships": {
+              "support": 10,
+              "precision": 0.0909,
+              "recall": 0.1,
+              "f1": 0.0952
+            },
+            "press": {
+              "support": 10,
+              "precision": 0.6667,
+              "recall": 0.8,
+              "f1": 0.7273
+            },
+            "procurement": {
+              "support": 11,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0
+            },
+            "product_feedback": {
+              "support": 12,
+              "precision": 0.1176,
+              "recall": 0.1667,
+              "f1": 0.1379
+            },
+            "sales": {
+              "support": 14,
+              "precision": 0.6667,
+              "recall": 0.4286,
+              "f1": 0.5217
+            },
+            "security": {
+              "support": 16,
+              "precision": 0.4286,
+              "recall": 0.375,
+              "f1": 0.4
+            },
+            "technical": {
+              "support": 13,
+              "precision": 0.4348,
+              "recall": 0.7692,
+              "f1": 0.5556
+            },
+            "training": {
+              "support": 10,
+              "precision": 0.2222,
+              "recall": 0.4,
+              "f1": 0.2857
+            }
+          }
+        },
+        "argmax_only": {
+          "n": 160,
+          "micro_precision": 0.4313,
+          "micro_recall": 0.3557,
+          "micro_f1": 0.3898,
+          "macro_f1": 0.3558,
+          "exact_set_match": 0.325,
+          "at_least_one_correct": 0.4313,
+          "mean_predicted_labels": 1.0,
+          "mean_gold_labels": 1.212,
+          "per_label": {
+            "account_admin": {
+              "support": 13,
+              "precision": 1.0,
+              "recall": 0.0769,
+              "f1": 0.1429
+            },
+            "billing": {
+              "support": 14,
+              "precision": 0.4348,
+              "recall": 0.7143,
+              "f1": 0.5405
+            },
+            "compliance": {
+              "support": 12,
+              "precision": 0.5,
+              "recall": 0.3333,
+              "f1": 0.4
+            },
+            "data_privacy": {
+              "support": 11,
+              "precision": 0.4615,
+              "recall": 0.5455,
+              "f1": 0.5
+            },
+            "facilities": {
+              "support": 11,
+              "precision": 0.3125,
+              "recall": 0.4545,
+              "f1": 0.3704
+            },
+            "hr": {
+              "support": 11,
+              "precision": 0.5,
+              "recall": 0.3636,
+              "f1": 0.4211
+            },
+            "legal": {
+              "support": 16,
+              "precision": 0.5625,
+              "recall": 0.5625,
+              "f1": 0.5625
+            },
+            "logistics": {
+              "support": 10,
+              "precision": 1.0,
+              "recall": 0.1,
+              "f1": 0.1818
+            },
+            "partnerships": {
+              "support": 10,
+              "precision": 0.1429,
+              "recall": 0.1,
+              "f1": 0.1176
+            },
+            "press": {
+              "support": 10,
+              "precision": 0.7273,
+              "recall": 0.8,
+              "f1": 0.7619
+            },
+            "procurement": {
+              "support": 11,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0
+            },
+            "product_feedback": {
+              "support": 12,
+              "precision": 0.1429,
+              "recall": 0.1667,
+              "f1": 0.1538
+            },
+            "sales": {
+              "support": 14,
+              "precision": 0.8,
+              "recall": 0.2857,
+              "f1": 0.4211
+            },
+            "security": {
+              "support": 16,
+              "precision": 0.5,
+              "recall": 0.1875,
+              "f1": 0.2727
+            },
+            "technical": {
+              "support": 13,
+              "precision": 0.4375,
+              "recall": 0.5385,
+              "f1": 0.4828
+            },
+            "training": {
+              "support": 10,
+              "precision": 0.3333,
+              "recall": 0.4,
+              "f1": 0.3636
+            }
+          }
+        }
+      }
+    }
+  },
+  "fixed_subset": {
+    "documents": [
+      "billing-01",
+      "billing-02",
+      "billing-03",
+      "billing-04",
+      "billing-05",
+      "billing-06",
+      "billing-07",
+      "billing-08",
+      "billing-09",
+      "billing-10",
+      "technical-01",
+      "technical-02",
+      "technical-03",
+      "technical-04",
+      "technical-05",
+      "technical-06",
+      "technical-07",
+      "technical-08",
+      "technical-09",
+      "technical-10"
+    ],
+    "labels": [
+      "billing",
+      "technical"
+    ],
+    "by_framing": {
+      "choice": {
+        "2": {
+          "n": 20,
+          "accuracy": 0.85,
+          "distractors": 0
+        },
+        "3": {
+          "n": 20,
+          "accuracy": 0.85,
+          "distractors": 1
+        },
+        "4": {
+          "n": 20,
+          "accuracy": 0.75,
+          "distractors": 2
+        },
+        "6": {
+          "n": 20,
+          "accuracy": 0.8,
+          "distractors": 4
+        },
+        "8": {
+          "n": 20,
+          "accuracy": 0.9,
+          "distractors": 6
+        },
+        "12": {
+          "n": 20,
+          "accuracy": 0.85,
+          "distractors": 10
+        },
+        "16": {
+          "n": 20,
+          "accuracy": 0.9,
+          "distractors": 14
+        }
+      },
+      "choice_bare": {
+        "2": {
+          "n": 20,
+          "accuracy": 0.85,
+          "distractors": 0
+        },
+        "3": {
+          "n": 20,
+          "accuracy": 0.75,
+          "distractors": 1
+        },
+        "4": {
+          "n": 20,
+          "accuracy": 0.75,
+          "distractors": 2
+        },
+        "6": {
+          "n": 20,
+          "accuracy": 0.7,
+          "distractors": 4
+        },
+        "8": {
+          "n": 20,
+          "accuracy": 0.65,
+          "distractors": 6
+        },
+        "12": {
+          "n": 20,
+          "accuracy": 0.65,
+          "distractors": 10
+        },
+        "16": {
+          "n": 20,
+          "accuracy": 0.65,
+          "distractors": 14
+        }
+      },
+      "noul_per_label": {
+        "2": {
+          "n": 20,
+          "accuracy": 0.9,
+          "distractors": 0
+        },
+        "3": {
+          "n": 20,
+          "accuracy": 0.8,
+          "distractors": 1
+        },
+        "4": {
+          "n": 20,
+          "accuracy": 0.8,
+          "distractors": 2
+        },
+        "6": {
+          "n": 20,
+          "accuracy": 0.8,
+          "distractors": 4
+        },
+        "8": {
+          "n": 20,
+          "accuracy": 0.8,
+          "distractors": 6
+        },
+        "12": {
+          "n": 20,
+          "accuracy": 0.65,
+          "distractors": 10
+        },
+        "16": {
+          "n": 20,
+          "accuracy": 0.65,
+          "distractors": 14
+        }
+      },
+      "noul_described": {
+        "2": {
+          "n": 20,
+          "accuracy": 0.8,
+          "distractors": 0
+        },
+        "3": {
+          "n": 20,
+          "accuracy": 0.8,
+          "distractors": 1
+        },
+        "4": {
+          "n": 20,
+          "accuracy": 0.8,
+          "distractors": 2
+        },
+        "6": {
+          "n": 20,
+          "accuracy": 0.75,
+          "distractors": 4
+        },
+        "8": {
+          "n": 20,
+          "accuracy": 0.65,
+          "distractors": 6
+        },
+        "12": {
+          "n": 20,
+          "accuracy": 0.65,
+          "distractors": 10
+        },
+        "16": {
+          "n": 20,
+          "accuracy": 0.65,
+          "distractors": 14
+        }
+      }
+    }
+  },
+  "field_ablation": {
+    "subject+body": {
+      "n": 160,
+      "accuracy": 0.5437,
+      "macro_f1": 0.5454
+    },
+    "subject_only": {
+      "n": 160,
+      "accuracy": 0.4313,
+      "macro_f1": 0.4242
+    },
+    "body_only": {
+      "n": 160,
+      "accuracy": 0.475,
+      "macro_f1": 0.4517
+    }
+  },
+  "determinism": {
+    "n": 20,
+    "identical": 20
+  },
+  "temperature_scaling": {
+    "2": {
+      "n_fit": 10,
+      "n_held_out": 10,
+      "temperature": 2.2,
+      "ece_top_prob_before": 0.0837,
+      "ece_top_prob_after": 0.186,
+      "accuracy_unchanged": true
+    },
+    "3": {
+      "n_fit": 15,
+      "n_held_out": 15,
+      "temperature": 1.7,
+      "ece_top_prob_before": 0.237,
+      "ece_top_prob_after": 0.3907,
+      "accuracy_unchanged": true
+    },
+    "4": {
+      "n_fit": 20,
+      "n_held_out": 20,
+      "temperature": 2.1,
+      "ece_top_prob_before": 0.2683,
+      "ece_top_prob_after": 0.414,
+      "accuracy_unchanged": true
+    },
+    "6": {
+      "n_fit": 30,
+      "n_held_out": 30,
+      "temperature": 0.5,
+      "ece_top_prob_before": 0.1806,
+      "ece_top_prob_after": 0.2163,
+      "accuracy_unchanged": true
+    },
+    "8": {
+      "n_fit": 40,
+      "n_held_out": 40,
+      "temperature": 0.9,
+      "ece_top_prob_before": 0.2543,
+      "ece_top_prob_after": 0.2524,
+      "accuracy_unchanged": true
+    },
+    "12": {
+      "n_fit": 60,
+      "n_held_out": 60,
+      "temperature": 5.0,
+      "ece_top_prob_before": 0.4204,
+      "ece_top_prob_after": 0.2922,
+      "accuracy_unchanged": true
+    },
+    "16": {
+      "n_fit": 80,
+      "n_held_out": 80,
+      "temperature": 5.0,
+      "ece_top_prob_before": 0.3929,
+      "ece_top_prob_after": 0.2921,
+      "accuracy_unchanged": true
+    }
+  },
+  "cost": {
+    "predict_calls": 6588,
+    "wall_seconds": 12598.2,
+    "calls_per_second": 0.5
+  }
+}

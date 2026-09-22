@@ -175,7 +175,11 @@ tbody tr:last-child td{border-bottom:none}
       scorable at <code>k</code> when its own gold label is on the menu, so as
       <code>k</code> grows the <em>document set</em> grows with it, and the labels added
       later are harder and closer together. Holding the documents fixed and growing only
-      the number of wrong answers on offer separates the two.</p>
+      the number of wrong answers on offer separates the two — for labels at the front of
+      the menu. The fixed documents are the <code>billing</code> and <code>technical</code>
+      ones, whose gold option always sits in slot 1 or 2, so this control measures
+      distractors added <em>behind</em> the answer, not menu length in general; reversing
+      the k=16 menu costs 2 of 20 and reversing the k=8 menu costs 4 of 20.</p>
     </div>
 
     <figure>
@@ -198,8 +202,10 @@ tbody tr:last-child td{border-bottom:none}
       </div>
       <figcaption><b>The same 20 documents at every rung</b>, with only the number of wrong
       answers growing. <code>choice</code> with written label descriptions is flat to
-      slightly up across 14 added distractors — option count costs it nothing. The other
-      three framings do decay, so the descriptions are what buys the robustness.</figcaption>
+      slightly up across 14 added distractors — extra options <em>behind</em> the answer
+      cost it nothing. The other three framings do decay. Note that past 10 options the
+      192-token option budget trims every description to a few words (11 tokens each at
+      k=16), so the described and bare menus are closer than they look here.</figcaption>
       <details><summary>Show as a table</summary><div class="scroll" id="tb-fix"></div></details>
     </figure>
   </section>
@@ -250,10 +256,16 @@ tbody tr:last-child td{border-bottom:none}
   <section>
     <h2>It gets more confident as it gets more wrong</h2>
     <div class="prose">
-      <p>This one has a mechanism, not just a correlation. Laya derives confidence as
-      normalised Shannon entropy, <code>1 − H(p)/log(k)</code>. The <code>log(k)</code>
-      denominator grows with the menu, so the same amount of real uncertainty maps to a
-      higher reported confidence every time you add a category.</p>
+      <p>This one has a mechanism, not just a correlation — but not the one an earlier
+      version of this page gave. The checkpoint ships a calibration table,
+      <code>temperature_by_options</code> in <code>rl_agent_config.json</code>, and its
+      <code>choice:11+</code> entry is <b>0.10</b> against 1.0 for six to ten options. The
+      logits are divided by it before the softmax, so every <code>choice</code> menu of
+      eleven or more options is sharpened tenfold: 79% of answers at k=12 and k=16 come back
+      at ≥0.99 probability, with or without descriptions, against 4% at k=8. Raising the
+      returned probabilities to the power 0.1 and renormalising undoes it without changing
+      a prediction; the model stays overconfident at k=16 even then (0.80 on answers right
+      0.54 of the time), so the entry explains the step, not the whole gap.</p>
     </div>
     <figure>
       <div class="chart">
@@ -346,7 +358,7 @@ const tiles = [
   {k:'Confidence at k=12', v:fmt(D.conf.choice[5],2), cls:'dn',
    n:`while accuracy sat at ${fmt(D.acc.choice[5],2)} — confident and wrong`},
   {k:'Fixed documents, +14 distractors', v:fmt(D.fixed.choice[6],2), cls:'up',
-   n:`up from ${fmt(D.fixed.choice[0],2)} — menu length alone costs nothing`},
+   n:`up from ${fmt(D.fixed.choice[0],2)} — with the answer kept in slot 1–2`},
 ];
 $('#tiles').innerHTML = tiles.map(t =>
   `<div class="tile"><span class="k">${t.k}</span>
@@ -510,7 +522,7 @@ const TUN = [
  ['ask one question per label','biggest win','y',
   `Order consistency 1.000 at every k against ${fmt(D.order.choice[6],2)} for a flat menu, and confidence that falls with k instead of rising.`],
  ['write label descriptions','buys robustness','y',
-  `Barely moves overall accuracy, but on a fixed document set choice holds ${fmt(D.fixed.choice[6],2)} across 14 distractors where bare labels decay to ${fmt(D.fixed.choice_bare[6],2)}.`],
+  `Barely moves overall accuracy, but on a fixed document set choice holds ${fmt(D.fixed.choice[6],2)} across 14 distractors where bare labels decay to ${fmt(D.fixed.choice_bare[6],2)} — with the answer always in slot 1–2, and descriptions cut to 11 tokens each at k=16.`],
  ['noul true/false criteria','actively hurts','n',
   `Undocumented but supported. Supplying an explicit reading dropped accuracy from ${fmt(D.acc.noul_per_label[6],2)} to ${fmt(D.acc.noul_described[6],2)} and made it over-predict badly.`],
  ['two-stage decomposition','actively hurts','n',
