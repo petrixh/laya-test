@@ -1,0 +1,81 @@
+{
+  "_comment": "Label sets nest: LABELS[:k] is the taxonomy at k. A degradation curve over k therefore isolates option count rather than which labels happened to be drawn. Rungs are the k values the sweep reports.",
+  "rungs": [
+    2,
+    3,
+    4,
+    6,
+    8,
+    12,
+    16
+  ],
+  "order": [
+    "billing",
+    "technical",
+    "sales",
+    "legal",
+    "security",
+    "hr",
+    "product_feedback",
+    "account_admin",
+    "logistics",
+    "partnerships",
+    "press",
+    "facilities",
+    "compliance",
+    "procurement",
+    "training",
+    "data_privacy"
+  ],
+  "descriptions": {
+    "billing": "invoices, payments, refunds, duplicate or incorrect charges, subscription fees and credit notes",
+    "technical": "software bugs, outages, error messages, failing integrations and things that do not work as documented",
+    "sales": "pricing enquiries, quotes, new contracts, renewals, upgrades and prospects evaluating the product",
+    "legal": "contract drafting and review, terms of service, liability, indemnities, trademarks and disputes",
+    "security": "vulnerability reports, breaches, phishing, malware, access control failures and responsible disclosure",
+    "hr": "job applications, recruitment, employment terms, staff matters, leave, payroll and benefits",
+    "product_feedback": "feature requests, product suggestions, usability complaints and praise for how the product works",
+    "account_admin": "logins, passwords, multi-factor authentication, user seats, roles, permissions and account settings",
+    "logistics": "shipping, delivery dates, customs, warehousing, stock levels and returns of physical goods",
+    "partnerships": "resellers, referral agreements, technology integrations, joint ventures and co-marketing proposals",
+    "press": "journalists, analysts, interview requests, media enquiries, embargoes and public statements",
+    "facilities": "offices, buildings, desks, meeting rooms, parking, cleaning, utilities and workplace equipment",
+    "compliance": "audits, certifications such as SOC 2 or ISO 27001, regulatory filings and policy attestation",
+    "procurement": "vendor onboarding, purchase orders, supplier questionnaires, tenders and sourcing decisions",
+    "training": "onboarding sessions, courses, certification, documentation requests and customer enablement",
+    "data_privacy": "GDPR subject access requests, data deletion and export, consent, retention and cross-border transfer"
+  },
+  "groups": {
+    "commercial": [
+      "billing",
+      "sales",
+      "procurement",
+      "partnerships"
+    ],
+    "technology": [
+      "technical",
+      "product_feedback",
+      "account_admin",
+      "training"
+    ],
+    "risk": [
+      "legal",
+      "security",
+      "compliance",
+      "data_privacy"
+    ],
+    "workplace": [
+      "hr",
+      "logistics",
+      "press",
+      "facilities"
+    ]
+  },
+  "group_descriptions": {
+    "commercial": "money and commercial relationships: what is charged, what is bought, what is sold and who sells it",
+    "technology": "the product itself: how it behaves, how it is administered and how people are taught to use it",
+    "risk": "obligation and exposure: contracts, security, regulatory duties and the handling of personal data",
+    "workplace": "running the organisation: the people in it, the premises, the physical goods and the public voice"
+  },
+  "_groups_comment": "Used only by the two_stage framing: pick a group, then a label within it. Chosen so that at k=16 both stages are 4-option questions, which is inside the range part one found this model reliable at."
+}

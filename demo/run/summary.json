@@ -2,7 +2,7 @@
   "generated": "2026-09-21T16:00:36.317Z",
   "options": {
     "headed": false,
-    "endpoint": "http://100.121.51.97:8000",
+    "endpoint": "<redacted>",
     "decisions": 150,
     "seconds": 1000,
     "out": "demo/run",

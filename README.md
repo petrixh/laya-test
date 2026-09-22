@@ -226,6 +226,7 @@ scripts/serve-macos.sh  native Apple-silicon service, no Docker
 scripts/introspect.py   print laya's real signatures after a version bump
 tests/test_api.py       HTTP contract against a live model
 demo/                   one recorded run: video, gif, trace, deaths, summary
+classify/               part two: document classification, its own README and results
 ```
 
 ## Notes

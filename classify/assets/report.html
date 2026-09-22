@@ -1,0 +1,540 @@
+<title>Where Laya Breaks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  --bg:#fbfbfa; --panel:#ffffff; --panel-2:#f5f6f7;
+  --ink:#101217; --ink-2:#3d434c; --muted:#5b6068; --faint:#878d96;
+  --rule:#e3e5e9; --grid:#edeff2;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4;
+  --good:#12805a; --bad:#c23433;
+  --heat-0:#f0f5fc; --heat-1:#d3e2f6; --heat-2:#a6c6ec; --heat-3:#74a5df; --heat-4:#4483ce; --heat-5:#2a62a5;
+  --heat-ink-lo:#0f1b2b; --heat-ink-hi:#ffffff;
+  --shadow:0 1px 2px rgba(16,18,23,.05), 0 8px 24px -16px rgba(16,18,23,.25);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16171a; --panel:#1d1f23; --panel-2:#232529;
+    --ink:#f1f2f4; --ink-2:#c9ced6; --muted:#a3a9b3; --faint:#7d838d;
+    --rule:#2c2f35; --grid:#24272c;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181;
+    --good:#3fbf8f; --bad:#e66767;
+    --heat-0:#1a2028; --heat-1:#1f2e3f; --heat-2:#264259; --heat-3:#2f5a7c; --heat-4:#3a76a4; --heat-5:#4a93c9;
+    --heat-ink-lo:#c9d6e4; --heat-ink-hi:#ffffff;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16171a; --panel:#1d1f23; --panel-2:#232529;
+  --ink:#f1f2f4; --ink-2:#c9ced6; --muted:#a3a9b3; --faint:#7d838d;
+  --rule:#2c2f35; --grid:#24272c;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181;
+  --good:#3fbf8f; --bad:#e66767;
+  --heat-0:#1a2028; --heat-1:#1f2e3f; --heat-2:#264259; --heat-3:#2f5a7c; --heat-4:#3a76a4; --heat-5:#4a93c9;
+  --heat-ink-lo:#c9d6e4; --heat-ink-hi:#ffffff;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:15.5px; line-height:1.62; margin:0;
+}
+.wrap{max-width:1080px; margin:0 auto; padding-inline:20px; padding-block:48px 72px}
+.prose{max-width:68ch}
+h1,h2,h3{font-family:"IBM Plex Serif",Georgia,"Times New Roman",serif; text-wrap:balance; margin:0}
+h1{font-size:clamp(2.1rem,5.2vw,3.1rem); font-weight:600; letter-spacing:-.021em; line-height:1.1}
+h2{font-size:clamp(1.35rem,3vw,1.7rem); font-weight:600; letter-spacing:-.012em; margin-top:0}
+h3{font-size:1.06rem; font-weight:600; margin-bottom:.35rem}
+p{margin:0 0 1rem}
+a{color:var(--s1)}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace; font-variant-numeric:tabular-nums}
+code{font-size:.87em; background:var(--panel-2); padding:.1em .34em; border-radius:3px}
+strong{font-weight:600}
+
+.eyebrow{font-family:"IBM Plex Mono",monospace; font-size:.71rem; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 .9rem}
+.lede{font-size:1.14rem; color:var(--ink-2); max-width:62ch; margin-top:1.1rem}
+.byline{font-family:"IBM Plex Mono",monospace; font-size:.76rem; color:var(--faint);
+  margin-top:1.6rem; padding-top:1.1rem; border-top:1px solid var(--rule); max-width:68ch}
+
+section{margin-top:3.6rem}
+section > h2 + p{margin-top:.7rem}
+
+/* caveat panel — deliberately the first thing, and deliberately not a card in a row */
+.caveat{border-left:3px solid var(--s4); background:var(--panel-2);
+  padding:1.1rem 1.25rem; border-radius:0 6px 6px 0; margin-top:2.4rem; max-width:72ch}
+.caveat h3{font-family:"IBM Plex Sans",sans-serif; font-size:.79rem; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--muted); margin-bottom:.6rem}
+.caveat ul{margin:0; padding-left:1.1rem}
+.caveat li{margin-bottom:.4rem; color:var(--ink-2); font-size:.95rem}
+.caveat li:last-child{margin-bottom:0}
+
+.tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(178px,1fr)); gap:1px;
+  background:var(--rule); border:1px solid var(--rule); border-radius:8px; overflow:hidden; margin-top:1.8rem}
+.tile{background:var(--panel); padding:1.15rem 1.2rem}
+.tile .k{font-family:"IBM Plex Mono",monospace; font-size:.69rem; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--muted); display:block; margin-bottom:.5rem}
+.tile .v{font-family:"IBM Plex Mono",monospace; font-size:1.85rem; font-weight:500;
+  letter-spacing:-.02em; line-height:1; font-variant-numeric:tabular-nums}
+.tile .n{font-size:.83rem; color:var(--muted); margin-top:.45rem; line-height:1.4}
+.v.up{color:var(--good)} .v.dn{color:var(--bad)}
+
+figure{margin:1.9rem 0 0}
+.chart{background:var(--panel); border:1px solid var(--rule); border-radius:8px;
+  padding:1.15rem 1.1rem .7rem; box-shadow:var(--shadow)}
+.chart svg{display:block; width:100%; height:auto; overflow:visible}
+figcaption{font-size:.89rem; color:var(--muted); margin-top:.85rem; max-width:70ch}
+figcaption b{color:var(--ink-2); font-weight:600}
+
+.legend{display:flex; flex-wrap:wrap; gap:.6rem 1.15rem; margin:0 0 .85rem; padding:0; list-style:none}
+.legend li{display:flex; align-items:center; gap:.42rem; font-size:.8rem; color:var(--ink-2)}
+.legend .sw{width:22px; height:3px; border-radius:2px; flex:none}
+.legend .sw.d{height:9px; width:9px; border-radius:50%}
+
+details{margin-top:.8rem; border-top:1px solid var(--rule); padding-top:.6rem}
+summary{cursor:pointer; font-size:.8rem; color:var(--muted); font-family:"IBM Plex Mono",monospace}
+summary:hover{color:var(--ink)}
+.scroll{overflow-x:auto; margin-top:.7rem}
+table{border-collapse:collapse; font-size:.83rem; width:100%; min-width:460px}
+th,td{text-align:right; padding:.4rem .6rem; border-bottom:1px solid var(--rule); white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+thead th{font-family:"IBM Plex Mono",monospace; font-size:.71rem; letter-spacing:.05em;
+  color:var(--muted); font-weight:500; text-transform:uppercase}
+tbody td{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; color:var(--ink-2)}
+tbody td:first-child{font-family:"IBM Plex Sans",sans-serif; color:var(--ink)}
+tbody tr:last-child td{border-bottom:none}
+
+.heat{border-collapse:separate; border-spacing:2px; min-width:520px}
+.heat td{border:none; padding:.55rem .3rem; text-align:center; border-radius:3px;
+  font-family:"IBM Plex Mono",monospace; font-size:.82rem}
+.heat th{border:none; font-family:"IBM Plex Mono",monospace; font-size:.73rem; color:var(--muted);
+  font-weight:500; text-align:center}
+.heat th:first-child{text-align:left}
+
+.chips{display:flex; flex-wrap:wrap; gap:.5rem; margin:1.1rem 0 0; padding:0; list-style:none}
+.chip{display:inline-flex; align-items:center; gap:.4rem; font-size:.82rem;
+  border:1px solid var(--rule); background:var(--panel); border-radius:999px; padding:.3rem .75rem}
+.chip .dot{width:7px; height:7px; border-radius:50%; flex:none}
+.chip.y .dot{background:var(--good)} .chip.n .dot{background:var(--bad)}
+
+.tunables{display:grid; gap:1px; background:var(--rule); border:1px solid var(--rule);
+  border-radius:8px; overflow:hidden; margin-top:1.5rem}
+.tun{background:var(--panel); padding:1rem 1.15rem; display:grid;
+  grid-template-columns:minmax(0,1fr) auto; gap:.5rem 1rem; align-items:baseline}
+.tun .name{font-family:"IBM Plex Mono",monospace; font-size:.88rem; color:var(--ink); font-weight:500}
+.tun .verdict{font-family:"IBM Plex Mono",monospace; font-size:.78rem; white-space:nowrap}
+.tun .why{grid-column:1/-1; font-size:.89rem; color:var(--muted); margin:0}
+
+.tip{position:fixed; pointer-events:none; opacity:0; transition:opacity .09s;
+  background:var(--ink); color:var(--bg); font-family:"IBM Plex Mono",monospace;
+  font-size:.74rem; padding:.42rem .6rem; border-radius:5px; z-index:50; white-space:nowrap;
+  box-shadow:0 4px 14px rgba(0,0,0,.28)}
+.tip.on{opacity:1}
+.foot{margin-top:4rem; padding-top:1.3rem; border-top:1px solid var(--rule);
+  font-size:.83rem; color:var(--faint); max-width:72ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
+@media (max-width:560px){ .wrap{padding-block:32px 52px} .tun{grid-template-columns:1fr} }
+</style>
+
+<div class="wrap">
+
+  <p class="eyebrow">Laya · part two · document classification</p>
+  <h1>Where Laya Breaks</h1>
+  <p class="lede">A 421M non-autoregressive decision model, given 160 business documents
+  and a menu of categories that grows from two to sixteen. It does not break where we
+  expected, and the control that catches it is not accuracy.</p>
+  <p class="byline" id="byline"></p>
+
+  <div class="caveat">
+    <h3>Read this first</h3>
+    <ul>
+      <li><b>The corpus is invented.</b> All 160 documents were written for this test to be
+      realistic in shape. None is a real message, and no number here transfers to real
+      traffic without re-measuring on real traffic.</li>
+      <li><b>Small samples.</b> Ten documents per label, forty per tier. A gap under
+      roughly ten points is not a gap.</li>
+      <li><b>One checkpoint, one backend.</b> Results are not comparable across the torch
+      and MLX builds — the MLX port is an independent FP16 conversion.</li>
+      <li>Written end to end by an LLM with a human steering. Nothing here is peer reviewed.</li>
+    </ul>
+  </div>
+
+  <div class="tiles" id="tiles"></div>
+
+  <section>
+    <h2>The expected finding did not replicate</h2>
+    <div class="prose">
+      <p>Part one of this project found that <b>option count</b> was the sharpest edge on
+      this model: a two-option question was reliable where a three-option one collapsed.
+      A classifier is just a question with one option per category, so the obvious
+      prediction was that accuracy would fall as the menu grew.</p>
+      <p>It does fall — but that turns out to be mostly an artefact. A document is only
+      scorable at <code>k</code> when its own gold label is on the menu, so as
+      <code>k</code> grows the <em>document set</em> grows with it, and the labels added
+      later are harder and closer together. Holding the documents fixed and growing only
+      the number of wrong answers on offer separates the two.</p>
+    </div>
+
+    <figure>
+      <div class="chart">
+        <ul class="legend" id="lg-acc"></ul>
+        <svg id="ch-acc" viewBox="0 0 780 330" role="img"
+             aria-label="Accuracy against option count for five framings"></svg>
+      </div>
+      <figcaption><b>All 160 documents.</b> Every framing falls as k grows. Chance (dashed)
+      falls faster, so lift over chance is rising throughout — the fall is not the model
+      losing the plot.</figcaption>
+      <details><summary>Show as a table</summary><div class="scroll" id="tb-acc"></div></details>
+    </figure>
+
+    <figure>
+      <div class="chart">
+        <ul class="legend" id="lg-fix"></ul>
+        <svg id="ch-fix" viewBox="0 0 780 330" role="img"
+             aria-label="Accuracy on a fixed document set as distractors are added"></svg>
+      </div>
+      <figcaption><b>The same 20 documents at every rung</b>, with only the number of wrong
+      answers growing. <code>choice</code> with written label descriptions is flat to
+      slightly up across 14 added distractors — option count costs it nothing. The other
+      three framings do decay, so the descriptions are what buys the robustness.</figcaption>
+      <details><summary>Show as a table</summary><div class="scroll" id="tb-fix"></div></details>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Where it actually breaks</h2>
+    <div class="prose">
+      <p>The control that needs no baseline: ask the same question with the options
+      rearranged. A model reading the document names the same category however the list is
+      ordered. One keyed on position does not.</p>
+    </div>
+
+    <figure>
+      <div class="chart">
+        <ul class="legend" id="lg-ord"></ul>
+        <svg id="ch-ord" viewBox="0 0 780 300" role="img"
+             aria-label="Order consistency against option count"></svg>
+      </div>
+      <figcaption>At k=16 a flat <code>choice</code> question gives a different answer for
+      <b>more than a third of documents</b> purely from reshuffling the menu — the accuracy
+      number alone never shows this. Asking one yes/no per label holds at
+      <b>1.000 at every rung</b>: there is no list, so there is no front of a list to
+      prefer. This is part one's finding, reproduced on a different task.</figcaption>
+      <details><summary>Show as a table</summary><div class="scroll" id="tb-ord"></div></details>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Difficulty beats option count</h2>
+    <div class="prose">
+      <p>Four tiers, forty documents each. <b>explicit</b> names its own category in plain
+      words. <b>realistic</b> buries the same signal in greetings, a quoted thread and a
+      signature. <b>implicit</b> removes the giveaway vocabulary entirely.
+      <b>adversarial</b> carries the surface vocabulary of a <em>different</em> category —
+      the message headed <code>Re: Invoice #7781</code> that is really about a download
+      failing.</p>
+    </div>
+    <figure>
+      <div class="chart">
+        <div class="scroll"><table class="heat" id="heat"></table></div>
+      </div>
+      <figcaption>Accuracy for <code>choice</code>. Reading down any column costs far more
+      than reading across any row: at k=16, <b>explicit 0.75 against adversarial 0.30</b>.
+      Writing style moves the number more than the length of the menu does.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>It gets more confident as it gets more wrong</h2>
+    <div class="prose">
+      <p>This one has a mechanism, not just a correlation. Laya derives confidence as
+      normalised Shannon entropy, <code>1 − H(p)/log(k)</code>. The <code>log(k)</code>
+      denominator grows with the menu, so the same amount of real uncertainty maps to a
+      higher reported confidence every time you add a category.</p>
+    </div>
+    <figure>
+      <div class="chart">
+        <ul class="legend" id="lg-cal"></ul>
+        <svg id="ch-cal" viewBox="0 0 780 300" role="img"
+             aria-label="Accuracy against reported confidence for the choice framing"></svg>
+      </div>
+      <figcaption>Between k=8 and k=12, accuracy falls from 0.600 to 0.517 while reported
+      confidence jumps from 0.463 to <b>0.968</b>. Anything downstream that gates on
+      confidence would trust this model most exactly where it is least reliable. Asking one
+      yes/no per label avoids the trap — its confidence <em>falls</em> with k, because each
+      question is binary and <code>log(k)</code> never enters.</figcaption>
+      <details><summary>Show as a table</summary><div class="scroll" id="tb-cal"></div></details>
+    </figure>
+  </section>
+
+  <section>
+    <h2>What is actually tunable</h2>
+    <div class="prose">
+      <p>The first question anyone asks is what the knobs are. For this model the familiar
+      ones do not exist: <code>predict(state, questions)</code> takes no sampling
+      parameters, and one forward pass is deterministic — the same prompt returned a
+      bit-identical distribution 20 times out of 20. There is nothing being sampled, so
+      there is nothing to sample differently.</p>
+    </div>
+    <div class="tunables" id="tunables"></div>
+  </section>
+
+  <section>
+    <h2>Naming more than one category</h2>
+    <div class="prose">
+      <p>34 documents carry a second gold label. Only the per-label framing can name more
+      than one, because its scores are independent — a choice question spreads one unit of
+      probability across the menu and can only ever have a single winner. That ceiling is
+      measured here rather than asserted.</p>
+    </div>
+    <figure>
+      <div class="chart"><div class="scroll" id="tb-ml"></div></div>
+      <figcaption>Thresholding at 0.5 beats the argmax ceiling on micro-F1
+      (<b>0.585 against 0.548</b>) and on recall (0.603 against 0.500), at some cost in
+      precision. The gain is real but modest: most documents genuinely have one label, so
+      exact-set match is actually best for argmax alone.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>What we would tell someone using this</h2>
+    <ul class="chips" id="chips"></ul>
+    <div class="prose" style="margin-top:1.4rem">
+      <p>The confusions are semantically sensible rather than random — <code>training</code>
+      read as <code>product_feedback</code>, <code>procurement</code> as <code>sales</code>,
+      <code>partnerships</code> as <code>sales</code>. Those are genuine near neighbours,
+      which suggests the taxonomy is asking something fair and the model is losing on
+      boundaries rather than on comprehension.</p>
+    </div>
+    <details open><summary>Most frequent confusions, choice at k=16</summary>
+      <div class="scroll" id="tb-cm"></div></details>
+  </section>
+
+  <p class="foot" id="foot"></p>
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+const D = {"rungs": [2, 3, 4, 6, 8, 12, 16], "service": {"checkpoint": "convaiinnovations/laya", "subfolder": null, "backend": "mlx", "device": "mlx", "runtime": "laya-mlx 0.1.0", "dtype": "float16"}, "generated": "2026-09-22", "corpus": {"n": 160, "multi_label": 34, "per_label": {"account_admin": 10, "billing": 10, "compliance": 10, "data_privacy": 10, "facilities": 10, "hr": 10, "legal": 10, "logistics": 10, "partnerships": 10, "press": 10, "procurement": 10, "product_feedback": 10, "sales": 10, "security": 10, "technical": 10, "training": 10}, "per_tier": {"explicit": 40, "realistic": 40, "implicit": 40, "adversarial": 40}, "per_type": {"email": 138, "chat": 9, "ticket": 5, "incident_report": 2, "form": 2, "notice": 1, "contract_clause": 1, "disclosure": 1, "application": 1}, "body_chars": {"min": 84, "mean": 384, "max": 950}}, "cost": {"predict_calls": 6588, "wall_seconds": 2007.7, "calls_per_second": 3.3}, "acc": {"choice": [0.85, 0.7667, 0.675, 0.6833, 0.6, 0.5167, 0.5437], "choice_bare": [0.85, 0.7, 0.675, 0.65, 0.5375, 0.5833, 0.55], "noul_per_label": [0.9, 0.8, 0.775, 0.7, 0.5875, 0.5667, 0.5125], "noul_described": [0.8, 0.8, 0.725, 0.55, 0.4375, 0.3833, 0.35], "two_stage": [0.75, 0.6667, 0.6, 0.4333, 0.4375, 0.35, 0.3063]}, "macro": {"choice": 0.5454, "choice_bare": 0.5576, "noul_per_label": 0.5098, "noul_described": 0.3185, "two_stage": 0.2692}, "passes": {"choice": 1.0, "choice_bare": 1.0, "noul_per_label": 1.0, "noul_described": 1.0, "two_stage": 2.0}, "p50": {"choice": 54.0, "choice_bare": 37.1, "noul_per_label": 289.8, "noul_described": 340.2, "two_stage": 84.1}, "fixed": {"choice": [0.85, 0.85, 0.75, 0.8, 0.9, 0.85, 0.9], "choice_bare": [0.85, 0.75, 0.75, 0.7, 0.65, 0.65, 0.65], "noul_per_label": [0.9, 0.8, 0.8, 0.8, 0.8, 0.65, 0.65], "noul_described": [0.8, 0.8, 0.8, 0.75, 0.65, 0.65, 0.65]}, "fixed_docs": 20, "fixed_labels": ["billing", "technical"], "order": {"choice": [1.0, 0.8333, 0.95, 0.75, 0.7625, 0.7417, 0.6375], "noul_per_label": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]}, "tiers": {"choice": {"explicit": [1.0, 0.875, 1.0, 0.875, 0.75, 0.6667, 0.75], "realistic": [1.0, 1.0, 0.9, 0.8667, 0.8, 0.6333, 0.65], "implicit": [0.75, 0.7143, 0.6, 0.5714, 0.5, 0.4667, 0.475], "adversarial": [0.6, 0.5, 0.2, 0.4, 0.35, 0.3, 0.3]}, "choice_bare": {"explicit": [1.0, 0.75, 0.8, 0.75, 0.75, 0.7667, 0.7], "realistic": [1.0, 1.0, 0.9, 0.8, 0.7, 0.7, 0.65], "implicit": [0.75, 0.5714, 0.6, 0.6429, 0.4, 0.4333, 0.525], "adversarial": [0.6, 0.5, 0.4, 0.4, 0.3, 0.4333, 0.325]}, "noul_per_label": {"explicit": [1.0, 0.875, 0.9, 0.875, 0.85, 0.7333, 0.75], "realistic": [1.0, 0.8571, 0.7, 0.6667, 0.6, 0.6333, 0.55], "implicit": [0.75, 0.8571, 0.8, 0.7143, 0.55, 0.5, 0.5], "adversarial": [0.8, 0.625, 0.7, 0.5333, 0.35, 0.4, 0.25]}, "noul_described": {"explicit": [1.0, 1.0, 0.9, 0.5625, 0.45, 0.4333, 0.425], "realistic": [1.0, 1.0, 0.8, 0.8, 0.6, 0.5667, 0.425], "implicit": [0.5, 0.5714, 0.6, 0.4286, 0.4, 0.2667, 0.3], "adversarial": [0.6, 0.625, 0.6, 0.4, 0.3, 0.2667, 0.25]}, "two_stage": {"explicit": [1.0, 1.0, 0.8, 0.5, 0.55, 0.4, 0.375], "realistic": [0.8, 0.7143, 0.7, 0.6, 0.55, 0.4667, 0.425], "implicit": [0.75, 0.5714, 0.5, 0.2857, 0.3, 0.3, 0.25], "adversarial": [0.4, 0.375, 0.4, 0.3333, 0.35, 0.2333, 0.175]}}, "conf": {"choice": [0.493, 0.3892, 0.3269, 0.4943, 0.4634, 0.968, 0.9662], "choice_bare": [0.4687, 0.399, 0.4272, 0.673, 0.6121, 0.9771, 0.9752], "noul_per_label": [0.5127, 0.4842, 0.4228, 0.403, 0.3555, 0.3251, 0.3133], "noul_described": [0.2326, 0.1943, 0.1721, 0.1266, 0.1052, 0.0977, 0.088], "two_stage": [null, null, null, null, null, null, null]}, "ece": {"choice": [0.4441, 0.3775, 0.3732, 0.3159, 0.2462, 0.4513, 0.4225], "choice_bare": [0.3813, 0.374, 0.2913, 0.233, 0.2097, 0.4014, 0.4296], "noul_per_label": [0.3873, 0.3322, 0.3522, 0.312, 0.2378, 0.245, 0.2013], "noul_described": [0.5674, 0.6057, 0.5529, 0.4234, 0.3323, 0.2856, 0.262], "two_stage": [null, null, null, null, null, null, null]}, "temp": {"2": {"n_fit": 10, "n_held_out": 10, "temperature": 2.2, "ece_top_prob_before": 0.0836, "ece_top_prob_after": 0.1859, "accuracy_unchanged": true}, "3": {"n_fit": 15, "n_held_out": 15, "temperature": 1.7, "ece_top_prob_before": 0.237, "ece_top_prob_after": 0.3431, "accuracy_unchanged": true}, "4": {"n_fit": 20, "n_held_out": 20, "temperature": 2.1, "ece_top_prob_before": 0.2683, "ece_top_prob_after": 0.414, "accuracy_unchanged": true}, "6": {"n_fit": 30, "n_held_out": 30, "temperature": 0.5, "ece_top_prob_before": 0.1805, "ece_top_prob_after": 0.2164, "accuracy_unchanged": true}, "8": {"n_fit": 40, "n_held_out": 40, "temperature": 0.9, "ece_top_prob_before": 0.2544, "ece_top_prob_after": 0.2523, "accuracy_unchanged": true}, "12": {"n_fit": 60, "n_held_out": 60, "temperature": 5.0, "ece_top_prob_before": 0.4201, "ece_top_prob_after": 0.2922, "accuracy_unchanged": true}, "16": {"n_fit": 80, "n_held_out": 80, "temperature": 5.0, "ece_top_prob_before": 0.399, "ece_top_prob_after": 0.2921, "accuracy_unchanged": true}}, "multilabel": {"0.3": {"n": 160, "micro_precision": 0.4672, "micro_recall": 0.6598, "micro_f1": 0.547, "macro_f1": 0.5647, "exact_set_match": 0.3375, "at_least_one_correct": 0.7312, "mean_predicted_labels": 1.712, "mean_gold_labels": 1.212, "per_label": {"account_admin": {"support": 13, "precision": 0.5556, "recall": 0.3846, "f1": 0.4545}, "billing": {"support": 14, "precision": 0.6316, "recall": 0.8571, "f1": 0.7273}, "compliance": {"support": 12, "precision": 0.6667, "recall": 0.6667, "f1": 0.6667}, "data_privacy": {"support": 11, "precision": 0.75, "recall": 0.5455, "f1": 0.6316}, "facilities": {"support": 11, "precision": 0.7692, "recall": 0.9091, "f1": 0.8333}, "hr": {"support": 11, "precision": 0.4, "recall": 0.5455, "f1": 0.4615}, "legal": {"support": 16, "precision": 0.3784, "recall": 0.875, "f1": 0.5283}, "logistics": {"support": 10, "precision": 1.0, "recall": 0.8, "f1": 0.8889}, "partnerships": {"support": 10, "precision": 0.25, "recall": 0.6, "f1": 0.3529}, "press": {"support": 10, "precision": 0.6923, "recall": 0.9, "f1": 0.7826}, "procurement": {"support": 11, "precision": 0.3333, "recall": 0.4545, "f1": 0.3846}, "product_feedback": {"support": 12, "precision": 0.2667, "recall": 0.3333, "f1": 0.2963}, "sales": {"support": 14, "precision": 0.44, "recall": 0.7857, "f1": 0.5641}, "security": {"support": 16, "precision": 0.6667, "recall": 0.375, "f1": 0.48}, "technical": {"support": 13, "precision": 0.3077, "recall": 0.9231, "f1": 0.4615}, "training": {"support": 10, "precision": 0.4615, "recall": 0.6, "f1": 0.5217}}}, "0.5": {"n": 160, "micro_precision": 0.568, "micro_recall": 0.6031, "micro_f1": 0.585, "macro_f1": 0.5889, "exact_set_match": 0.4375, "at_least_one_correct": 0.7, "mean_predicted_labels": 1.288, "mean_gold_labels": 1.212, "per_label": {"account_admin": {"support": 13, "precision": 0.8333, "recall": 0.3846, "f1": 0.5263}, "billing": {"support": 14, "precision": 0.6471, "recall": 0.7857, "f1": 0.7097}, "compliance": {"support": 12, "precision": 0.7, "recall": 0.5833, "f1": 0.6364}, "data_privacy": {"support": 11, "precision": 0.7143, "recall": 0.4545, "f1": 0.5556}, "facilities": {"support": 11, "precision": 0.8333, "recall": 0.9091, "f1": 0.8696}, "hr": {"support": 11, "precision": 0.5455, "recall": 0.5455, "f1": 0.5455}, "legal": {"support": 16, "precision": 0.5, "recall": 0.75, "f1": 0.6}, "logistics": {"support": 10, "precision": 1.0, "recall": 0.7, "f1": 0.8235}, "partnerships": {"support": 10, "precision": 0.3, "recall": 0.6, "f1": 0.4}, "press": {"support": 10, "precision": 0.8, "recall": 0.8, "f1": 0.8}, "procurement": {"support": 11, "precision": 0.5, "recall": 0.4545, "f1": 0.4762}, "product_feedback": {"support": 12, "precision": 0.2727, "recall": 0.25, "f1": 0.2609}, "sales": {"support": 14, "precision": 0.4706, "recall": 0.5714, "f1": 0.5161}, "security": {"support": 16, "precision": 0.75, "recall": 0.375, "f1": 0.5}, "technical": {"support": 13, "precision": 0.48, "recall": 0.9231, "f1": 0.6316}, "training": {"support": 10, "precision": 0.5455, "recall": 0.6, "f1": 0.5714}}}, "0.7": {"n": 160, "micro_precision": 0.5964, "micro_recall": 0.5103, "micro_f1": 0.55, "macro_f1": 0.5418, "exact_set_match": 0.4625, "at_least_one_correct": 0.6188, "mean_predicted_labels": 1.038, "mean_gold_labels": 1.212, "per_label": {"account_admin": {"support": 13, "precision": 0.75, "recall": 0.2308, "f1": 0.3529}, "billing": {"support": 14, "precision": 0.6667, "recall": 0.7143, "f1": 0.6897}, "compliance": {"support": 12, "precision": 0.7143, "recall": 0.4167, "f1": 0.5263}, "data_privacy": {"support": 11, "precision": 0.8333, "recall": 0.4545, "f1": 0.5882}, "facilities": {"support": 11, "precision": 0.8, "recall": 0.7273, "f1": 0.7619}, "hr": {"support": 11, "precision": 0.5455, "recall": 0.5455, "f1": 0.5455}, "legal": {"support": 16, "precision": 0.6, "recall": 0.75, "f1": 0.6667}, "logistics": {"support": 10, "precision": 1.0, "recall": 0.6, "f1": 0.75}, "partnerships": {"support": 10, "precision": 0.3333, "recall": 0.5, "f1": 0.4}, "press": {"support": 10, "precision": 0.8889, "recall": 0.8, "f1": 0.8421}, "procurement": {"support": 11, "precision": 0.4, "recall": 0.1818, "f1": 0.25}, "product_feedback": {"support": 12, "precision": 0.375, "recall": 0.25, "f1": 0.3}, "sales": {"support": 14, "precision": 0.4615, "recall": 0.4286, "f1": 0.4444}, "security": {"support": 16, "precision": 0.6667, "recall": 0.25, "f1": 0.3636}, "technical": {"support": 13, "precision": 0.4762, "recall": 0.7692, "f1": 0.5882}, "training": {"support": 10, "precision": 0.6, "recall": 0.6, "f1": 0.6}}}, "argmax_only": {"n": 160, "micro_precision": 0.6062, "micro_recall": 0.5, "micro_f1": 0.548, "macro_f1": 0.5413, "exact_set_match": 0.475, "at_least_one_correct": 0.6062, "mean_predicted_labels": 1.0, "mean_gold_labels": 1.212, "per_label": {"account_admin": {"support": 13, "precision": 0.75, "recall": 0.2308, "f1": 0.3529}, "billing": {"support": 14, "precision": 0.7143, "recall": 0.7143, "f1": 0.7143}, "compliance": {"support": 12, "precision": 0.7143, "recall": 0.4167, "f1": 0.5263}, "data_privacy": {"support": 11, "precision": 0.8333, "recall": 0.4545, "f1": 0.5882}, "facilities": {"support": 11, "precision": 0.8, "recall": 0.7273, "f1": 0.7619}, "hr": {"support": 11, "precision": 0.5455, "recall": 0.5455, "f1": 0.5455}, "legal": {"support": 16, "precision": 0.6667, "recall": 0.75, "f1": 0.7059}, "logistics": {"support": 10, "precision": 1.0, "recall": 0.6, "f1": 0.75}, "partnerships": {"support": 10, "precision": 0.3333, "recall": 0.5, "f1": 0.4}, "press": {"support": 10, "precision": 0.8889, "recall": 0.8, "f1": 0.8421}, "procurement": {"support": 11, "precision": 0.4, "recall": 0.1818, "f1": 0.25}, "product_feedback": {"support": 12, "precision": 0.375, "recall": 0.25, "f1": 0.3}, "sales": {"support": 14, "precision": 0.4615, "recall": 0.4286, "f1": 0.4444}, "security": {"support": 16, "precision": 0.6667, "recall": 0.25, "f1": 0.3636}, "technical": {"support": 13, "precision": 0.4444, "recall": 0.6154, "f1": 0.5161}, "training": {"support": 10, "precision": 0.6, "recall": 0.6, "f1": 0.6}}}}, "fields": {"subject+body": {"n": 160, "accuracy": 0.5437, "macro_f1": 0.5454}, "subject_only": {"n": 160, "accuracy": 0.4313, "macro_f1": 0.4231}, "body_only": {"n": 160, "accuracy": 0.4688, "macro_f1": 0.4483}}, "determinism": {"n": 20, "identical": 20}, "confusion": [{"gold": "training", "pred": "product_feedback", "n": 4}, {"gold": "sales", "pred": "legal", "n": 3}, {"gold": "security", "pred": "account_admin", "n": 3}, {"gold": "product_feedback", "pred": "technical", "n": 3}, {"gold": "logistics", "pred": "technical", "n": 3}, {"gold": "partnerships", "pred": "product_feedback", "n": 3}, {"gold": "partnerships", "pred": "sales", "n": 3}, {"gold": "procurement", "pred": "sales", "n": 3}]};
+const $ = s => document.querySelector(s);
+const tip = $('#tip');
+const S = ['--s1','--s2','--s3','--s4','--s5'].map(v=>`var(${v})`);
+const NAME = {choice:'choice', choice_bare:'choice_bare', noul_per_label:'noul_per_label',
+              noul_described:'noul_described', two_stage:'two_stage'};
+const fmt = (v,n=3) => v==null ? '—' : v.toFixed(n);
+
+/* ---------- header bits ---------- */
+$('#byline').textContent =
+  `${D.corpus.n} documents · ${D.rungs.length} menu sizes · 5 framings · `
+  + `${D.cost.predict_calls.toLocaleString()} forward passes · `
+  + `${D.service.backend}/${D.service.dtype} · ${D.generated}`;
+
+$('#foot').innerHTML =
+  `Generated from <code>base-mlx-mlx-n160-o3__classify.json</code>. The corpus, the sweep `
+  + `and the renderer live in <code>classify/</code>; <code>make all</code> reproduces every `
+  + `number here, and runs the tests first so a red suite never produces a report. `
+  + `${D.cost.predict_calls.toLocaleString()} calls in ${Math.round(D.cost.wall_seconds)}s.`;
+
+const tiles = [
+  {k:'Order consistency, k=16', v:fmt(D.order.choice[6],2), cls:'dn',
+   n:'a flat choice question changes its answer on a reshuffled menu'},
+  {k:'Same, one question per label', v:fmt(D.order.noul_per_label[6],2), cls:'up',
+   n:'identical answer under every ordering, at every menu size'},
+  {k:'Confidence at k=12', v:fmt(D.conf.choice[5],2), cls:'dn',
+   n:`while accuracy sat at ${fmt(D.acc.choice[5],2)} — confident and wrong`},
+  {k:'Fixed documents, +14 distractors', v:fmt(D.fixed.choice[6],2), cls:'up',
+   n:`up from ${fmt(D.fixed.choice[0],2)} — menu length alone costs nothing`},
+];
+$('#tiles').innerHTML = tiles.map(t =>
+  `<div class="tile"><span class="k">${t.k}</span>
+   <div class="v ${t.cls} mono">${t.v}</div><div class="n">${t.n}</div></div>`).join('');
+
+/* ---------- generic line chart ---------- */
+function lineChart(sel, legendSel, series, opts){
+  const svg = $(sel), W=780, H=opts.h||330, m={t:18,r:112,b:44,l:52};
+  const xs = D.rungs, n = xs.length;
+  const X = i => m.l + i*(W-m.l-m.r)/(n-1);
+  const y0 = opts.y0 ?? 0, y1 = opts.y1 ?? 1;
+  const Y = v => m.t + (1-(v-y0)/(y1-y0))*(H-m.t-m.b);
+  let g = '';
+
+  for(let t=0; t<=5; t++){
+    const v = y0+(y1-y0)*t/5, y=Y(v);
+    g += `<line x1="${m.l}" y1="${y}" x2="${W-m.r}" y2="${y}" stroke="var(--grid)" stroke-width="1"/>`;
+    g += `<text x="${m.l-10}" y="${y+4}" text-anchor="end" font-size="11" fill="var(--muted)"
+          font-family="IBM Plex Mono,monospace">${v.toFixed(1)}</text>`;
+  }
+  xs.forEach((k,i)=>{
+    g += `<text x="${X(i)}" y="${H-m.b+21}" text-anchor="middle" font-size="11.5"
+          fill="var(--muted)" font-family="IBM Plex Mono,monospace">${k}</text>`;
+  });
+  g += `<text x="${(m.l+W-m.r)/2}" y="${H-6}" text-anchor="middle" font-size="11"
+        fill="var(--faint)" font-family="IBM Plex Mono,monospace">options on the menu (k)</text>`;
+  g += `<line x1="${m.l}" y1="${Y(y0)}" x2="${W-m.r}" y2="${Y(y0)}" stroke="var(--rule)" stroke-width="1"/>`;
+
+  if(opts.chance){
+    const pts = xs.map((k,i)=>`${X(i)},${Y(1/k)}`).join(' ');
+    g += `<polyline points="${pts}" fill="none" stroke="var(--faint)" stroke-width="1.5"
+          stroke-dasharray="4 4"/>`;
+    g += `<text x="${W-m.r+8}" y="${Y(1/xs[n-1])+4}" font-size="11" fill="var(--faint)"
+          font-family="IBM Plex Mono,monospace">chance</text>`;
+  }
+
+  const ends = [];
+  series.forEach((s,si)=>{
+    const col = s.color || S[si];
+    const pts = s.v.map((v,i)=> v==null?null:`${X(i)},${Y(v)}`).filter(Boolean).join(' ');
+    g += `<polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2"
+          stroke-linejoin="round" stroke-linecap="round"/>`;
+    s.v.forEach((v,i)=>{ if(v==null) return;
+      g += `<circle cx="${X(i)}" cy="${Y(v)}" r="4.5" fill="${col}" stroke="var(--panel)"
+            stroke-width="2"><title>${s.label} · k=${xs[i]} · ${fmt(v)}</title></circle>`;
+    });
+    const last = s.v.map((v,i)=>[v,i]).filter(([v])=>v!=null).pop();
+    if(last) ends.push({x:X(last[1]), y:Y(last[0]), at:Y(last[0]),
+                        text:(s.short||s.label), col});
+  });
+
+  // Direct labels are the relief the light palette needs, so they have to stay
+  // legible: push apart any that would overlap, and elbow a leader line back to
+  // the point the label was moved off.
+  const GAP = 13.5;
+  ends.sort((a,b)=>a.y-b.y);
+  for(let i=1;i<ends.length;i++)
+    if(ends[i].y - ends[i-1].y < GAP) ends[i].y = ends[i-1].y + GAP;
+  const over = ends.length ? ends[ends.length-1].y - (H-m.b-2) : 0;
+  if(over > 0) ends.forEach(e => e.y -= over);
+  ends.forEach(e=>{
+    if(Math.abs(e.y - e.at) > 1.5)
+      g += `<path d="M${e.x+5},${e.at} L${e.x+9},${e.y-3.5}" fill="none" stroke="${e.col}"
+            stroke-width="1" opacity=".55"/>`;
+    g += `<text x="${e.x+12}" y="${e.y+4}" font-size="11.5" fill="${e.col}"
+      font-family="IBM Plex Mono,monospace" font-weight="500">${e.text}</text>`;
+  });
+
+  // hover band per rung
+  xs.forEach((k,i)=>{
+    const w=(W-m.l-m.r)/(n-1);
+    g += `<rect x="${X(i)-w/2}" y="${m.t}" width="${w}" height="${H-m.t-m.b}" fill="transparent"
+          data-i="${i}" class="hb"/>`;
+  });
+  svg.innerHTML = g;
+
+  svg.querySelectorAll('.hb').forEach(r=>{
+    r.addEventListener('pointerenter', e=>{
+      const i=+r.dataset.i;
+      tip.innerHTML = `k=${xs[i]}<br>` + series.map((s,si)=>
+        `<span style="color:${s.color||S[si]}">■</span> ${s.short||s.label} ${fmt(s.v[i])}`).join('<br>');
+      tip.classList.add('on');
+    });
+    r.addEventListener('pointermove', e=>{
+      tip.style.left = Math.min(e.clientX+14, innerWidth-tip.offsetWidth-10)+'px';
+      tip.style.top  = Math.max(e.clientY-10, 8)+'px';
+    });
+    r.addEventListener('pointerleave', ()=> tip.classList.remove('on'));
+  });
+
+  if(legendSel) $(legendSel).innerHTML = series.map((s,si)=>
+    `<li><span class="sw" style="background:${s.color||S[si]}"></span>${s.label}</li>`).join('')
+    + (opts.chance ? `<li><span class="sw" style="background:var(--faint)"></span>chance (1/k)</li>`:'');
+}
+
+function tableOf(el, head, rows){
+  $(el).innerHTML = `<table><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead>`
+    + `<tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+}
+
+/* ---------- charts ---------- */
+const FR = ['choice','choice_bare','noul_per_label','noul_described','two_stage'];
+lineChart('#ch-acc','#lg-acc', FR.map(f=>({label:NAME[f], short:f.replace('noul_','n_'), v:D.acc[f]})),
+          {chance:true});
+tableOf('#tb-acc', ['framing',...D.rungs.map(k=>'k='+k)],
+        FR.map(f=>[NAME[f], ...D.acc[f].map(v=>fmt(v))]).concat([['chance',...D.rungs.map(k=>fmt(1/k))]]));
+
+const FF = Object.keys(D.fixed);
+lineChart('#ch-fix','#lg-fix', FF.map(f=>({label:NAME[f], short:f.replace('noul_','n_'), v:D.fixed[f]})),
+          {y0:0.5, y1:1});
+tableOf('#tb-fix', ['framing',...D.rungs.map(k=>'k='+k)],
+        FF.map(f=>[NAME[f], ...D.fixed[f].map(v=>fmt(v))])
+          .concat([['distractors added', ...D.rungs.map(k=>k-D.fixed_labels.length)]]));
+
+lineChart('#ch-ord','#lg-ord',
+  [{label:'choice', short:'choice', v:D.order.choice},
+   {label:'noul_per_label', short:'n_per_label', v:D.order.noul_per_label, color:'var(--s3)'}],
+  {y0:0.5, y1:1, h:300});
+tableOf('#tb-ord', ['framing',...D.rungs.map(k=>'k='+k)],
+        Object.keys(D.order).map(f=>[NAME[f], ...D.order[f].map(v=>fmt(v))]));
+
+lineChart('#ch-cal','#lg-cal',
+  [{label:'accuracy', short:'accuracy', v:D.acc.choice},
+   {label:'reported confidence', short:'confidence', v:D.conf.choice, color:'var(--s2)'},
+   {label:'confidence, one question per label', short:'conf (per-label)',
+    v:D.conf.noul_per_label, color:'var(--s3)'}],
+  {h:300});
+tableOf('#tb-cal', ['k','accuracy','confidence','ECE'],
+        D.rungs.map((k,i)=>[k, fmt(D.acc.choice[i]), fmt(D.conf.choice[i]), fmt(D.ece.choice[i])]));
+
+/* ---------- heatmap ---------- */
+(function(){
+  const tiers=['explicit','realistic','implicit','adversarial'], t=D.tiers.choice;
+  const step = v => v==null?0:Math.min(5,Math.max(0,Math.floor(v*6)));
+  let h = `<thead><tr><th>tier</th>${D.rungs.map(k=>`<th>k=${k}</th>`).join('')}</tr></thead><tbody>`;
+  tiers.forEach(name=>{
+    h += `<tr><th>${name}</th>` + t[name].map(v=>{
+      const s=step(v);
+      return `<td style="background:var(--heat-${s});color:var(--heat-ink-${s>=3?'hi':'lo'})"
+              title="${name} · ${fmt(v)}">${v==null?'—':v.toFixed(2)}</td>`;
+    }).join('') + `</tr>`;
+  });
+  $('#heat').innerHTML = h + `</tbody>`;
+})();
+
+/* ---------- multi-label ---------- */
+(function(){
+  const m=D.multilabel, keys=['0.3','0.5','0.7','argmax_only'];
+  const label={'0.3':'threshold 0.3','0.5':'threshold 0.5','0.7':'threshold 0.7',
+               argmax_only:'argmax only (the ceiling)'};
+  tableOf('#tb-ml', ['rule','micro P','micro R','micro F1','macro F1','exact set','≥1 right','labels/doc'],
+    keys.map(k=>[label[k], fmt(m[k].micro_precision), fmt(m[k].micro_recall), fmt(m[k].micro_f1),
+                 fmt(m[k].macro_f1), fmt(m[k].exact_set_match), fmt(m[k].at_least_one_correct),
+                 m[k].mean_predicted_labels.toFixed(2)]));
+})();
+
+/* ---------- tunables ---------- */
+const TUN = [
+ ['temperature / top-p / top-k','does not exist','n',
+  'predict() takes no sampling parameters. One deterministic forward pass — 20/20 identical on a repeat call.'],
+ ['ask one question per label','biggest win','y',
+  `Order consistency 1.000 at every k against ${fmt(D.order.choice[6],2)} for a flat menu, and confidence that falls with k instead of rising.`],
+ ['write label descriptions','buys robustness','y',
+  `Barely moves overall accuracy, but on a fixed document set choice holds ${fmt(D.fixed.choice[6],2)} across 14 distractors where bare labels decay to ${fmt(D.fixed.choice_bare[6],2)}.`],
+ ['noul true/false criteria','actively hurts','n',
+  `Undocumented but supported. Supplying an explicit reading dropped accuracy from ${fmt(D.acc.noul_per_label[6],2)} to ${fmt(D.acc.noul_described[6],2)} and made it over-predict badly.`],
+ ['two-stage decomposition','actively hurts','n',
+  `Worst framing tested at ${fmt(D.acc.two_stage[6],2)}. Errors compound: a wrong group at stage one cannot be recovered at stage two.`],
+ ['post-hoc temperature scaling','helps only at large k','~',
+  `Argmax-invariant, so it fixes confidence without touching a prediction. Held-out ECE ${fmt(D.temp['16'].ece_top_prob_before,2)} → ${fmt(D.temp['16'].ece_top_prob_after,2)} at k=16, but it made calibration worse at every k below 8.`],
+ ['what you put in the state','both fields earn their place','y',
+  `Subject and body together ${fmt(D.fields['subject+body'].accuracy,3)}, body alone ${fmt(D.fields.body_only.accuracy,3)}, subject alone ${fmt(D.fields.subject_only.accuracy,3)}.`],
+];
+$('#tunables').innerHTML = TUN.map(([n,v,s,w])=>{
+  const col = s==='y'?'var(--good)': s==='n'?'var(--bad)':'var(--s4)';
+  return `<div class="tun"><span class="name">${n}</span>
+    <span class="verdict" style="color:${col}">${s==='y'?'▲':s==='n'?'▼':'●'} ${v}</span>
+    <p class="why">${w}</p></div>`;
+}).join('');
+
+/* ---------- chips + confusion ---------- */
+$('#chips').innerHTML = [
+ ['y','Ask one yes/no per label, not one menu'],
+ ['y','Keep the menu under about eight real categories'],
+ ['y','Write a description for every label'],
+ ['n','Do not gate anything on its confidence at large k'],
+ ['n','Do not decompose into a group-then-label cascade'],
+].map(([s,t])=>`<li class="chip ${s}"><span class="dot"></span>${t}</li>`).join('');
+
+tableOf('#tb-cm', ['gold','read as','n'], D.confusion.map(c=>[c.gold, c.pred, c.n]));
+</script>
