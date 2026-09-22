@@ -30,7 +30,9 @@ rescue it, and what does the failure look like on the way down?
 
 **A nested taxonomy.** Sixteen business categories in a fixed order, where the
 first *k* are the taxonomy at *k*. Every rung is a prefix of the next, so the
-curve over *k* measures option count and not which labels happened to be drawn.
+curve over *k* is not confounded by *which* labels happened to be drawn. It is
+still confounded by which *documents* are scorable at each rung — see the
+fixed-subset control below, which is what actually separates the two.
 
 ```
 k=2   billing technical
@@ -62,7 +64,7 @@ majority-class baseline are both exactly 1/k, so one number covers both.
 
 Thirty-four documents carry a **second** gold label, for the multi-label half.
 
-**Four framings**, scored identically so the comparison is like for like:
+**Five framings**, scored identically so the comparison is like for like:
 
 | framing | what it asks |
 |---|---|
@@ -80,8 +82,12 @@ asks one 16-option question.
 
 - **Option order.** The same question with the options rearranged. A model
   reading the document answers the same way; one keyed on position does not.
-  This is the control that needs no baseline, and it is what caught the lane
-  question in part one.
+  This is the control that needs no baseline, it is what caught the lane
+  question in part one, and it turned out to be the one that matters most here.
+- **A fixed document subset.** The same twenty documents at every rung, with
+  only the number of wrong answers growing. Without this the curve over *k*
+  cannot tell a longer menu apart from a harder document set, and on this
+  corpus it was mostly the latter.
 - **Position bias.** How far the most-favoured option slot ran above its 1/k share.
 - **Determinism.** The same prompt twice. Every comparison assumes it.
 - **Baselines.** Chance and majority, on every row.
@@ -89,7 +95,17 @@ asks one 16-option question.
 ## Results
 
 **[`results/report.md`](results/report.md)** — generated, not written by hand.
-Regenerate it with `make report` from any result file.
+Regenerate it with `make report` from any result file. There is a rendered
+version in [`assets/report.html`](assets/report.html).
+
+The short version: the option-count hypothesis above **did not replicate**.
+Accuracy does fall as the menu grows, but hold the documents fixed and grow
+only the distractors and a described `choice` question is flat to slightly up
+across fourteen of them. What actually breaks is presentation — at k=16 a flat
+menu gives a different answer for a third of documents when it is reshuffled,
+which no accuracy number reveals — and the model becomes *more* confident as it
+becomes less accurate, because its confidence is `1 - H(p)/log(k)` and the
+denominator grows with the menu.
 
 The raw numbers sit beside it as JSON. Filenames encode everything that makes
 two runs incomparable — checkpoint, backend, device, corpus size, orders —
@@ -137,24 +153,39 @@ answer is that the familiar ones do not exist:
 > model and it is deterministic — the same prompt returns bit-identical scores.
 > Nothing is being sampled, so there is nothing to sample differently.
 
-What is real, roughly in order of how much it moved the numbers:
+What is real, ordered by how much it actually moved the numbers in
+[`results/report.md`](results/report.md):
 
-1. **How many options you ask for.** The dominant axis, and the reason this
-   folder exists.
-2. **Whether you decompose.** `noul_per_label` and `two_stage` are the same
-   information asked in smaller pieces.
-3. **Label descriptions.** `choice` against `choice_bare` isolates it.
+1. **Ask one question per label rather than one menu.** The largest effect
+   found, and it does not show up in accuracy at all: `noul_per_label` gives
+   the same answer under every option ordering at every k, where a flat
+   `choice` question at k=16 changes its answer on a third of documents from a
+   reshuffle alone. Its confidence also falls with k instead of rising.
+2. **How hard the documents are.** At k=16 the explicit tier scores 0.75 and
+   the adversarial tier 0.30. Writing style moves the number further than
+   anything on this list.
+3. **Label descriptions.** Barely change overall accuracy, but they are what
+   makes `choice` indifferent to menu length: on a fixed document set it holds
+   across fourteen added distractors where bare labels decay.
    `laya.render_options` renders a criterion as `label: description` and falls
    back to the bare label when the description is empty.
-4. **The true/false reading on a `noul` question.** Undocumented but supported:
-   `render_options` falls back to "yes, the statement holds" when you do not
-   supply one. `noul_described` measures whether writing a better one pays.
+4. **How many options you ask for.** Much weaker than part one implied, and the
+   reason the sweep grew a fixed-subset control: most of the apparent fall over
+   k was the document set changing underneath it, not the menu growing.
 5. **Post-hoc temperature scaling.** The one honest sense in which this model
    has a temperature — not sampling, but softening the returned distribution
-   after the fact. Fitted on half the corpus and scored on the other half. It
-   is argmax-invariant, so it fixes the confidence without touching a single
-   prediction.
-6. **What you put in the state.** Subject alone against body alone against both.
+   after the fact. Argmax-invariant, so it fixes the confidence without
+   touching a single prediction. It only helps at large k, and made
+   calibration worse at every k below 8.
+6. **What you put in the state.** Subject and body together beat either alone.
+
+Two knobs that sounded promising and were not. **The true/false reading on a
+`noul` question** is undocumented but supported — `render_options` falls back
+to "yes, the statement holds" when you omit it — and supplying one dropped
+accuracy sharply while making the model over-predict. **Two-stage
+decomposition**, a group question then a label question, was the worst framing
+tested: a wrong group at stage one cannot be recovered at stage two, so the
+errors compound.
 
 `LAYA_SUBFOLDER` also selects a different checkpoint (`typed-decisions`,
 `multilingual`), which is a genuine lever — the abandoned `three-lanes` branch
